@@ -283,19 +283,14 @@ def run_bot():
 
             bot.infinity_polling(
                 skip_pending=True,
-                timeout=30,
-                long_polling_timeout=30,
-                allowed_updates=["message"]
+                timeout=20,
+                long_polling_timeout=20
             )
 
         except Exception as e:
             print("POLLING CRASH:", repr(e))
-
-            if "409" in str(e):
-                print("⚠️ Another instance is using this token")
-
-            time.sleep(5)
-
+            time.sleep(10)
+            
 # ================= START =================
 
 if __name__ == "__main__":
