@@ -4,19 +4,16 @@ import requests
 from flask import Flask
 from threading import Thread
 import telebot
-‎
-‎# ================= BOT =================
-‎
-‎TOKEN = os.getenv("BOT_TOKEN")
-‎
-‎if not TOKEN:
-‎    raise Exception("BOT_TOKEN not found")
-‎
-‎bot = telebot.TeleBot(TOKEN, threaded=True)
-‎print("Telegram bot initialized")
-‎
-‎app = Flask(__name__)
-‎
+
+TOKEN = os.getenv("BOT_TOKEN")
+
+if not TOKEN:
+    raise Exception("BOT_TOKEN not found")
+
+bot = telebot.TeleBot(TOKEN, threaded=True)
+
+app = Flask(__name__)
+
 ‎# ================= GROUPS =================
 ‎
 ‎FREE_GROUP = "https://t.me/UltimateAvian"
