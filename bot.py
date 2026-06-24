@@ -164,14 +164,32 @@ def start(msg):
         f"/ping\n"
         f"/test"
     )
+ except Exception as e:
+    print("Signal error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error generating signal")
+except Exception as e:
+    print("Price error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error getting price")
 
 @bot.message_handler(commands=["ping"])
 def ping(msg):
     bot.reply_to(msg, "🏓 Pong! Bot is alive.")
+except Exception as e:
+    print("Signal error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error generating signal")
+except Exception as e:
+    print("Price error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error getting price")
 
 @bot.message_handler(commands=["test"])
 def test(msg):
     bot.reply_to(msg, "🔥 BOT ONLINE AND WORKING")
+except Exception as e:
+    print("Signal error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error generating signal")
+except Exception as e:
+    print("Price error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error getting price")
 
 @bot.message_handler(commands=["price"])
 def price_cmd(msg):
@@ -250,6 +268,12 @@ def scan(msg):
     except Exception as e:
         print("Scan error:", repr(e))
         bot.reply_to(msg, "⚠️ Scan failed")
+except Exception as e:
+    print("Signal error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error generating signal")
+except Exception as e:
+    print("Price error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error getting price")
 
 # ================= FALLBACK =================
 
@@ -265,6 +289,12 @@ def unknown(msg):
         "/ping\n"
         "/test"
     )
+except Exception as e:
+    print("Signal error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error generating signal")
+except Exception as e:
+    print("Price error:", repr(e))
+    bot.reply_to(msg, "⚠️ Error getting price")
 
 # ================= BOT LOOP =================
 
