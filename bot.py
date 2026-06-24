@@ -1,9 +1,9 @@
 import os
-‎import time
-‎import requests
-‎from flask import Flask
-‎from threading import Thread
-‎import telebot
+import time
+import requests
+from flask import flask
+from threading import thread
+import telebot
 ‎
 ‎# ================= BOT =================
 ‎
