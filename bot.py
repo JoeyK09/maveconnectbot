@@ -76,7 +76,7 @@ def get_price(coin):
 
             price = data.get(coin_id, {}).get("usd")
 
-            if price:
+            if price is not None:
                 price = float(price)
                 price_cache[coin] = (price, now)
                 return price
@@ -106,7 +106,7 @@ def get_price(coin):
 
 
 def safe_get_price(coin):
-    for _ in range(2):
+    for _ in range(3):
         try:
             price = get_price(coin)
 
@@ -116,7 +116,7 @@ def safe_get_price(coin):
         except Exception as e:
             print("Retry error:", e)
 
-        time.sleep(0.5)
+        time.sleep(1)
 
     return None
 
@@ -173,7 +173,7 @@ def price_cmd(msg):
         else:
             bot.reply_to(
                 msg,
-                "❌ Coin not found or price service temporarily unavailable."
+                "❌ Coin not found or price service unavailable."
             )
 
     except Exception as e:
@@ -196,7 +196,7 @@ def signal_cmd(msg):
         if price is None:
             bot.reply_to(
                 msg,
-                "❌ Coin not found or price service temporarily unavailable."
+                "❌ Coin not found or price service unavailable."
             )
             return
 
@@ -211,15 +211,25 @@ def signal_cmd(msg):
         print("Signal command error:", e)
         bot.reply_to(msg, "⚠️ Error generating signal")
 
-@bot.message_handler(func=lambda m: True)
-def unknown(msg):
+# ================= DEBUG =================
+
+@bot.message_handler(func=lambda message: True)
+def debug(message):
+    print(
+        f"MESSAGE RECEIVED | "
+        f"Chat: {message.chat.id} | "
+        f"User: {message.from_user.username} | "
+        f"Text: {message.text}"
+    )
+
     bot.reply_to(
-        msg,
+        message,
         "❓ Unknown command.\n\n"
         "Use:\n"
         "/price btc\n"
         "/signal btc\n"
-        "/ping"
+        "/ping\n"
+        "/test"
     )
 
 # ================= BOT LOOP =================
@@ -231,8 +241,8 @@ def run_bot():
 
             bot.infinity_polling(
                 skip_pending=True,
-                timeout=30,
-                long_polling_timeout=30,
+                timeout=60,
+                long_polling_timeout=60,
                 allowed_updates=["message"]
             )
 
@@ -247,6 +257,7 @@ if __name__ == "__main__":
 
     try:
         bot.delete_webhook(drop_pending_updates=True)
+        bot.remove_webhook()
         print("Webhook removed and updates cleared")
     except Exception as e:
         print("Webhook error:", e)
@@ -260,4 +271,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port
-)
+        )
