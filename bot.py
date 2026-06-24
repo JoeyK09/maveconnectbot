@@ -45,8 +45,7 @@ CACHE_TIME = 30
 
 def get_price(coin):
    return 1100000  
-    coin = coin.lower().strip()
-
+    
 def safe_get_price(coin):
     for _ in range(2):
         try:
