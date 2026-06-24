@@ -66,23 +66,21 @@ def get_price(coin):
     coin_id = COINS[coin]
 
     # CoinGecko
+    try:
+        r = requests.get(
+            "https://api.coingecko.com/api/v3/simple/price",
+            params={
+                "ids": coin_id,
+                "vs_currencies": "usd"
+            },
+            timeout=5
+        )
 
-try:
-    r = requests.get(
-        "https://api.coingecko.com/api/v3/simple/price",
-        params={
-            "ids": coin_id,
-            "vs_currencies": "usd"
-        },
-        timeout=5
-    )
+        print("CoinGecko Status:", r.status_code)
+        print("CoinGecko Response:", r.text)
 
-    print("CoinGecko Status:", r.status_code)
-    print("CoinGecko Response:", r.text)
-
-    if r.status_code == 200:
-        data = r.json()
-        ...
+        if r.status_code == 200:
+            data = r.json()
 
             price = data.get(coin_id, {}).get("usd")
 
@@ -113,23 +111,7 @@ try:
         print("Binance error:", e)
 
     return None
-
-
-def safe_get_price(coin):
-    for _ in range(3):
-        try:
-            price = get_price(coin)
-
-            if price is not None:
-                return price
-
-        except Exception as e:
-            print("Retry error:", e)
-
-        time.sleep(1)
-
-    return None
-
+    
 # ================= SIGNAL ENGINE =================
 
 def get_signal(coin):
