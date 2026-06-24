@@ -111,6 +111,20 @@ def get_price(coin):
         print("Binance error:", e)
 
     return None
+    def safe_get_price(coin):
+    for _ in range(3):
+        try:
+            price = get_price(coin)
+
+            if price is not None:
+                return price
+
+        except Exception as e:
+            print("Retry error:", repr(e))
+
+        time.sleep(1)
+
+    return None
     
 # ================= SIGNAL ENGINE =================
 
@@ -145,11 +159,6 @@ def home():
 
 # ================= COMMANDS =================
 
-@bot.message_handler(func=lambda m: True)
-def debug_all(m):
-    print(f"RECEIVED: {m.text}")
-    bot.reply_to(m, f"You sent: {m.text}")
-    
 @bot.message_handler(commands=["start"])
 def start(msg):
     bot.reply_to(
