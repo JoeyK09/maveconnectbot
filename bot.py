@@ -47,65 +47,6 @@ def get_price(coin):
    return 1100000  
     coin = coin.lower().strip()
 
-    if coin not in COINS:
-        return None
-
-    now = time.time()
-
-    # Cache
-    if coin in price_cache:
-        cached_price, ts = price_cache[coin]
-
-        if now - ts < CACHE_TIME:
-            return cached_price
-
-    coin_id = COINS[coin]
-
-    # CoinGecko
-    try:
-        r = requests.get(
-            "https://api.coingecko.com/api/v3/simple/price",
-            params={
-                "ids": coin_id,
-                "vs_currencies": "usd"
-            },
-            timeout=5
-        )
-
-        if r.status_code == 200:
-            data = r.json()
-
-            price = data.get(coin_id, {}).get("usd")
-
-            if price:
-                price = float(price)
-                price_cache[coin] = (price, now)
-                return price
-
-    except Exception as e:
-        print("CoinGecko error:", e)
-
-    # Binance fallback
-    try:
-        symbol = coin.upper() + "USDT"
-
-        r = requests.get(
-            "https://api.binance.com/api/v3/ticker/price",
-            params={"symbol": symbol},
-            timeout=5
-        )
-
-        if r.status_code == 200:
-            price = float(r.json()["price"])
-            price_cache[coin] = (price, now)
-            return price
-
-    except Exception as e:
-        print("Binance error:", e)
-
-    return None
-
-
 def safe_get_price(coin):
     for _ in range(2):
         try:
@@ -196,7 +137,7 @@ def signal_cmd(msg):
 
         price = safe_get_price(coin)
 
-        if price is not None:
+        if price is None:
             bot.reply_to(
                 msg,
                 "❌ Coin not found or price service temporarily unavailable."
@@ -234,9 +175,7 @@ def scan(msg):
     except Exception as e:
         print("Scan error:", e)
         bot.reply_to(msg, "⚠️ Scan failed")
-    
-@bot.message_handler(func=lambda m: True)
-def unknown(msg):
+        
     bot.reply_to(
         msg,
         "Commands:\n"
