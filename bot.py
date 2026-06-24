@@ -145,6 +145,11 @@ def home():
 
 # ================= COMMANDS =================
 
+@bot.message_handler(func=lambda m: True)
+def debug_all(m):
+    print(f"RECEIVED: {m.text}")
+    bot.reply_to(m, f"You sent: {m.text}")
+    
 @bot.message_handler(commands=["start"])
 def start(msg):
     bot.reply_to(
