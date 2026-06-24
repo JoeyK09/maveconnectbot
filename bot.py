@@ -215,24 +215,35 @@ def signal_cmd(msg):
 def unknown(msg):
     bot.reply_to(
         msg,
-        "❓ Unknown command.\n\n"
+        "Commands:\n"
         "Use:\n"
         "/price btc\n"
         "/signal btc\n"
-        "/ping"
+        "/ping\n"
+        "/scan\n"
+        "/test"
     )
 
 @bot.message_handler(commands=["scan"])
 def scan(msg):
-    output = "📊 MARKET SCAN\n\n"
+    try:
+        output = "📊 LEVEL 4 MARKET SCAN\n\n"
 
-    for coin in ["btc", "eth", "sol", "bnb"]:
-        price = safe_get_price(coin)
+        coins_to_scan = ["btc", "eth", "bnb", "sol", "xrp"]
 
-        if price:
-            output += f"{coin.upper()} → ${price:,.2f}\n"
+        for coin in coins_to_scan:
+            price = safe_get_price(coin)
 
-    bot.reply_to(msg, output)
+            if price is not None:
+                output += f"✅ {coin.upper()} - ${price:,.2f}\n"
+            else:
+                output += f"❌ {coin.upper()} - Price unavailable\n"
+
+        bot.send_message(msg.chat.id, output)
+
+    except Exception as e:
+        print("Scan error:", e)
+        bot.reply_to(msg, "⚠️ Scan failed")
     
 # ================= BOT LOOP =================
 
