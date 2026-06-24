@@ -17,6 +17,12 @@ print("Telegram bot initialized")
 
 app = Flask(__name__)
 
+# ================= GROUPS =================
+
+FREE_GROUP = "https://t.me/UltimateAvian"
+VIP_GROUP = "https://t.me/UltimateAve"
+VIP_CHANNEL = "@UltimateAve"
+
 # ================= COINS =================
 
 COINS = {
@@ -44,10 +50,68 @@ CACHE_TIME = 30
 # ================= PRICE ENGINE =================
 
 def get_price(coin):
-   return 1100000  
-    
+    coin = coin.lower().strip()
+
+    if coin not in COINS:
+        return None
+
+    now = time.time()
+
+    if coin in price_cache:
+        cached_price, ts = price_cache[coin]
+
+        if now - ts < CACHE_TIME:
+            return cached_price
+
+    coin_id = COINS[coin]
+
+    # CoinGecko
+    try:
+        r = requests.get(
+            "https://api.coingecko.com/api/v3/simple/price",
+            params={
+                "ids": coin_id,
+                "vs_currencies": "usd"
+            },
+            timeout=5
+        )
+
+        if r.status_code == 200:
+            data = r.json()
+
+            price = data.get(coin_id, {}).get("usd")
+
+            if price is not None:
+                price = float(price)
+                price_cache[coin] = (price, now)
+                return price
+
+    except Exception as e:
+        print("CoinGecko error:", e)
+
+    # Binance fallback
+    try:
+        symbol = coin.upper() + "USDT"
+
+        r = requests.get(
+            "https://api.binance.com/api/v3/ticker/price",
+            params={"symbol": symbol},
+            timeout=5
+        )
+
+        if r.status_code == 200:
+            price = float(r.json()["price"])
+            price_cache[coin] = (price, now)
+            return price
+
+    except Exception as e:
+        print("Binance error:", e)
+
+    return None
+
+
 def safe_get_price(coin):
-    for _ in range(2):
+    for _ in range(3):
         try:
             price = get_price(coin)
 
@@ -57,9 +121,34 @@ def safe_get_price(coin):
         except Exception as e:
             print("Retry error:", e)
 
-        time.sleep(0.5)
+        time.sleep(1)
 
     return None
+
+# ================= SIGNAL ENGINE =================
+
+def get_signal(coin):
+    price = safe_get_price(coin)
+
+    if price is None:
+        return None
+
+    score = int((price % 50) + 50)
+
+    if score >= 85:
+        action = "🟢 STRONG BUY"
+    elif score >= 70:
+        action = "🟢 BUY"
+    elif score >= 55:
+        action = "⚪ HOLD"
+    else:
+        action = "🔴 SELL"
+
+    return {
+        "price": price,
+        "score": score,
+        "action": action
+    }
 
 # ================= FLASK =================
 
@@ -73,16 +162,15 @@ def home():
 def start(msg):
     bot.reply_to(
         msg,
-        "🚀 LEVEL 4 AI TRADING BOT\n\n"
-        "📢 Free Group:\n"
-        "https://t.me/UltimateAvian\n\n"
-        "💎 VIP Group:\n"
-        "https://t.me/UltimateAve\n\n"
-        "Commands:\n"
-        "/price btc\n"
-        "/signal btc\n"
-        "/ping\n"
-        "/test"
+        f"🚀 LEVEL 4 AI TRADING BOT\n\n"
+        f"📢 Free Group:\n{FREE_GROUP}\n\n"
+        f"💎 VIP Group:\n{VIP_GROUP}\n\n"
+        f"Commands:\n"
+        f"/price btc\n"
+        f"/signal btc\n"
+        f"/scan\n"
+        f"/ping\n"
+        f"/test"
     )
 
 @bot.message_handler(commands=["ping"])
@@ -106,7 +194,7 @@ def price_cmd(msg):
 
         price = safe_get_price(coin)
 
-        if price is None:
+        if price is not None:
             bot.reply_to(
                 msg,
                 f"💰 {coin.upper()} = ${price:,.4f}"
@@ -114,13 +202,11 @@ def price_cmd(msg):
         else:
             bot.reply_to(
                 msg,
-                "❌ Coin not found or price service temporarily unavailable."
+                "❌ Coin not found or price service unavailable."
             )
-            print("PRICE COMMAND RECEIVED")
-            print("Coin:", coin)
 
     except Exception as e:
-        print("Price command error:", e)
+        print("Price error:", repr(e))
         bot.reply_to(msg, "⚠️ Error getting price")
 
 @bot.message_handler(commands=["signal"])
@@ -134,24 +220,22 @@ def signal_cmd(msg):
 
         coin = parts[1].lower().strip()
 
-        price = safe_get_price(coin)
+        result = get_signal(coin)
 
-        if price is None:
-            bot.reply_to(
-                msg,
-                "❌ Coin not found or price service temporarily unavailable."
-            )
+        if result is None:
+            bot.reply_to(msg, "❌ Coin not found")
             return
 
         bot.reply_to(
             msg,
             f"🤖 {coin.upper()} SIGNAL\n\n"
-            f"⚪ HOLD\n"
-            f"💰 Price: ${price:,.4f}"
+            f"{result['action']}\n"
+            f"💰 Price: ${result['price']:,.4f}\n"
+            f"🔥 Strength: {result['score']}/100"
         )
 
     except Exception as e:
-        print("Signal command error:", e)
+        print("Signal error:", repr(e))
         bot.reply_to(msg, "⚠️ Error generating signal")
 
 @bot.message_handler(commands=["scan"])
@@ -159,25 +243,30 @@ def scan(msg):
     try:
         output = "📊 LEVEL 4 MARKET SCAN\n\n"
 
-        coins_to_scan = ["btc", "eth", "bnb", "sol", "xrp"]
+        for coin in COINS.keys():
+            result = get_signal(coin)
 
-        for coin in coins_to_scan:
-            price = safe_get_price(coin)
-
-            if price is not None:
-                output += f"✅ {coin.upper()} - ${price:,.2f}\n"
-            else:
-                output += f"❌ {coin.upper()} - Price unavailable\n"
+            if result:
+                output += (
+                    f"{coin.upper()} | "
+                    f"{result['action']} | "
+                    f"{result['score']}/100\n"
+                )
 
         bot.send_message(msg.chat.id, output)
 
     except Exception as e:
-        print("Scan error:", e)
+        print("Scan error:", repr(e))
         bot.reply_to(msg, "⚠️ Scan failed")
-        
+
+# ================= FALLBACK =================
+
+@bot.message_handler(func=lambda m: True)
+def unknown(msg):
     bot.reply_to(
         msg,
-        "Commands:\n"
+        "❓ Unknown command.\n\n"
+        "Use:\n"
         "/price btc\n"
         "/signal btc\n"
         "/scan\n"
@@ -190,7 +279,7 @@ def scan(msg):
 def run_bot():
     while True:
         try:
-            print("Bot polling started...")
+            print("Polling started...")
 
             bot.infinity_polling(
                 skip_pending=True,
@@ -200,7 +289,11 @@ def run_bot():
             )
 
         except Exception as e:
-            print("Polling error:", e)
+            print("POLLING CRASH:", repr(e))
+
+            if "409" in str(e):
+                print("⚠️ Another instance is using this token")
+
             time.sleep(5)
 
 # ================= START =================
@@ -209,11 +302,14 @@ if __name__ == "__main__":
     print("Starting application...")
 
     try:
-        bot.remove_webhook()
         bot.delete_webhook(drop_pending_updates=True)
-        print("Webhook removed and updates cleared")
+        bot.remove_webhook()
+
+        me = bot.get_me()
+        print(f"Connected as @{me.username}")
+
     except Exception as e:
-        print("Webhook error:", e)
+        print("Startup error:", repr(e))
 
     Thread(target=run_bot, daemon=True).start()
 
@@ -224,4 +320,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port
-            )
+)
