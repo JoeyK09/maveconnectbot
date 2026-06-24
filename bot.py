@@ -44,6 +44,7 @@ CACHE_TIME = 30
 # ================= PRICE ENGINE =================
 
 def get_price(coin):
+   return 1100000  
     coin = coin.lower().strip()
 
     if coin not in COINS:
