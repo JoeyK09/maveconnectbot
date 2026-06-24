@@ -166,7 +166,7 @@ def price_cmd(msg):
 
         price = safe_get_price(coin)
 
-        if price is not None:
+        if price is None:
             bot.reply_to(
                 msg,
                 f"💰 {coin.upper()} = ${price:,.4f}"
@@ -214,18 +214,6 @@ def signal_cmd(msg):
         print("Signal command error:", e)
         bot.reply_to(msg, "⚠️ Error generating signal")
 
-@bot.message_handler(func=lambda m: True)
-def unknown(msg):
-    bot.reply_to(
-        msg,
-        "Commands:\n"
-        "/price btc\n"
-        "/signal btc\n"
-        "/scan\n"
-        "/ping\n"
-        "/test"
-    )
-
 @bot.message_handler(commands=["scan"])
 def scan(msg):
     try:
@@ -247,6 +235,18 @@ def scan(msg):
         print("Scan error:", e)
         bot.reply_to(msg, "⚠️ Scan failed")
     
+@bot.message_handler(func=lambda m: True)
+def unknown(msg):
+    bot.reply_to(
+        msg,
+        "Commands:\n"
+        "/price btc\n"
+        "/signal btc\n"
+        "/scan\n"
+        "/ping\n"
+        "/test"
+    )
+
 # ================= BOT LOOP =================
 
 def run_bot():
