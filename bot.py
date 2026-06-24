@@ -17,6 +17,12 @@ print("Telegram bot initialized")
 
 app = Flask(__name__)
 
+# ================= GROUPS =================
+
+FREE_GROUP = "https://t.me/UltimateAvian"
+VIP_GROUP = "https://t.me/UltimateAve"
+VIP_CHANNEL = "@UltimateAve"
+
 # ================= COINS =================
 
 COINS = {
@@ -51,7 +57,6 @@ def get_price(coin):
 
     now = time.time()
 
-    # Cache
     if coin in price_cache:
         cached_price, ts = price_cache[coin]
 
@@ -120,6 +125,31 @@ def safe_get_price(coin):
 
     return None
 
+# ================= SIGNAL ENGINE =================
+
+def get_signal(coin):
+    price = safe_get_price(coin)
+
+    if price is None:
+        return None
+
+    score = int((price % 50) + 50)
+
+    if score >= 85:
+        action = "🟢 STRONG BUY"
+    elif score >= 70:
+        action = "🟢 BUY"
+    elif score >= 55:
+        action = "⚪ HOLD"
+    else:
+        action = "🔴 SELL"
+
+    return {
+        "price": price,
+        "score": score,
+        "action": action
+    }
+
 # ================= FLASK =================
 
 @app.route("/")
@@ -132,16 +162,15 @@ def home():
 def start(msg):
     bot.reply_to(
         msg,
-        "🚀 LEVEL 4 AI TRADING BOT\n\n"
-        "📢 Free Group:\n"
-        "https://t.me/UltimateAvian\n\n"
-        "💎 VIP Group:\n"
-        "https://t.me/UltimateAve\n\n"
-        "Commands:\n"
-        "/price btc\n"
-        "/signal btc\n"
-        "/ping\n"
-        "/test"
+        f"🚀 LEVEL 4 AI TRADING BOT\n\n"
+        f"📢 Free Group:\n{FREE_GROUP}\n\n"
+        f"💎 VIP Group:\n{VIP_GROUP}\n\n"
+        f"Commands:\n"
+        f"/price btc\n"
+        f"/signal btc\n"
+        f"/scan\n"
+        f"/ping\n"
+        f"/test"
     )
 
 @bot.message_handler(commands=["ping"])
@@ -177,7 +206,7 @@ def price_cmd(msg):
             )
 
     except Exception as e:
-        print("Price command error:", e)
+        print("Price error:", repr(e))
         bot.reply_to(msg, "⚠️ Error getting price")
 
 @bot.message_handler(commands=["signal"])
@@ -191,43 +220,56 @@ def signal_cmd(msg):
 
         coin = parts[1].lower().strip()
 
-        price = safe_get_price(coin)
+        result = get_signal(coin)
 
-        if price is None:
-            bot.reply_to(
-                msg,
-                "❌ Coin not found or price service unavailable."
-            )
+        if result is None:
+            bot.reply_to(msg, "❌ Coin not found")
             return
 
         bot.reply_to(
             msg,
             f"🤖 {coin.upper()} SIGNAL\n\n"
-            f"⚪ HOLD\n"
-            f"💰 Price: ${price:,.4f}"
+            f"{result['action']}\n"
+            f"💰 Price: ${result['price']:,.4f}\n"
+            f"🔥 Strength: {result['score']}/100"
         )
 
     except Exception as e:
-        print("Signal command error:", e)
+        print("Signal error:", repr(e))
         bot.reply_to(msg, "⚠️ Error generating signal")
 
-# ================= DEBUG =================
+@bot.message_handler(commands=["scan"])
+def scan(msg):
+    try:
+        output = "📊 LEVEL 4 MARKET SCAN\n\n"
 
-@bot.message_handler(func=lambda message: True)
-def debug(message):
-    print(
-        f"MESSAGE RECEIVED | "
-        f"Chat: {message.chat.id} | "
-        f"User: {message.from_user.username} | "
-        f"Text: {message.text}"
-    )
+        for coin in COINS.keys():
+            result = get_signal(coin)
 
+            if result:
+                output += (
+                    f"{coin.upper()} | "
+                    f"{result['action']} | "
+                    f"{result['score']}/100\n"
+                )
+
+        bot.send_message(msg.chat.id, output)
+
+    except Exception as e:
+        print("Scan error:", repr(e))
+        bot.reply_to(msg, "⚠️ Scan failed")
+
+# ================= FALLBACK =================
+
+@bot.message_handler(func=lambda m: True)
+def unknown(msg):
     bot.reply_to(
-        message,
+        msg,
         "❓ Unknown command.\n\n"
         "Use:\n"
         "/price btc\n"
         "/signal btc\n"
+        "/scan\n"
         "/ping\n"
         "/test"
     )
@@ -237,17 +279,21 @@ def debug(message):
 def run_bot():
     while True:
         try:
-            print("Bot polling started...")
+            print("Polling started...")
 
             bot.infinity_polling(
                 skip_pending=True,
-                timeout=60,
-                long_polling_timeout=60,
+                timeout=30,
+                long_polling_timeout=30,
                 allowed_updates=["message"]
             )
 
         except Exception as e:
-            print("Polling error:", e)
+            print("POLLING CRASH:", repr(e))
+
+            if "409" in str(e):
+                print("⚠️ Another instance is using this token")
+
             time.sleep(5)
 
 # ================= START =================
@@ -258,9 +304,12 @@ if __name__ == "__main__":
     try:
         bot.delete_webhook(drop_pending_updates=True)
         bot.remove_webhook()
-        print("Webhook removed and updates cleared")
+
+        me = bot.get_me()
+        print(f"Connected as @{me.username}")
+
     except Exception as e:
-        print("Webhook error:", e)
+        print("Startup error:", repr(e))
 
     Thread(target=run_bot, daemon=True).start()
 
@@ -271,4 +320,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port
-        )
+            )
