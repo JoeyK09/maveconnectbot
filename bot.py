@@ -218,11 +218,10 @@ def unknown(msg):
     bot.reply_to(
         msg,
         "Commands:\n"
-        "Use:\n"
         "/price btc\n"
         "/signal btc\n"
-        "/ping\n"
         "/scan\n"
+        "/ping\n"
         "/test"
     )
 
