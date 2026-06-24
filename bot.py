@@ -66,18 +66,23 @@ def get_price(coin):
     coin_id = COINS[coin]
 
     # CoinGecko
-    try:
-        r = requests.get(
-            "https://api.coingecko.com/api/v3/simple/price",
-            params={
-                "ids": coin_id,
-                "vs_currencies": "usd"
-            },
-            timeout=5
-        )
 
-        if r.status_code == 200:
-            data = r.json()
+try:
+    r = requests.get(
+        "https://api.coingecko.com/api/v3/simple/price",
+        params={
+            "ids": coin_id,
+            "vs_currencies": "usd"
+        },
+        timeout=5
+    )
+
+    print("CoinGecko Status:", r.status_code)
+    print("CoinGecko Response:", r.text)
+
+    if r.status_code == 200:
+        data = r.json()
+        ...
 
             price = data.get(coin_id, {}).get("usd")
 
