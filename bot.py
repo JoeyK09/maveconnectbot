@@ -175,6 +175,8 @@ def price_cmd(msg):
                 msg,
                 "❌ Coin not found or price service temporarily unavailable."
             )
+            print("PRICE COMMAND RECEIVED")
+            print("Coin:", coin)
 
     except Exception as e:
         print("Price command error:", e)
@@ -193,7 +195,7 @@ def signal_cmd(msg):
 
         price = safe_get_price(coin)
 
-        if price is None:
+        if price is not None:
             bot.reply_to(
                 msg,
                 "❌ Coin not found or price service temporarily unavailable."
