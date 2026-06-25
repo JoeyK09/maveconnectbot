@@ -54,7 +54,7 @@ vip_users = set()
 def get_price(coin):
     coin = coin.lower().strip()
 
-    PAPRIKA_IDS = {
+    COINCAP_IDS = {
         "btc": "btc-bitcoin",
         "eth": "eth-ethereum",
         "bnb": "bnb-binance-coin",
@@ -70,20 +70,32 @@ def get_price(coin):
         "link": "link-chainlink"
     }
 
-    if coin not in PAPRIKA_IDS:
+    if coin not in COINCAP_IDS:
         return None
+
+    # ===== CACHE CHECK =====
+    now = time.time()
+
+    if coin in price_cache:
+        price, timestamp = price_cache[coin]
+
+        if now - timestamp < CACHE_TIME:
+            return price
 
     try:
         r = requests.get(
-            f"https://api.coinpaprika.com/v1/tickers/{PAPRIKA_IDS[coin]}",
+            f"https://api.coinpaprika.com/v1/tickers/{COINCAP_IDS[coin]}",
             timeout=10
         )
 
-        print("Status:", r.status_code)
-
         if r.status_code == 200:
             data = r.json()
-            return float(data["quotes"]["USD"]["price"])
+            price = float(data["quotes"]["USD"]["price"])
+
+            # ===== SAVE TO CACHE =====
+            price_cache[coin] = (price, now)
+
+            return price
 
     except Exception as e:
         print("CoinPaprika error:", repr(e))
