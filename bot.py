@@ -88,7 +88,7 @@ f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
             return float(data["price"])
 
     except Exception as e:
-        print("Price error:", e)
+        print("Price error:",e)
 
     return None
         
