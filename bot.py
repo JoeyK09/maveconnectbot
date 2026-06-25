@@ -347,6 +347,10 @@ def unknown(msg):
         "/test"
     )
 
+@bot.message_handler(commands=["debug"])
+def debug(msg):
+    bot.reply_to(msg, "✅ Debug command works")
+    
 # ================= BOT LOOP =================
 
 def run_bot():
