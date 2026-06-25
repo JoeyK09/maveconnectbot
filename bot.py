@@ -59,50 +59,12 @@ def get_price(coin):
 
     now = time.time()
 
-    # Cache
     if coin in price_cache:
         cached_price, ts = price_cache[coin]
 
         if now - ts < CACHE_TIME:
             return cached_price
 
-    coin_id = COINS[coin]
-    
-    print("Coin:", coin)
-    print("Coin ID:", coin_id)
-
-    # CoinGecko
-    try:
-        print("Trying CoinGecko...")
-
-        r = requests.get(
-            "https://api.coingecko.com/api/v3/simple/price",
-            params={
-                "ids": coin_id,
-                "vs_currencies": "usd"
-            },
-            timeout=5
-        )
-
-        print("CoinGecko status:", r.status_code)
-        print("CoinGecko response:", r.text[:200])
-        print("CoinGecko status:", r.status_code)
-        print("CoinGecko response:", r.text)
-
-        if r.status_code == 200:
-            data = r.json()
-
-            price = data.get(coin_id, {}).get("usd")
-
-            if price is not None:
-                price = float(price)
-                price_cache[coin] = (price, now)
-                return price
-
-    except Exception as e:
-        print("CoinGecko error:", e)
-
-    # Binance fallback
     try:
         symbol = coin.upper() + "USDT"
 
@@ -112,12 +74,11 @@ def get_price(coin):
             timeout=5
         )
 
-        print("Binance status:", r.status_code)
-        print("Binance response:", r.text[:200])
-
         if r.status_code == 200:
             price = float(r.json()["price"])
+
             price_cache[coin] = (price, now)
+
             return price
 
     except Exception as e:
@@ -168,15 +129,20 @@ def get_signal(coin):
         change = data["price_change_percentage_24h"]
 
     except Exception as e:
-        print("Signal CoinGecko error:", e)
+    print("Signal CoinGecko error:", e)
 
-        price = safe_get_price(coin)
+    price = safe_get_price(coin)
 
-        if price is None:
-            return None
+    if price is None:
+        return None
 
-        change = 0
-
+    return {
+        "price": price,
+        "change": 0,
+        "score": 60,
+        "action": "⚪ HOLD"
+    }
+    
     if change >= 8:
         action = "🟢 STRONG BUY"
         score = 90
