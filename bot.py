@@ -22,6 +22,7 @@ app = Flask(__name__)
 FREE_GROUP = "https://t.me/UltimateAvian"
 VIP_GROUP = "https://t.me/UltimateAve"
 VIP_CHANNEL = "@UltimateAve"
+ADMIN_ID = 7988782705
 
 # ================= COINS =================
 
@@ -46,6 +47,7 @@ COINS = {
 
 price_cache = {}
 CACHE_TIME = 30
+vip_users = set()
 
 # ================= PRICE ENGINE =================
 
@@ -196,6 +198,10 @@ def get_signal(coin):
     }
     
 def is_vip(user_id):
+
+    if user_id in vip_users:
+        return True
+
     try:
         member = bot.get_chat_member(VIP_CHANNEL, user_id)
 
@@ -340,6 +346,67 @@ def scan(msg):
     except Exception as e:
         print("Scan error:", repr(e))
         bot.reply_to(msg, "⚠️ Scan failed")
+
+@bot.message_handler(commands=["addvip"])
+def addvip(msg):
+
+    if msg.from_user.id != ADMIN_ID:
+        return
+
+    parts = msg.text.split()
+
+    if len(parts) != 2:
+        bot.reply_to(msg, "Usage: /addvip USER_ID")
+        return
+
+    try:
+        user_id = int(parts[1])
+
+        vip_users.add(user_id)
+
+        bot.reply_to(
+            msg,
+            f"✅ Added {user_id} to VIP"
+        )
+
+    except Exception as e:
+        bot.reply_to(msg, f"Error: {e}")
+
+@bot.message_handler(commands=["removevip"])
+def removevip(msg):
+
+    if msg.from_user.id != ADMIN_ID:
+        return
+
+    parts = msg.text.split()
+
+    if len(parts) != 2:
+        bot.reply_to(msg, "Usage: /removevip USER_ID")
+        return
+
+    try:
+        user_id = int(parts[1])
+
+        vip_users.discard(user_id)
+
+        bot.reply_to(
+            msg,
+            f"❌ Removed {user_id}"
+        )
+
+    except Exception as e:
+        bot.reply_to(msg, f"Error: {e}")
+
+@bot.message_handler(commands=["vipcount"])
+def vipcount(msg):
+
+    if msg.from_user.id != ADMIN_ID:
+        return
+
+    bot.reply_to(
+        msg,
+        f"💎 VIP Users: {len(vip_users)}"
+    )
 
 # ================= FALLBACK =================
 
