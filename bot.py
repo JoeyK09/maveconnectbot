@@ -105,6 +105,20 @@ def get_signal(coin):
         "action": action
     }
     
+def is_vip(user_id):
+    try:
+        member = bot.get_chat_member(VIP_CHANNEL, user_id)
+
+        return member.status in [
+            "member",
+            "administrator",
+            "creator"
+        ]
+
+    except Exception as e:
+        print("VIP check error:", e)
+        return False
+    
 # ================= FLASK =================
 
 @app.route("/")
@@ -116,12 +130,16 @@ def home():
 @bot.message_handler(commands=["start"])
 def start(msg):
     bot.reply_to(
-      msg,
-      f"🤖 {coin.upper()} SIGNAL\n\n"
-      f"{result['action']}\n"
-      f"💰 Price: ${result['price']:,.4f}\n"
-      f"📈 24h Change: {result['change']:.2f}%\n"
-      f"🔥 Strength: {result['score']}/100"
+        msg,
+        f"🚀 LEVEL 4 AI TRADING BOT\n\n"
+        f"📢 Free Group:\n{FREE_GROUP}\n\n"
+        f"💎 VIP Group:\n{VIP_GROUP}\n\n"
+        f"Commands:\n"
+        f"/price btc\n"
+        f"/signal btc\n"
+        f"/scan\n"
+        f"/ping\n"
+        f"/test"
     )
     
 @bot.message_handler(commands=["ping"])
@@ -162,6 +180,15 @@ def price_cmd(msg):
 
 @bot.message_handler(commands=["signal"])
 def signal_cmd(msg):
+
+    if not is_vip(msg.from_user.id):
+        bot.reply_to(
+            msg,
+            f"🔒 VIP ONLY FEATURE\n\n"
+            f"Join VIP:\n{VIP_GROUP}"
+        )
+        return
+
     try:
         parts = msg.text.split()
 
@@ -191,6 +218,15 @@ def signal_cmd(msg):
 
 @bot.message_handler(commands=["scan"])
 def scan(msg):
+
+    if not is_vip(msg.from_user.id):
+        bot.reply_to(
+            msg,
+            f"🔒 VIP ONLY FEATURE\n\n"
+            f"Join VIP:\n{VIP_GROUP}"
+        )
+        return
+
     try:
         output = "📊 LEVEL 4 MARKET SCAN\n\n"
 
