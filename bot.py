@@ -42,7 +42,22 @@ COINS = {
     "shib": "shiba-inu",
     "link": "chainlink"
 }
-
+BINANCE_SYMBOLS = {
+    "btc": "BTCUSDT",
+    "eth": "ETHUSDT",
+    "bnb": "BNBUSDT",
+    "sol": "SOLUSDT",
+    "xrp": "XRPUSDT",
+    "ada": "ADAUSDT",
+    "doge": "DOGEUSDT",
+    "matic": "POLUSDT",
+    "dot": "DOTUSDT",
+    "ltc": "LTCUSDT",
+    "trx": "TRXUSDT",
+    "avax": "AVAXUSDT",
+    "shib": "SHIBUSDT",
+    "link": "LINKUSDT"
+}
 # ================= CACHE =================
 
 price_cache = {}
@@ -66,8 +81,13 @@ def get_price(coin):
             return cached_price
 
     try:
-        symbol = coin.upper() + "USDT"
+        symbol = BINANCE_SYMBOLS.get(coin)
 
+        if not symbol:
+            return None
+
+        print("Testing Binance symbol:", symbol)
+        
         r = requests.get(
             "https://api.binance.com/api/v3/ticker/price",
             params={"symbol": symbol},
