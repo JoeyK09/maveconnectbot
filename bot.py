@@ -110,6 +110,21 @@ def get_price(coin):
 
     return None
 
+def safe_get_price(coin):
+    for _ in range(3):
+        try:
+            price = get_price(coin)
+
+            if price is not None:
+                return price
+
+        except Exception as e:
+            print("Retry error:", e)
+
+        time.sleep(1)
+
+    return None
+
 # ================= SIGNAL ENGINE =================
 
 def get_signal(coin):
