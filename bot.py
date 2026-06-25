@@ -66,35 +66,25 @@ def get_price(coin):
 
     coin_id = COINS[coin]
 
-# CoinGecko
-try:
-    print("Trying CoinGecko...")
+    # CoinGecko
+    try:
+        print("Trying CoinGecko...")
 
-    r = requests.get(
-        "https://api.coingecko.com/api/v3/simple/price",
-        params={
-            "ids": coin_id,
-            "vs_currencies": "usd"
-        },
-        timeout=5
-    )
+        r = requests.get(
+            "https://api.coingecko.com/api/v3/simple/price",
+            params={
+                "ids": coin_id,
+                "vs_currencies": "usd"
+            },
+            timeout=5
+        )
 
-    print("CoinGecko status:", r.status_code)
-    print("CoinGecko response:", r.text[:200])
+        print("CoinGecko status:", r.status_code)
+        print("CoinGecko response:", r.text[:200])
 
-    if r.status_code == 200:
-        data = r.json()
+        if r.status_code == 200:
+            data = r.json()
 
-        price = data.get(coin_id, {}).get("usd")
-
-        if price is not None:
-            price = float(price)
-            price_cache[coin] = (price, now)
-            return price
-
-except Exception as e:
-    print("CoinGecko error:", e)
-    
             price = data.get(coin_id, {}).get("usd")
 
             if price is not None:
@@ -115,6 +105,9 @@ except Exception as e:
             timeout=5
         )
 
+        print("Binance status:", r.status_code)
+        print("Binance response:", r.text[:200])
+
         if r.status_code == 200:
             price = float(r.json()["price"])
             price_cache[coin] = (price, now)
@@ -124,7 +117,7 @@ except Exception as e:
         print("Binance error:", e)
 
     return None
-
+    
 def safe_get_price(coin):
     for _ in range(3):
         try:
