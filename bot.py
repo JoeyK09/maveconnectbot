@@ -42,22 +42,7 @@ COINS = {
     "shib": "shiba-inu",
     "link": "chainlink"
 }
-BINANCE_SYMBOLS = {
-    "btc": "BTCUSDT",
-    "eth": "ETHUSDT",
-    "bnb": "BNBUSDT",
-    "sol": "SOLUSDT",
-    "xrp": "XRPUSDT",
-    "ada": "ADAUSDT",
-    "doge": "DOGEUSDT",
-    "matic": "POLUSDT",
-    "dot": "DOTUSDT",
-    "ltc": "LTCUSDT",
-    "trx": "TRXUSDT",
-    "avax": "AVAXUSDT",
-    "shib": "SHIBUSDT",
-    "link": "LINKUSDT"
-}
+
 # ================= CACHE =================
 
 price_cache = {}
@@ -67,29 +52,39 @@ vip_users = set()
 # ================= PRICE ENGINE ===========
 
 def get_price(coin):
-    mapping = {
+    coin = coin.lower().strip()
+
+    COINCAP_IDS = {
         "btc": "bitcoin",
         "eth": "ethereum",
+        "bnb": "binance-coin",
         "sol": "solana",
-        "xrp": "xrp"
+        "xrp": "xrp",
+        "ada": "cardano",
+        "doge": "dogecoin"
     }
 
-    if coin not in mapping:
+    if coin not in COINCAP_IDS:
         return None
 
     try:
         r = requests.get(
-            f"https://api.coincap.io/v2/assets/{mapping[coin]}",
+            f"https://api.coincap.io/v2/assets/{COINCAP_IDS[coin]}",
             timeout=10
         )
 
+        print("Status:", r.status_code)
+        print("Response:", r.text)
+
         if r.status_code == 200:
-            return float(r.json()["data"]["priceUsd"])
+            data = r.json()
+            return float(data["data"]["priceUsd"])
+
+        return None
 
     except Exception as e:
-        print(e)
-
-    return None
+        print("CoinCap error:", repr(e))
+        raise
     
 # ================= SIGNAL ENGINE =================
 
