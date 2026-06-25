@@ -69,19 +69,15 @@ def get_signal(coin):
             timeout=10
         )
 
-        if r.status_code == 200:
-            data = r.json()["market_data"]
+        data = r.json()["market_data"]
 
-            price = data["current_price"]["usd"]
-            change = data["price_change_percentage_24h"]
-
-        else:
-            raise Exception("CoinGecko failed")
+        price = data["current_price"]["usd"]
+        change = data["price_change_percentage_24h"]
 
     except Exception as e:
         print("Signal CoinGecko error:", e)
 
-        # FALL BACK TO BINANCE PRICE
+        # Binance fallback for price
         price = safe_get_price(coin)
 
         if price is None:
@@ -92,15 +88,12 @@ def get_signal(coin):
     if change >= 8:
         action = "🟢 STRONG BUY"
         score = 90
-
     elif change >= 3:
         action = "🟢 BUY"
         score = 75
-
     elif change > -3:
         action = "⚪ HOLD"
         score = 60
-
     else:
         action = "🔴 SELL"
         score = 40
@@ -111,32 +104,7 @@ def get_signal(coin):
         "score": score,
         "action": action
     }
-
-# ================= SIGNAL ENGINE =================
-
-def get_signal(coin):
-    price = safe_get_price(coin)
-
-    if price is None:
-        return None
-
-    score = int((price % 50) + 50)
-
-    if score >= 85:
-        action = "🟢 STRONG BUY"
-    elif score >= 70:
-        action = "🟢 BUY"
-    elif score >= 55:
-        action = "⚪ HOLD"
-    else:
-        action = "🔴 SELL"
-
-    return {
-        "price": price,
-        "score": score,
-        "action": action
-    }
-
+    
 # ================= FLASK =================
 
 @app.route("/")
