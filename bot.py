@@ -407,6 +407,7 @@ if __name__ == "__main__":
 
         me = bot.get_me()
         print(f"Connected as @{me.username}")
+        bot.send_message(7988782705, "✅ Bot restarted successfully")
 
     except Exception as e:
         print("Startup error:", repr(e))
