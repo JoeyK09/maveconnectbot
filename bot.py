@@ -66,17 +66,17 @@ vip_users = set()
 
 # ================= PRICE ENGINE =================
 
-    def get_price(coin):
-    coin = coin.lower().strip()
+def get_price(coin):
+   coin = coin.lower().strip()
 
-    if coin not in BINANCE_SYMBOLS:
+   if coin not in BINANCE_SYMBOLS:
         return None
 
-    symbol = BINANCE_SYMBOLS[coin]
+   symbol = BINANCE_SYMBOLS[coin]
 
-    try:
+   try:
         r = requests.get(
-            f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
+f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
             timeout=10
         )
 
