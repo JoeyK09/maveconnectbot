@@ -83,20 +83,21 @@ def get_price(coin):
     try:
         symbol = BINANCE_SYMBOLS.get(coin)
 
-        if not symbol:
-            return None
+if not symbol:
+    return None
 
-        print("Testing Binance symbol:", symbol)
-        
-        r = requests.get(
-            "https://api.binance.com/api/v3/ticker/price",
-            params={"symbol": symbol},
-            timeout=5
-        )
-        print("Binance status:", r.status_code)
-        print("Binance response:", r.text)
+print("Testing Binance symbol:", symbol)
 
-        if r.status_code == 200:
+r = requests.get(
+    "https://api.binance.com/api/v3/ticker/price",
+    params={"symbol": symbol},
+    timeout=5
+)
+
+print("Binance status:", r.status_code)
+print("Binance response:", r.text)
+
+if r.status_code == 200:
             price = float(r.json()["price"])
 
             price_cache[coin] = (price, now)
