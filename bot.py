@@ -69,7 +69,7 @@ vip_users = set()
 def get_price(coin):
     coin = coin.lower().strip()
 
-    if coin not in COINS:
+    if coin not in BINANCE_SYMBOLS:
         return None
 
     now = time.time()
@@ -83,21 +83,21 @@ def get_price(coin):
     try:
         symbol = BINANCE_SYMBOLS.get(coin)
 
-if not symbol:
-    return None
+        if not symbol:
+            return None
 
-print("Testing Binance symbol:", symbol)
+        print("Testing Binance symbol:", symbol)
 
-r = requests.get(
-    "https://api.binance.com/api/v3/ticker/price",
-    params={"symbol": symbol},
-    timeout=5
-)
+        r = requests.get(
+            "https://api.binance.com/api/v3/ticker/price",
+            params={"symbol": symbol},
+            timeout=10
+        )
 
-print("Binance status:", r.status_code)
-print("Binance response:", r.text)
+        print("Binance status:", r.status_code)
+        print("Binance response:", r.text)
 
-if r.status_code == 200:
+        if r.status_code == 200:
             price = float(r.json()["price"])
 
             price_cache[coin] = (price, now)
@@ -105,7 +105,7 @@ if r.status_code == 200:
             return price
 
     except Exception as e:
-        print("Binance error:", e)
+        print("Binance error:", repr(e))
 
     return None
     
