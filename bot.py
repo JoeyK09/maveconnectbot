@@ -408,6 +408,23 @@ def vipcount(msg):
         f"💎 VIP Users: {len(vip_users)}"
     )
 
+@bot.message_handler(commands=["testapi"])
+def testapi(msg):
+
+    try:
+        r = requests.get(
+            "https://api.coingecko.com/api/v3/ping",
+            timeout=10
+        )
+
+        bot.reply_to(
+            msg,
+            f"Status: {r.status_code}\n\n{r.text}"
+        )
+
+    except Exception as e:
+        bot.reply_to(msg, f"API Error:\n{e}")
+
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
