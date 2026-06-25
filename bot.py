@@ -110,21 +110,40 @@ def get_price(coin):
 
     return None
 
+# ================= SIGNAL ENGINE =================
 
-def safe_get_price(coin):
-    for _ in range(3):
-        try:
-            price = get_price(coin)
+def get_signal(coin):
+    coin_id = COINS.get(coin)
 
-            if price is not None:
-                return price
+    if not coin_id:
+        return None
 
-        except Exception as e:
-            print("Retry error:", e)
+    try:
+        r = requests.get(
+            f"https://api.coingecko.com/api/v3/coins/{coin_id}",
+            params={
+                "localization": "false",
+                "tickers": "false",
+                "market_data": "true",
+                "community_data": "false",
+                "developer_data": "false",
+                "sparkline": "false"
+            },
+            timeout=10
+        )
 
-        time.sleep(1)
+        data = r.json()["market_data"]
 
-    return None
+        price = data["current_price"]["usd"]
+        change = data["price_change_percentage_24h"]
+
+    except Exception as e:
+        print("Signal CoinGecko error:", e)
+
+        price = safe_get_price(coin)
+
+        if price is None:
+            return None
 
         change = 0
 
