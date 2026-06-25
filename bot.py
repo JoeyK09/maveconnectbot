@@ -49,81 +49,68 @@ CACHE_TIME = 30
 
 # ================= PRICE ENGINE =================
 
-def get_price(coin):
-    coin = coin.lower().strip()
+def get_signal(coin):
+    coin_id = COINS.get(coin)
 
-    if coin not in COINS:
+    if not coin_id:
         return None
 
-    now = time.time()
-
-    if coin in price_cache:
-        cached_price, ts = price_cache[coin]
-
-        if now - ts < CACHE_TIME:
-            return cached_price
-
-    coin_id = COINS[coin]
-
-    # CoinGecko
     try:
         r = requests.get(
-            "https://api.coingecko.com/api/v3/simple/price",
+            f"https://api.coingecko.com/api/v3/coins/{coin_id}",
             params={
-                "ids": coin_id,
-                "vs_currencies": "usd"
+                "localization": "false",
+                "tickers": "false",
+                "market_data": "true",
+                "community_data": "false",
+                "developer_data": "false",
+                "sparkline": "false"
             },
-            timeout=5
+            timeout=10
         )
 
         if r.status_code == 200:
-            data = r.json()
+            data = r.json()["market_data"]
 
-            price = data.get(coin_id, {}).get("usd")
+            price = data["current_price"]["usd"]
+            change = data["price_change_percentage_24h"]
 
-            if price is not None:
-                price = float(price)
-                price_cache[coin] = (price, now)
-                return price
-
-    except Exception as e:
-        print("CoinGecko error:", e)
-
-    # Binance fallback
-    try:
-        symbol = coin.upper() + "USDT"
-
-        r = requests.get(
-            "https://api.binance.com/api/v3/ticker/price",
-            params={"symbol": symbol},
-            timeout=5
-        )
-
-        if r.status_code == 200:
-            price = float(r.json()["price"])
-            price_cache[coin] = (price, now)
-            return price
+        else:
+            raise Exception("CoinGecko failed")
 
     except Exception as e:
-        print("Binance error:", e)
+        print("Signal CoinGecko error:", e)
 
-    return None
+        # FALL BACK TO BINANCE PRICE
+        price = safe_get_price(coin)
 
+        if price is None:
+            return None
 
-def safe_get_price(coin):
-    for _ in range(3):
-        try:
-            price = get_price(coin)
+        change = 0
 
-            if price is not None:
-                return price
+    if change >= 8:
+        action = "🟢 STRONG BUY"
+        score = 90
 
-        except Exception as e:
-            print("Retry error:", e)
+    elif change >= 3:
+        action = "🟢 BUY"
+        score = 75
 
-        time.sleep(1)
+    elif change > -3:
+        action = "⚪ HOLD"
+        score = 60
 
-    return None
+    else:
+        action = "🔴 SELL"
+        score = 40
+
+    return {
+        "price": price,
+        "change": change,
+        "score": score,
+        "action": action
+    }
 
 # ================= SIGNAL ENGINE =================
 
@@ -161,18 +148,14 @@ def home():
 @bot.message_handler(commands=["start"])
 def start(msg):
     bot.reply_to(
-        msg,
-        f"🚀 LEVEL 4 AI TRADING BOT\n\n"
-        f"📢 Free Group:\n{FREE_GROUP}\n\n"
-        f"💎 VIP Group:\n{VIP_GROUP}\n\n"
-        f"Commands:\n"
-        f"/price btc\n"
-        f"/signal btc\n"
-        f"/scan\n"
-        f"/ping\n"
-        f"/test"
+      msg,
+      f"🤖 {coin.upper()} SIGNAL\n\n"
+      f"{result['action']}\n"
+      f"💰 Price: ${result['price']:,.4f}\n"
+      f"📈 24h Change: {result['change']:.2f}%\n"
+      f"🔥 Strength: {result['score']}/100"
     )
-
+    
 @bot.message_handler(commands=["ping"])
 def ping(msg):
     bot.reply_to(msg, "🏓 Pong! Bot is alive.")
