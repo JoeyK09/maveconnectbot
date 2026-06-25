@@ -64,19 +64,19 @@ price_cache = {}
 CACHE_TIME = 30
 vip_users = set()
 
-# ================= PRICE ENGINE =================
+# ================= PRICE ENGINE ===========
 
 def get_price(coin):
-   coin = coin.lower().strip()
+    coin = coin.lower().strip()
 
-   if coin not in BINANCE_SYMBOLS:
+    if coin not in BINANCE_SYMBOLS:
         return None
 
-   symbol = BINANCE_SYMBOLS[coin]
+    symbol = BINANCE_SYMBOLS[coin]
 
-   try:
+    try:
         r = requests.get(
-f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
+            f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
             timeout=10
         )
 
@@ -88,22 +88,7 @@ f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
             return float(data["price"])
 
     except Exception as e:
-        print("Price error:",e)
-
-    return None
-        
-def safe_get_price(coin):
-    for _ in range(3):
-        try:
-            price = get_price(coin)
-
-            if price is not None:
-                return price
-
-        except Exception as e:
-            print("Retry error:", e)
-
-        time.sleep(1)
+        print("Price error:", e)
 
     return None
     
