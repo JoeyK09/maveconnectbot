@@ -49,39 +49,82 @@ CACHE_TIME = 30
 
 # ================= PRICE ENGINE =================
 
-def get_signal(coin):
-    coin_id = COINS.get(coin)
+def get_price(coin):
+    coin = coin.lower().strip()
 
-    if not coin_id:
+    if coin not in COINS:
         return None
 
+    now = time.time()
+
+    # Cache
+    if coin in price_cache:
+        cached_price, ts = price_cache[coin]
+
+        if now - ts < CACHE_TIME:
+            return cached_price
+
+    coin_id = COINS[coin]
+
+    # CoinGecko
     try:
         r = requests.get(
-            f"https://api.coingecko.com/api/v3/coins/{coin_id}",
+            "https://api.coingecko.com/api/v3/simple/price",
             params={
-                "localization": "false",
-                "tickers": "false",
-                "market_data": "true",
-                "community_data": "false",
-                "developer_data": "false",
-                "sparkline": "false"
+                "ids": coin_id,
+                "vs_currencies": "usd"
             },
-            timeout=10
+            timeout=5
         )
 
-        data = r.json()["market_data"]
+        if r.status_code == 200:
+            data = r.json()
 
-        price = data["current_price"]["usd"]
-        change = data["price_change_percentage_24h"]
+            price = data.get(coin_id, {}).get("usd")
+
+            if price is not None:
+                price = float(price)
+                price_cache[coin] = (price, now)
+                return price
 
     except Exception as e:
-        print("Signal CoinGecko error:", e)
+        print("CoinGecko error:", e)
 
-        # Binance fallback for price
-        price = safe_get_price(coin)
+    # Binance fallback
+    try:
+        symbol = coin.upper() + "USDT"
 
-        if price is None:
-            return None
+        r = requests.get(
+            "https://api.binance.com/api/v3/ticker/price",
+            params={"symbol": symbol},
+            timeout=5
+        )
+
+        if r.status_code == 200:
+            price = float(r.json()["price"])
+            price_cache[coin] = (price, now)
+            return price
+
+    except Exception as e:
+        print("Binance error:", e)
+
+    return None
+
+
+def safe_get_price(coin):
+    for _ in range(3):
+        try:
+            price = get_price(coin)
+
+            if price is not None:
+                return price
+
+        except Exception as e:
+            print("Retry error:", e)
+
+        time.sleep(1)
+
+    return None
 
         change = 0
 
@@ -209,6 +252,7 @@ def signal_cmd(msg):
             f"🤖 {coin.upper()} SIGNAL\n\n"
             f"{result['action']}\n"
             f"💰 Price: ${result['price']:,.4f}\n"
+            f"📈 24H Change: {result['change']:.2f}%\n"
             f"🔥 Strength: {result['score']}/100"
         )
 
