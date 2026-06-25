@@ -67,28 +67,27 @@ vip_users = set()
 # ================= PRICE ENGINE ===========
 
 def get_price(coin):
-    coin = coin.lower().strip()
+    mapping = {
+        "btc": "bitcoin",
+        "eth": "ethereum",
+        "sol": "solana",
+        "xrp": "xrp"
+    }
 
-    if coin not in BINANCE_SYMBOLS:
+    if coin not in mapping:
         return None
-
-    symbol = BINANCE_SYMBOLS[coin]
 
     try:
         r = requests.get(
-            f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
+            f"https://api.coincap.io/v2/assets/{mapping[coin]}",
             timeout=10
         )
 
-        print("Status:", r.status_code)
-        print("Response:", r.text)
-
         if r.status_code == 200:
-            data = r.json()
-            return float(data["price"])
+            return float(r.json()["data"]["priceUsd"])
 
     except Exception as e:
-        print("Price error:", e)
+        print(e)
 
     return None
     
