@@ -104,64 +104,44 @@ def safe_get_price(coin):
 # ================= SIGNAL ENGINE =================
 
 def get_signal(coin):
-    coin_id = COINS.get(coin)
-
-    if not coin_id:
-        return None
 
     try:
+        symbol = coin.upper() + "USDT"
+
         r = requests.get(
-            f"https://api.coingecko.com/api/v3/coins/{coin_id}",
-            params={
-                "localization": "false",
-                "tickers": "false",
-                "market_data": "true",
-                "community_data": "false",
-                "developer_data": "false",
-                "sparkline": "false"
-            },
-            timeout=10
+            "https://api.binance.com/api/v3/ticker/24hr",
+            params={"symbol": symbol},
+            timeout=5
         )
 
-        data = r.json()["market_data"]
+        data = r.json()
 
-        price = data["current_price"]["usd"]
-        change = data["price_change_percentage_24h"]
+        price = float(data["lastPrice"])
+        change = float(data["priceChangePercent"])
+
+        if change >= 8:
+            action = "🟢 STRONG BUY"
+            score = 90
+        elif change >= 3:
+            action = "🟢 BUY"
+            score = 75
+        elif change > -3:
+            action = "⚪ HOLD"
+            score = 60
+        else:
+            action = "🔴 SELL"
+            score = 40
+
+        return {
+            "price": price,
+            "change": change,
+            "score": score,
+            "action": action
+        }
 
     except Exception as e:
-    print("Signal CoinGecko error:", e)
-
-    price = safe_get_price(coin)
-
-    if price is None:
+        print("Signal error:", e)
         return None
-
-    return {
-        "price": price,
-        "change": 0,
-        "score": 60,
-        "action": "⚪ HOLD"
-    }
-    
-    if change >= 8:
-        action = "🟢 STRONG BUY"
-        score = 90
-    elif change >= 3:
-        action = "🟢 BUY"
-        score = 75
-    elif change > -3:
-        action = "⚪ HOLD"
-        score = 60
-    else:
-        action = "🔴 SELL"
-        score = 40
-
-    return {
-        "price": price,
-        "change": change,
-        "score": score,
-        "action": action
-    }
     
 def is_vip(user_id):
 
