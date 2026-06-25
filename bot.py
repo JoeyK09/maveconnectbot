@@ -100,48 +100,26 @@ def safe_get_price(coin):
         time.sleep(1)
 
     return None
-
+    
 # ================= SIGNAL ENGINE =================
 
 def get_signal(coin):
 
-    try:
-        symbol = coin.upper() + "USDT"
+    price = safe_get_price(coin)
 
-        r = requests.get(
-            "https://api.binance.com/api/v3/ticker/24hr",
-            params={"symbol": symbol},
-            timeout=5
-        )
-
-        data = r.json()
-
-        price = float(data["lastPrice"])
-        change = float(data["priceChangePercent"])
-
-        if change >= 8:
-            action = "🟢 STRONG BUY"
-            score = 90
-        elif change >= 3:
-            action = "🟢 BUY"
-            score = 75
-        elif change > -3:
-            action = "⚪ HOLD"
-            score = 60
-        else:
-            action = "🔴 SELL"
-            score = 40
-
-        return {
-            "price": price,
-            "change": change,
-            "score": score,
-            "action": action
-        }
-
-    except Exception as e:
-        print("Signal error:", e)
+    if price is None:
         return None
+
+    score = 60
+    action = "⚪ HOLD"
+
+    return {
+        "price": price,
+        "change": 0,
+        "score": score,
+        "action": action
+    }
+
     
 def is_vip(user_id):
 
@@ -353,23 +331,6 @@ def vipcount(msg):
         msg,
         f"💎 VIP Users: {len(vip_users)}"
     )
-
-@bot.message_handler(commands=["testapi"])
-def testapi(msg):
-
-    try:
-        r = requests.get(
-            "https://api.coingecko.com/api/v3/ping",
-            timeout=10
-        )
-
-        bot.reply_to(
-            msg,
-            f"Status: {r.status_code}\n\n{r.text}"
-        )
-
-    except Exception as e:
-        bot.reply_to(msg, f"API Error:\n{e}")
 
 # ================= FALLBACK =================
 
