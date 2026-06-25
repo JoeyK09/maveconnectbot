@@ -339,19 +339,11 @@ def vipcount(msg):
         f"💎 VIP Users: {len(vip_users)}"
     )
 
-@bot.message_handler(commands=["coincap"])
-def coincap_test(msg):
+@bot.message_handler(commands=["nettest"])
+def nettest(msg):
     try:
-        r = requests.get(
-            "https://api.coincap.io/v2/assets",
-            timeout=10
-        )
-
-        bot.reply_to(
-            msg,
-            f"Status: {r.status_code}\n\n{r.text[:300]}"
-        )
-
+        r = requests.get("https://www.google.com", timeout=10)
+        bot.reply_to(msg, f"Google OK: {r.status_code}")
     except Exception as e:
         bot.reply_to(msg, str(e))
         
