@@ -343,17 +343,17 @@ def vipcount(msg):
 def coincap_test(msg):
     try:
         r = requests.get(
-            "https://api.coincap.io/v2/assets/bitcoin",
+            "https://api.coincap.io/v2/assets",
             timeout=10
         )
 
         bot.reply_to(
             msg,
-            f"Status: {r.status_code}\n\n{r.text[:500]}"
+            f"Status: {r.status_code}\n\n{r.text[:300]}"
         )
 
     except Exception as e:
-        bot.reply_to(msg, f"Error: {e}")
+        bot.reply_to(msg, str(e))
         
 # ================= FALLBACK =================
 
