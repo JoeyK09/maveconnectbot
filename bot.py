@@ -61,30 +61,52 @@ def get_price(coin):
         "sol": "solana",
         "xrp": "xrp",
         "ada": "cardano",
-        "doge": "dogecoin"
+        "doge": "dogecoin",
+        "dot": "polkadot",
+        "ltc": "litecoin",
+        "trx": "tron",
+        "avax": "avalanche",
+        "shib": "shiba-inu",
+        "link": "chainlink"
     }
 
-    if coin not in COINCAP_IDS:
+    asset = COINCAP_IDS.get(coin)
+
+    if not asset:
         return None
 
     try:
         r = requests.get(
-            f"https://api.coincap.io/v2/assets/{COINCAP_IDS[coin]}",
+            f"https://api.coincap.io/v2/assets/{asset}",
             timeout=10
         )
 
-        print("Status:", r.status_code)
-        print("Response:", r.text)
+        print("CoinCap Status:", r.status_code)
+        print("CoinCap Response:", r.text[:300])
 
         if r.status_code == 200:
             data = r.json()
             return float(data["data"]["priceUsd"])
 
-        return None
-
     except Exception as e:
         print("CoinCap error:", repr(e))
-        raise
+
+    return None
+
+def safe_get_price(coin):
+    for _ in range(3):
+        try:
+            price = get_price(coin)
+
+            if price is not None:
+                return price
+
+        except Exception as e:
+            print("Retry error:", e)
+
+        time.sleep(1)
+
+    return None
     
 # ================= SIGNAL ENGINE =================
 
