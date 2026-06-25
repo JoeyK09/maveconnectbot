@@ -65,6 +65,8 @@ def get_price(coin):
             return cached_price
 
     coin_id = COINS[coin]
+        print("Coin:", coin)
+        print("Coin ID:", coin_id)
 
     # CoinGecko
     try:
@@ -81,6 +83,8 @@ def get_price(coin):
 
         print("CoinGecko status:", r.status_code)
         print("CoinGecko response:", r.text[:200])
+        print("CoinGecko status:", r.status_code)
+        print("CoinGecko response:", r.text)
 
         if r.status_code == 200:
             data = r.json()
