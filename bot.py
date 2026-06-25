@@ -65,6 +65,7 @@ def get_price(coin):
             return cached_price
 
     coin_id = COINS[coin]
+    
     print("Coin:", coin)
     print("Coin ID:", coin_id)
 
