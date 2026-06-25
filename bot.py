@@ -66,49 +66,32 @@ vip_users = set()
 
 # ================= PRICE ENGINE =================
 
-def get_price(coin):
+    def get_price(coin):
     coin = coin.lower().strip()
 
     if coin not in BINANCE_SYMBOLS:
         return None
 
-    now = time.time()
-
-    if coin in price_cache:
-        cached_price, ts = price_cache[coin]
-
-        if now - ts < CACHE_TIME:
-            return cached_price
+    symbol = BINANCE_SYMBOLS[coin]
 
     try:
-        symbol = BINANCE_SYMBOLS.get(coin)
-
-        if not symbol:
-            return None
-
-        print("Testing Binance symbol:", symbol)
-
         r = requests.get(
-            "https://api.binance.com/api/v3/ticker/price",
-            params={"symbol": symbol},
+            f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
             timeout=10
         )
 
-        print("Binance status:", r.status_code)
-        print("Binance response:", r.text)
+        print("Status:", r.status_code)
+        print("Response:", r.text)
 
         if r.status_code == 200:
-            price = float(r.json()["price"])
-
-            price_cache[coin] = (price, now)
-
-            return price
+            data = r.json()
+            return float(data["price"])
 
     except Exception as e:
-        print("Binance error:", repr(e))
+        print("Price error:", e)
 
     return None
-    
+        
 def safe_get_price(coin):
     for _ in range(3):
         try:
@@ -355,6 +338,22 @@ def vipcount(msg):
         f"💎 VIP Users: {len(vip_users)}"
     )
 
+@bot.message_handler(commands=["binance"])
+def binance_test(msg):
+    try:
+        r = requests.get(
+            "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT",
+            timeout=10
+        )
+
+        bot.reply_to(
+            msg,
+            f"Status: {r.status_code}\n\n{r.text[:500]}"
+        )
+
+    except Exception as e:
+        bot.reply_to(msg, f"Error: {e}")
+        
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
