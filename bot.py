@@ -93,6 +93,8 @@ def get_price(coin):
             params={"symbol": symbol},
             timeout=5
         )
+        print("Binance status:", r.status_code)
+        print("Binance response:", r.text)
 
         if r.status_code == 200:
             price = float(r.json()["price"])
