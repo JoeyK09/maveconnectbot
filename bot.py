@@ -347,6 +347,22 @@ def nettest(msg):
     except Exception as e:
         bot.reply_to(msg, str(e))
         
+@bot.message_handler(commands=["gecko"])
+def gecko_test(msg):
+    try:
+        r = requests.get(
+            "https://api.coingecko.com/api/v3/ping",
+            timeout=10
+        )
+
+        bot.reply_to(
+            msg,
+            f"Status: {r.status_code}\n\n{r.text}"
+        )
+
+    except Exception as e:
+        bot.reply_to(msg, str(e))
+        
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
