@@ -339,11 +339,11 @@ def vipcount(msg):
         f"💎 VIP Users: {len(vip_users)}"
     )
 
-@bot.message_handler(commands=["binance"])
-def binance_test(msg):
+@bot.message_handler(commands=["coincap"])
+def coincap_test(msg):
     try:
         r = requests.get(
-            "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT",
+            "https://api.coincap.io/v2/assets/bitcoin",
             timeout=10
         )
 
