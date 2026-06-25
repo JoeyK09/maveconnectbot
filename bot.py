@@ -54,42 +54,39 @@ vip_users = set()
 def get_price(coin):
     coin = coin.lower().strip()
 
-    COINCAP_IDS = {
-        "btc": "bitcoin",
-        "eth": "ethereum",
-        "bnb": "binance-coin",
-        "sol": "solana",
-        "xrp": "xrp",
-        "ada": "cardano",
-        "doge": "dogecoin",
-        "dot": "polkadot",
-        "ltc": "litecoin",
-        "trx": "tron",
-        "avax": "avalanche",
-        "shib": "shiba-inu",
-        "link": "chainlink"
+    PAPRIKA_IDS = {
+        "btc": "btc-bitcoin",
+        "eth": "eth-ethereum",
+        "bnb": "bnb-binance-coin",
+        "sol": "sol-solana",
+        "xrp": "xrp-xrp",
+        "ada": "ada-cardano",
+        "doge": "doge-dogecoin",
+        "dot": "dot-polkadot",
+        "ltc": "ltc-litecoin",
+        "trx": "trx-tron",
+        "avax": "avax-avalanche",
+        "shib": "shib-shiba-inu",
+        "link": "link-chainlink"
     }
 
-    asset = COINCAP_IDS.get(coin)
-
-    if not asset:
+    if coin not in PAPRIKA_IDS:
         return None
 
     try:
         r = requests.get(
-            f"https://api.coincap.io/v2/assets/{asset}",
+            f"https://api.coinpaprika.com/v1/tickers/{PAPRIKA_IDS[coin]}",
             timeout=10
         )
 
-        print("CoinCap Status:", r.status_code)
-        print("CoinCap Response:", r.text[:300])
+        print("Status:", r.status_code)
 
         if r.status_code == 200:
             data = r.json()
-            return float(data["data"]["priceUsd"])
+            return float(data["quotes"]["USD"]["price"])
 
     except Exception as e:
-        print("CoinCap error:", repr(e))
+        print("CoinPaprika error:", repr(e))
 
     return None
 
@@ -347,21 +344,21 @@ def nettest(msg):
     except Exception as e:
         bot.reply_to(msg, str(e))
         
-@bot.message_handler(commands=["gecko"])
-def gecko_test(msg):
+@bot.message_handler(commands=["paprika"])
+def paprika_test(msg):
     try:
         r = requests.get(
-            "https://api.coingecko.com/api/v3/ping",
+            "https://api.coinpaprika.com/v1/tickers/btc-bitcoin",
             timeout=10
         )
 
         bot.reply_to(
             msg,
-            f"Status: {r.status_code}\n\n{r.text}"
+            f"Status: {r.status_code}\n\n{r.text[:500]}"
         )
 
     except Exception as e:
-        bot.reply_to(msg, str(e))
+        bot.reply_to(msg, f"Error: {e}")
         
 # ================= FALLBACK =================
 
