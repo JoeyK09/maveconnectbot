@@ -313,10 +313,14 @@ def scan(msg):
         )
         return
 
+    bot.reply_to(msg, "🔍 Scanning market...")
+
     try:
         output = "📊 LEVEL 4 MARKET SCAN\n\n"
 
-        for coin in COINS.keys():
+        SCAN_COINS = ["btc", "eth", "bnb", "sol", "xrp"]
+
+        for coin in SCAN_COINS:
             result = get_signal(coin)
 
             if result:
