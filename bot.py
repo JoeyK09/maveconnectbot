@@ -56,12 +56,6 @@ price_cache = {}
 CACHE_TIME = 30
 vip_users = set()
 
-# ================= PLATS =================
-
-if os.path.exists("plats.json"):
-    with open("plats.json", "r") as f:
-        plats = json.load(f)
-
 # ================= PRICE ENGINE ===============
 
 def get_price(coin):
@@ -184,9 +178,15 @@ def start(msg):
         f"📢 Free Group:\n{FREE_GROUP}\n\n"
         f"💎 VIP Group:\n{VIP_GROUP}\n\n"
         f"Commands:\n"
-        f"/price btc\n"
-        f"/signal btc\n"
+        f"/price btc,eth,sol,xrp,bnb\n"
+        f"/signal btc,etg,sol,xrp,bnb\n"
         f"/scan\n"
+        f"/mine\n"
+        f"/balance\n"
+        f"/leaderboard\n"
+        f"/daily\n"
+        f"/subscribe\n"
+        f"/help\n"
         f"/ping\n"
         f"/test"
     )
@@ -419,22 +419,21 @@ def help_cmd(msg):
 
 @bot.message_handler(commands=["mine"])
 def mine(msg):
-
     user = str(msg.from_user.id)
 
-    reward = random.randint(5,25)
+    reward = random.randint(5, 25)
 
     add_plats(user, reward)
 
-balance = get_balance(user)
+    balance = get_balance(user)
 
-bot.reply_to(
-    msg,
-    f"🦆 Platypus mined!\n\n"
-    f"+{reward} PLATS\n\n"
-    f"Balance: {balance} PLATS"
+    bot.reply_to(
+        msg,
+        f"🦆 Platypus mined!\n\n"
+        f"+{reward} PLATS\n\n"
+        f"Balance: {balance} PLATS"
 )
-
+    
 @bot.message_handler(commands=["balance"])
 def balance(msg):
 
@@ -451,28 +450,25 @@ def balance(msg):
 @bot.message_handler(commands=["leaderboard"])
 def leaderboard(msg):
 
-   cursor.execute(
-      "SELECT user_id, balance FROM plats ORDER BY balance DESC LIMIT 10"
+    cursor.execute(
+        "SELECT user_id, balance FROM plats ORDER BY balance DESC LIMIT 10"
     )
 
     top = cursor.fetchall()
 
-    text="🏆 TOP PLATYPUS MINERS\n\n"
+    text = "🏆 TOP PLATYPUS MINERS\n\n"
 
-    for i,(uid,bal) in enumerate(top,1):
-        text+=f"{i}. {bal} PLATS\n"
+    for i, (uid, bal) in enumerate(top, 1):
+        text += f"{i}. User {uid} - {bal} PLATS\n"
 
-    bot.reply_to(msg,text)
-
+    bot.reply_to(msg, text)
+    
 @bot.message_handler(commands=["daily"])
 def daily(msg):
 
-    user=str(msg.from_user.id)
+    user = str(msg.from_user.id)
 
-    reward=100
-
-    if user not in plats:
-        plats[user]=0
+    reward = 100
 
     add_plats(user, reward)
 
@@ -481,9 +477,10 @@ def daily(msg):
     bot.reply_to(
         msg,
         f"🎁 Daily Reward\n\n"
-        f"+100 PLATS\n"
-        f"Balance: {plats[user]}"
+        f"+100 PLATS\n\n"
+        f"Balance: {balance} PLATS"
     )
+    
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
@@ -491,10 +488,16 @@ def unknown(msg):
     bot.reply_to(
         msg,
         "❓ Unknown command.\n\n"
-        "Use:\n"
+        "Use one of these commands:\n\n"
         "/price btc\n"
         "/signal btc\n"
         "/scan\n"
+        "/mine\n"
+        "/balance\n"
+        "/leaderboard\n"
+        "/daily\n"
+        "/subscribe\n"
+        "/help\n"
         "/ping\n"
         "/test"
     )
