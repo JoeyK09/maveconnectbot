@@ -77,8 +77,15 @@ PRICE_BUTTONS = {
     "🤖 ICP":"icp",
     "🔷 RENDER":"render",
     "🛰 AKT":"akt",
-    "💎 GRT":"grt"
-    
+    "💎 GRT":"grt",
+    # ================= MEME COINS ============
+    "🐶 DOGE":"doge",
+    "🐶 SHIB": "shib",
+    "🐸 PEPE": "pepe",
+    "🐕 FLOKI": "floki",
+    "🦴 BONK": "bonk",
+    "🐶 WIF": "wif",
+    "🍞 BRETT": "brett",
 }
 
 DASHBOARD_BUTTONS = [
@@ -90,15 +97,6 @@ DASHBOARD_BUTTONS = [
     "⭐ Favorites",
     "🏠 Home"
 ]
-
-# ================= MEME COINS ============
-"🐕 DOGE": "doge",
-"🐶 SHIB": "shib",
-"🐸 PEPE": "pepe",
-"🐕 FLOKI": "floki",
-"🦴 BONK": "bonk",
-"🐶 WIF": "wif",
-"🍞 BRETT": "brett",
 
 # ================= CACHE =================
 
