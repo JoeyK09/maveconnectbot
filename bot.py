@@ -96,7 +96,20 @@ PRICE_BUTTONS = {
     "🍣 SUSHI": "sushi",
     "🔀 1INCH": "1inch",
     "💧 LDO": "ldo",
-  
+
+    # ================= LAYER 1 =================
+
+    "🌌 ATOM": "atom",
+    "🌐 NEAR": "near",
+    "🚀 APT": "apt",
+    "💧 SUI": "sui",
+    "💎 TON": "ton",
+    "⚫ HBAR": "hbar",
+    "⚡ KAS": "kas",
+    "🦅 EGLD": "egld",
+    "🔷 ALGO": "algo",
+    "✔️ VET": "vet",
+    
 }
 
 DASHBOARD_BUTTONS = [
@@ -533,6 +546,40 @@ def topcoins_menu():
         KeyboardButton("🔺 TRX"),
         KeyboardButton("🏔 AVAX"),
         KeyboardButton("🔗 LINK")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
+
+# ================ LAYER 1 =============
+
+def layer1_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🌌 ATOM"),
+        KeyboardButton("🌐 NEAR"),
+        KeyboardButton("🚀 APT")
+    )
+
+    markup.row(
+        KeyboardButton("💧 SUI"),
+        KeyboardButton("💎 TON"),
+        KeyboardButton("⚫ HBAR")
+    )
+
+    markup.row(
+        KeyboardButton("⚡ KAS"),
+        KeyboardButton("🦅 EGLD"),
+        KeyboardButton("🔷 ALGO")
+    )
+
+    markup.row(
+        KeyboardButton("✔️ VET")
     )
 
     markup.row(
@@ -1144,6 +1191,15 @@ def meme_coins(msg):
         reply_markup=memecoins_menu()
     )
 
+@bot.message_handler(func=lambda m: m.text == "⚡ Layer 1")
+def layer1(msg):
+
+    bot.send_message(
+        msg.chat.id,
+        "⚡ Top Layer 1 Coins",
+        reply_markup=layer1_menu()
+    )
+    
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
