@@ -1079,41 +1079,14 @@ def dashboard(msg):
         reply_markup=dashboard_menu()
     )
 
-@bot.message_handler(func=lambda m: m.text=="🏦 DeFi")
+@bot.message_handler(func=lambda m: m.text == "🏦 DeFi")
 def defi(msg):
-
-    text = (
-        "🏦 Top DeFi Coins\n\n"
-        "💰 UNI\n"
-        "💰 AAVE\n"
-        "💰 MKR\n"
-        "💰 CRV\n"
-        "💰 COMP\n"
-        "💰 SUSHI\n"
-        "💰 LDO\n"
-        "💰 PENDLE"
+    bot.send_message(
+        msg.chat.id,
+        "🏦 Top DeFi Coins",
+        reply_markup=defi_menu()
     )
-
-    bot.reply_to(msg, text)
-
-@bot.message_handler(func=lambda m: m.text=="⚡ Layer 1")
-def layer1(msg):
-
-    text = (
-        "⚡ Layer 1 Coins\n\n"
-        "BTC\n"
-        "ETH\n"
-        "SOL\n"
-        "BNB\n"
-        "ADA\n"
-        "AVAX\n"
-        "SUI\n"
-        "APT\n"
-        "ATOM"
-    )
-
-    bot.reply_to(msg, text)
-
+    
 @bot.message_handler(func=lambda m: m.text=="💎 RWA")
 def rwa(msg):
 
@@ -1171,15 +1144,6 @@ def meme_coins(msg):
         reply_markup=memecoins_menu()
     )
 
-@bot.message_handler(func=lambda m: m.text == "🏦 DeFi")
-def defi(msg):
-
-    bot.send_message(
-        msg.chat.id,
-        "🏦 DeFi Coins",
-        reply_markup=defi_menu()
-    )
-    
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
