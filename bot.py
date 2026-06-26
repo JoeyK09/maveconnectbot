@@ -201,6 +201,11 @@ def main_menu():
         KeyboardButton("🏆 Leaderboard")
     )
 
+    markup.row(
+        KeyboardButton("🎮 Games"),
+        KeyboardButton("⚙️ Settings")
+    )
+
     return markup
     
 # ================= COMMANDS =================
@@ -580,34 +585,74 @@ def activate(msg):
 
     bot.reply_to(msg, "✅ VIP activated.")
 
-@bot.message_handler(func=lambda m: m.text == "👤 Account")
-def account(msg):
+@bot.message_handler(func=lambda m: m.text=="👤 Account")
+def account_btn(msg):
     profile(msg)
 
-@bot.message_handler(func=lambda m: m.text == "💳 Wallet")
-def wallet(msg):
+
+@bot.message_handler(func=lambda m: m.text=="💳 Wallet")
+def wallet_btn(msg):
     balance(msg)
 
-@bot.message_handler(func=lambda m: m.text == "🎁 Daily")
-def daily_button(msg):
-    daily(msg)
 
-@bot.message_handler(func=lambda m: m.text == "🏆 Leaderboard")
-def leaderboard_button(msg):
-    leaderboard_cmd(msg)
-
-@bot.message_handler(func=lambda m: m.text == "💎 VIP")
-def vip(msg):
+@bot.message_handler(func=lambda m: m.text=="💎 VIP")
+def vip_btn(msg):
     subscribe(msg)
 
-@bot.message_handler(func=lambda m: m.text == "📈 Trading")
-def trading(msg):
+
+@bot.message_handler(func=lambda m: m.text=="🏆 Leaderboard")
+def leaderboard_btn(msg):
+    leaderboard_cmd(msg)
+
+
+@bot.message_handler(func=lambda m: m.text=="🎁 Daily")
+def daily_btn(msg):
+    daily(msg)
+
+
+@bot.message_handler(func=lambda m: m.text=="⛏ Mine")
+def mine_btn(msg):
+    mine(msg)
+
+
+@bot.message_handler(func=lambda m: m.text=="📈 Trading")
+def trading_btn(msg):
     bot.reply_to(
         msg,
-        "Trading Commands\n\n"
+        "📈 Trading Menu\n\n"
         "/price btc\n"
         "/signal btc\n"
         "/scan"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text=="👥 Refer & Earn")
+def refer_btn(msg):
+    bot.reply_to(
+        msg,
+        "👥 Referral System\n\n"
+        "🚧 Coming Soon!"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text=="🎮 Games")
+def games_btn(msg):
+    bot.reply_to(
+        msg,
+        "🎮 Games\n\n"
+        "🎲 Dice\n"
+        "🪙 Coin Flip\n"
+        "🎰 Slots\n\n"
+        "Coming in the next update!"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text=="⚙️ Settings")
+def settings_btn(msg):
+    bot.reply_to(
+        msg,
+        "⚙️ Settings\n\n"
+        "Coming Soon!"
     )
     
 # ================= FALLBACK =================
