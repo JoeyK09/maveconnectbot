@@ -115,7 +115,6 @@ COINPAPRIKA_IDS = {
     "sol": "sol-solana",
     "xrp": "xrp-xrp",
     "ada": "ada-cardano",
-    "doge": "doge-dogecoin",
     "trx": "trx-tron",
     "avax": "avax-avalanche",
     "dot": "dot-polkadot",
@@ -161,6 +160,7 @@ COINPAPRIKA_IDS = {
     "oas": "oas-oasys",
 
     # Meme
+    "doge": "doge-dogecoin",
     "shib": "shib-shiba-inu",
     "pepe": "pepe-pepe",
     "floki": "floki-floki",
