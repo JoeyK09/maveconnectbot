@@ -6,10 +6,17 @@ cursor = conn.cursor()
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS plats (
     user_id TEXT PRIMARY KEY,
-    balance INTEGER DEFAULT 0
+    balance INTEGER DEFAULT 0,
+    xp INTEGER DEFAULT 0,
+    level INTEGER DEFAULT 1,
+    last_daily INTEGER DEFAULT 0,
+    last_mine INTEGER DEFAULT 0,
+    wins INTEGER DEFAULT 0
 )
 """)
+
 conn.commit()
+
 
 def get_balance(user_id):
     cursor.execute(
@@ -18,6 +25,7 @@ def get_balance(user_id):
     )
     row = cursor.fetchone()
     return row[0] if row else 0
+
 
 def add_plats(user_id, amount):
     balance = get_balance(user_id)
