@@ -180,12 +180,13 @@ def home():
 def start(msg):
     bot.reply_to(
         msg,
+        f"👋🏼Welcome to MAVECONNECT BOT\n\n"
         f"🚀 LEVEL 4 AI TRADING BOT\n\n"
         f"📢 Free Group:\n{FREE_GROUP}\n\n"
         f"💎 VIP Group:\n{VIP_GROUP}\n\n"
         f"Commands:\n"
         f"/price btc,eth,sol,xrp,bnb\n"
-        f"/signal btc,etg,sol,xrp,bnb\n"
+        f"/signal btc,eth,sol,xrp,bnb\n"
         f"/scan\n"
         f"/mine\n"
         f"/balance\n"
@@ -494,62 +495,31 @@ def mine(msg):
     )
 
 @bot.message_handler(commands=["leaderboard"])
-def leaderboard(msg):
-
-    cursor.execute(
-        "SELECT user_id, balance FROM plats ORDER BY balance DESC LIMIT 10"
-    )
+def leaderboard_cmd(msg):
 
     top = leaderboard()
 
-text = "🏆 TOP PLATYPUS MINERS\n\n"
+    text = "🏆 TOP PLATYPUS MINERS\n\n"
 
-for i, (uid, bal) in enumerate(top, 1):
-    text += f"{i}. {bal} PLATS\n"
+    if not top:
+        text += "No miners yet."
+    else:
+        for i, (uid, bal) in enumerate(top, 1):
+            text += f"{i}. {bal} PLATS\n"
 
-bot.reply_to(msg, text)
-    
-@bot.message_handler(commands=["daily"])
-def daily(msg):
+    bot.reply_to(msg, text)
+
+@bot.message_handler(commands=["balance"])
+def balance(msg):
 
     user = str(msg.from_user.id)
 
-    balance, xp, level, last_daily, last_mine, wins = get_profile(user)
-
-    now = int(time.time())
-
-    cooldown = 86400
-
-    if now-last_daily < cooldown:
-
-        left = cooldown-(now-last_daily)
-
-        hrs = left//3600
-        mins = (left%3600)//60
-
-        bot.reply_to(
-            msg,
-            f"🎁 Daily already claimed.\n\n"
-            f"Come back in {hrs}h {mins}m"
-        )
-
-        return
-
-    reward = 100
-
-    balance += reward
-
-    update_daily(
-        user,
-        balance,
-        now
-    )
+    balance = get_balance(user)
 
     bot.reply_to(
         msg,
-        f"🎁 Daily Reward\n\n"
-        f"+100 PLATS\n\n"
-        f"Balance: {balance}"
+        f"💰 Balance\n\n"
+        f"{balance} PLATS"
     )
 
 @bot.message_handler(commands=["profile"])
