@@ -500,11 +500,11 @@ def balance(msg):
 @bot.message_handler(commands=["leaderboard"])
 def leaderboard(msg):
 
-    top=sorted(
-        plats.items(),
-        key=lambda x:x[1],
-        reverse=True
-    )[:10]
+   cursor.execute(
+      "SELECT user_id, balance FROM plats ORDER BY balance DESC LIMIT 10"
+    )
+
+    top = cursor.fetchall()
 
     text="🏆 TOP PLATYPUS MINERS\n\n"
 
@@ -524,6 +524,8 @@ def daily(msg):
         plats[user]=0
 
     add_plats(user, reward)
+
+    balance = get_balance(user)
 
     bot.reply_to(
         msg,
