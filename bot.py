@@ -356,7 +356,41 @@ def is_vip(user_id):
     except Exception as e:
         print("VIP check error:", e)
         return False
-    
+
+# ================= COIN DETAILS ===============
+
+def get_coin_data(coin):
+
+    coin = coin.lower().strip()
+
+    if coin not in COINPAPRIKA_IDS:
+        return None
+
+    try:
+        r = requests.get(
+            f"https://api.coinpaprika.com/v1/tickers/{COINPAPRIKA_IDS[coin]}",
+            timeout=10
+        )
+
+        if r.status_code != 200:
+            return None
+
+        data = r.json()
+
+        return {
+            "name": data["name"],
+            "symbol": data["symbol"],
+            "price": data["quotes"]["USD"]["price"],
+            "change24": data["quotes"]["USD"]["percent_change_24h"],
+            "marketcap": data["quotes"]["USD"]["market_cap"],
+            "volume": data["quotes"]["USD"]["volume_24h"],
+            "rank": data["rank"]
+        }
+
+    except Exception as e:
+        print(e)
+        return None
+        
 # ================= FLASK =================
 
 @app.route("/")
@@ -1249,23 +1283,24 @@ def search_coin_result(msg):
 
     search_users.discard(msg.from_user.id)
 
-    coin = msg.text.lower().strip()
+coin = msg.text.lower().strip()
 
-    price = safe_get_price(coin)
+data = get_coin_data(coin)
 
-    if price is None:
-        bot.reply_to(
-            msg,
-            "❌ Coin not found or not supported."
-        )
-        return
+if data is None:
+    bot.reply_to(msg, "❌ Coin not found.")
+    return
 
-    bot.reply_to(
-        msg,
-        f"💰 {coin.upper()}\n\n"
-        f"Price: ${price:,.6f}"
+bot.reply_to(
+    msg,
+    f"🪙 {data['name']} ({data['symbol']})\n\n"
+    f"💰 Price: ${data['price']:,.6f}\n"
+    f"📈 24H: {data['change24']:.2f}%\n"
+    f"🏆 Rank: #{data['rank']}\n"
+    f"💎 Market Cap: ${data['marketcap']:,.0f}\n"
+    f"📊 Volume: ${data['volume']:,.0f}"
 )
-    
+
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
