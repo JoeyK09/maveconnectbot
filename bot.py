@@ -86,6 +86,7 @@ PRICE_BUTTONS = {
     "🦴 BONK": "bonk",
     "🐶 WIF": "wif",
     "🍞 BRETT": "brett",
+    
 }
 
 DASHBOARD_BUTTONS = [
@@ -440,6 +441,7 @@ def dashboard_menu():
 
     return markup
 
+# ================ MEME COINS ================
 def meme_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
@@ -465,7 +467,7 @@ def meme_menu():
 
     return markup
     
-# ================= TOP COINS ================
+# ================= TOP COINS ===============
 
 def topcoins_menu():
 
