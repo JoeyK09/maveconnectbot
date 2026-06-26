@@ -57,6 +57,23 @@ COINS = {
     "link": "chainlink"
 }
 
+PRICE_BUTTONS = {
+
+    "₿ BTC":"btc",
+    "Ξ ETH":"eth",
+    "🟡 BNB":"bnb",
+    "☀️ SOL":"sol",
+    "💧 XRP":"xrp",
+    "🔵 ADA":"ada",
+    "🐶 DOGE":"doge",
+    "🔷 DOT":"dot",
+    "⚡ LTC":"ltc",
+    "🔺 TRX":"trx",
+    "🏔 AVAX":"avax",
+    "🔗 LINK":"link"
+
+}
+
 # ================= CACHE =================
 
 price_cache = {}
@@ -204,6 +221,69 @@ def main_menu():
     markup.row(
         KeyboardButton("🎮 Games"),
         KeyboardButton("⚙️ Settings")
+    )
+
+    return markup
+
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+
+def trading_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🟢 Top Coins"),
+        KeyboardButton("🤖 AI Coins")
+    )
+
+    markup.row(
+        KeyboardButton("🐸 Meme Coins"),
+        KeyboardButton("🏦 DeFi")
+    )
+
+    markup.row(
+        KeyboardButton("⚡ Layer 1"),
+        KeyboardButton("🔍 Search Coin")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
+
+# ================= TOP COINS ================
+
+def topcoins_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("₿ BTC"),
+        KeyboardButton("Ξ ETH"),
+        KeyboardButton("🟡 BNB")
+    )
+
+    markup.row(
+        KeyboardButton("☀️ SOL"),
+        KeyboardButton("💧 XRP"),
+        KeyboardButton("🔵 ADA")
+    )
+
+    markup.row(
+        KeyboardButton("🐶 DOGE"),
+        KeyboardButton("🔷 DOT"),
+        KeyboardButton("⚡ LTC")
+    )
+
+    markup.row(
+        KeyboardButton("🔺 TRX"),
+        KeyboardButton("🏔 AVAX"),
+        KeyboardButton("🔗 LINK")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
     )
 
     return markup
@@ -616,24 +696,12 @@ def mine_btn(msg):
 
 
 @bot.message_handler(func=lambda m: m.text == "📈 Trading")
-def trading_btn(msg):
-
-    markup = ReplyKeyboardMarkup(resize_keyboard=True)
-
-    markup.row(
-        KeyboardButton("💲 Price"),
-        KeyboardButton("🤖 Signal")
-    )
-
-    markup.row(
-        KeyboardButton("📊 Scan"),
-        KeyboardButton("🏠 Home")
-    )
+def trading(msg):
 
     bot.send_message(
         msg.chat.id,
-        "📈 Trading Center\n\nChoose an option:",
-        reply_markup=markup
+        "📈 Trading Center\n\nChoose a category.",
+        reply_markup=trading_menu()
     )
 
 
@@ -703,6 +771,42 @@ def signal_menu(msg):
 @bot.message_handler(func=lambda m: m.text == "📊 Scan")
 def scan_menu(msg):
     scan(msg)
+
+
+@bot.message_handler(func=lambda m: m.text == "🟢 Top Coins")
+def topcoins(msg):
+
+    bot.send_message(
+        msg.chat.id,
+        "💰 Top Coins",
+        reply_markup=topcoins_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text in PRICE_BUTTONS)
+def coin_price(msg):
+
+    coin = PRICE_BUTTONS[msg.text]
+
+    price = safe_get_price(coin)
+
+    if price is None:
+        bot.reply_to(msg, "❌ Price unavailable.")
+        return
+
+    bot.reply_to(
+        msg,
+        f"💰 {coin.upper()}\n\n"
+        f"Price: ${price:,.4f}"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🏠 Home")
+def home_button(msg):
+
+    bot.send_message(
+        msg.chat.id,
+        "🏠 Main Menu",
+        reply_markup=main_menu()
+    )
     
 # ================= FALLBACK =================
 
