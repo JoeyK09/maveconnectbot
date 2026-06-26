@@ -15,9 +15,8 @@ cursor = conn.cursor()
 # ================= CREATE TABLE =================
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS plats vip_users (
+CREATE TABLE IF NOT EXISTS plats(
     user_id TEXT PRIMARY KEY,
-    expires INTEGER
     balance INTEGER DEFAULT 0,
     xp INTEGER DEFAULT 0,
     level INTEGER DEFAULT 1,
