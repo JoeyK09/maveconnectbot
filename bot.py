@@ -109,6 +109,12 @@ PRICE_BUTTONS = {
     "🦅 EGLD": "egld",
     "🔷 ALGO": "algo",
     "✔️ VET": "vet",
+
+    # ================= RWA =================
+
+    "💎 ONDO": "ondo",
+    "🕉 OM": "om",
+    "⏳ PENDLE": "pendle",
     
 }
 
@@ -580,6 +586,24 @@ def layer1_menu():
 
     markup.row(
         KeyboardButton("✔️ VET")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
+
+# ================= DEFI ===============
+
+def rwa_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("💎 ONDO"),
+        KeyboardButton("🕉 OM"),
+        KeyboardButton("⏳ PENDLE")
     )
 
     markup.row(
@@ -1198,6 +1222,15 @@ def layer1(msg):
         msg.chat.id,
         "⚡ Top Layer 1 Coins",
         reply_markup=layer1_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text == "💎 RWA")
+def rwa(msg):
+
+    bot.send_message(
+        msg.chat.id,
+        "💎 Real World Asset (RWA) Coins",
+        reply_markup=rwa_menu()
     )
     
 # ================= FALLBACK =================
