@@ -1,3 +1,5 @@
+import json
+import random
 import os
 import time
 import requests
@@ -45,11 +47,25 @@ COINS = {
 
 # ================= CACHE =================
 
+import json
+
 price_cache = {}
 CACHE_TIME = 30
 vip_users = set()
 
-# ================= PRICE ENGINE ===========
+# ================= PLATS =================
+
+if os.path.exists("plats.json"):
+    with open("plats.json", "r") as f:
+        plats = json.load(f)
+else:
+    plats = {}
+
+def save_plats():
+    with open("plats.json", "w") as f:
+        json.dump(plats, f, indent=4)
+
+# ================= PRICE ENGINE ===============
 
 def get_price(coin):
     coin = coin.lower().strip()
@@ -404,6 +420,76 @@ def help_cmd(msg):
         "/help - Show commands"
     )
 
+@bot.message_handler(commands=["mine"])
+def mine(msg):
+
+    user = str(msg.from_user.id)
+
+    reward = random.randint(5,25)
+
+    if user not in plats:
+        plats[user]=0
+
+    plats[user]+=reward
+
+    save_plats()
+
+    bot.reply_to(
+        msg,
+        f"🦆 Platypus mined!\n\n"
+        f"+{reward} PLATS\n\n"
+        f"Balance: {plats[user]} PLATS"
+    )
+
+@bot.message_handler(commands=["balance"])
+def balance(msg):
+
+    user=str(msg.from_user.id)
+
+    bal=plats.get(user,0)
+
+    bot.reply_to(
+        msg,
+        f"💰 Your Balance\n\n"
+        f"{bal} PLATS"
+    )
+
+@bot.message_handler(commands=["leaderboard"])
+def leaderboard(msg):
+
+    top=sorted(
+        plats.items(),
+        key=lambda x:x[1],
+        reverse=True
+    )[:10]
+
+    text="🏆 TOP PLATYPUS MINERS\n\n"
+
+    for i,(uid,bal) in enumerate(top,1):
+        text+=f"{i}. {bal} PLATS\n"
+
+    bot.reply_to(msg,text)
+
+@bot.message_handler(commands=["daily"])
+def daily(msg):
+
+    user=str(msg.from_user.id)
+
+    reward=100
+
+    if user not in plats:
+        plats[user]=0
+
+    plats[user]+=reward
+
+    save_plats()
+
+    bot.reply_to(
+        msg,
+        f"🎁 Daily Reward\n\n"
+        f"+100 PLATS\n"
+        f"Balance: {plats[user]}"
+    )
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
