@@ -78,15 +78,15 @@ PRICE_BUTTONS = {
     "🔷 RENDER":"render",
     "🛰 AKT":"akt",
     "💎 GRT":"grt",
-    # ================= MEME COINS ============
-    "🐶 DOGE":"doge",
+
+    "🐕 DOGE": "doge",
     "🐶 SHIB": "shib",
     "🐸 PEPE": "pepe",
     "🐕 FLOKI": "floki",
     "🦴 BONK": "bonk",
     "🐶 WIF": "wif",
     "🍞 BRETT": "brett",
-    
+  
 }
 
 DASHBOARD_BUTTONS = [
