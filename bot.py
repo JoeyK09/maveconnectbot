@@ -182,8 +182,8 @@ def main_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
-        KeyboardButton("👤 Account"),
-        KeyboardButton("👥 Refer & Earn")
+        KeyboardButton("📈 Trading"),
+        KeyboardButton("⛏️ Mine")
     )
 
     markup.row(
@@ -192,12 +192,12 @@ def main_menu():
     )
 
     markup.row(
-        KeyboardButton("⛏ Mine"),
+        KeyboardButton("👥 Refer & Earn"),
         KeyboardButton("🎁 Daily")
     )
 
     markup.row(
-        KeyboardButton("📈 Trading"),
+        KeyboardButton("👤 Account"),
         KeyboardButton("🏆 Leaderboard")
     )
 
