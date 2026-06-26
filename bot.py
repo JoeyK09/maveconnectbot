@@ -133,6 +133,7 @@ DASHBOARD_BUTTONS = [
 price_cache = {}
 CACHE_TIME = 30
 vip_users = set()
+search_users = set()
 
 # ================= COINPAPRIKA IDS =================
 
@@ -1232,6 +1233,38 @@ def rwa(msg):
         "💎 Real World Asset (RWA) Coins",
         reply_markup=rwa_menu()
     )
+
+@bot.message_handler(func=lambda m: m.text == "🔍 Search Coin")
+def search_coin(msg):
+
+    search_users.add(msg.from_user.id)
+
+    bot.send_message(
+        msg.chat.id,
+        "🔎 Send a coin symbol.\n\nExamples:\nBTC\nETH\nDOGE\nSUI\nONDO"
+    )
+
+@bot.message_handler(func=lambda m: m.from_user.id in search_users)
+def search_coin_result(msg):
+
+    search_users.discard(msg.from_user.id)
+
+    coin = msg.text.lower().strip()
+
+    price = safe_get_price(coin)
+
+    if price is None:
+        bot.reply_to(
+            msg,
+            "❌ Coin not found or not supported."
+        )
+        return
+
+    bot.reply_to(
+        msg,
+        f"💰 {coin.upper()}\n\n"
+        f"Price: ${price:,.6f}"
+)
     
 # ================= FALLBACK =================
 
