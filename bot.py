@@ -59,12 +59,6 @@ vip_users = set()
 if os.path.exists("plats.json"):
     with open("plats.json", "r") as f:
         plats = json.load(f)
-else:
-    plats = {}
-
-def save_plats():
-    with open("plats.json", "w") as f:
-        json.dump(plats, f, indent=4)
 
 import sqlite3
 
