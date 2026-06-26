@@ -371,7 +371,39 @@ def paprika_test(msg):
 
     except Exception as e:
         bot.reply_to(msg, f"Error: {e}")
-        
+
+@bot.message_handler(commands=["subscribe"])
+def subscribe(msg):
+    bot.reply_to(
+        msg,
+        "💎 VIP MEMBERSHIP\n\n"
+        "Monthly: $10\n"
+        "Quarterly: $25\n"
+        "Yearly: $80\n\n"
+        "VIP Benefits:\n"
+        "✅ AI Buy/Sell Signals\n"
+        "✅ Market Scanner\n"
+        "✅ Early Coin Alerts\n"
+        "✅ Platypus Rewards\n\n"
+        "Contact Admin:\n"
+        "@YourTelegramUsername"
+    )
+
+@bot.message_handler(commands=["help"])
+def help_cmd(msg):
+    bot.reply_to(
+        msg,
+        "🤖 LEVEL 4 AI BOT\n\n"
+        "/price btc - Live price\n"
+        "/signal btc - VIP signal\n"
+        "/scan - VIP scanner\n"
+        "/mine - Mine Plats\n"
+        "/balance - Check Plats\n"
+        "/leaderboard - Top miners\n"
+        "/subscribe - VIP plans\n"
+        "/help - Show commands"
+    )
+
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
