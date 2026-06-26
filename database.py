@@ -87,14 +87,26 @@ def remove_plats(user_id, amount):
     new_balance = max(0, balance - amount)
 
     cursor.execute("""
-        UPDATE plats
-        SET balance=%s
-        WHERE user_id=%s
-    """, (
-        new_balance,
-        user_id
-    ))
+CREATE INDEX IF NOT EXISTS idx_balance
+ON plats(balance DESC)
+""")
 
+cursor.execute("""
+CREATE INDEX IF NOT EXISTS idx_level
+ON plats(level DESC)
+""")
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS vip_users(
+    user_id TEXT PRIMARY KEY,
+    expires BIGINT
+)
+""")
+
+cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS referred_by TEXT;
+""")
 
 def update_mine(user_id, balance, xp, level, last_mine):
     get_profile(user_id)
