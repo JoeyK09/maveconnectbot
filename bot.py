@@ -178,16 +178,27 @@ def home():
 # =================MAIN MENU ================
 
 def main_menu():
+
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
         KeyboardButton("👤 Account"),
-        KeyboardButton("💰 Wallet")
+        KeyboardButton("👥 Refer & Earn")
     )
 
     markup.row(
-        KeyboardButton("⛏️ Mine"),
+        KeyboardButton("💳 Wallet"),
+        KeyboardButton("💎 VIP")
+    )
+
+    markup.row(
+        KeyboardButton("⛏ Mine"),
         KeyboardButton("🎁 Daily")
+    )
+
+    markup.row(
+        KeyboardButton("📈 Trading"),
+        KeyboardButton("🏆 Leaderboard")
     )
 
     return markup
@@ -196,30 +207,15 @@ def main_menu():
 
 @bot.message_handler(commands=["start"])
 def start(msg):
-    bot.reply_to(
-        msg,
-        f"👋🏼Welcome to MAVECONNECT BOT\n\n"
+
+    bot.send_message(
+        msg.chat.id,
+        f"👋 Welcome to MaveConnect!\n\n"
         f"🚀 LEVEL 4 AI TRADING BOT\n\n"
         f"📢 Free Group:\n{FREE_GROUP}\n\n"
         f"💎 VIP Group:\n{VIP_GROUP}\n\n"
-        f"Commands:\n"
-        f"/price btc,eth,sol,xrp,bnb\n"
-        f"/signal btc,eth,sol,xrp,bnb\n"
-        f"/scan\n"
-        f"/mine\n"
-        f"/balance\n"
-        f"/leaderboard\n"
-        f"/daily\n"
-        f"/subscribe\n"
-        f"/help\n"
-        f"/ping\n"
-        f"/test"
-    )
-
-    bot.reply_to(
-    msg,
-    "🚀 Welcome to MaveConnect!",
-    reply_markup=main_menu()
+        f"Use the menu below 👇",
+        reply_markup=main_menu()
     )
     
 @bot.message_handler(commands=["ping"])
@@ -583,6 +579,36 @@ def activate(msg):
     vip_users.add(int(user_id))
 
     bot.reply_to(msg, "✅ VIP activated.")
+
+@bot.message_handler(func=lambda m: m.text == "👤 Account")
+def account(msg):
+    profile(msg)
+
+@bot.message_handler(func=lambda m: m.text == "💳 Wallet")
+def wallet(msg):
+    balance(msg)
+
+@bot.message_handler(func=lambda m: m.text == "🎁 Daily")
+def daily_button(msg):
+    daily(msg)
+
+@bot.message_handler(func=lambda m: m.text == "🏆 Leaderboard")
+def leaderboard_button(msg):
+    leaderboard_cmd(msg)
+
+@bot.message_handler(func=lambda m: m.text == "💎 VIP")
+def vip(msg):
+    subscribe(msg)
+
+@bot.message_handler(func=lambda m: m.text == "📈 Trading")
+def trading(msg):
+    bot.reply_to(
+        msg,
+        "Trading Commands\n\n"
+        "/price btc\n"
+        "/signal btc\n"
+        "/scan"
+    )
     
 # ================= FALLBACK =================
 
