@@ -442,7 +442,7 @@ def dashboard_menu():
     return markup
 
 # ================ MEME COINS ================
-def meme_menu():
+def memecoins_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
