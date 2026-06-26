@@ -16,6 +16,7 @@ from database import (
     add_win,
     leaderboard
 )
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import telebot
 
 # ================= BOT =================
@@ -174,6 +175,23 @@ def is_vip(user_id):
 def home():
     return "LEVEL 4 AI TRADING BOT 🚀"
 
+# =================MAIN MENU ================
+
+def main_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("👤 Account"),
+        KeyboardButton("💰 Wallet")
+    )
+
+    markup.row(
+        KeyboardButton("⛏️ Mine"),
+        KeyboardButton("🎁 Daily")
+    )
+
+    return markup
+    
 # ================= COMMANDS =================
 
 @bot.message_handler(commands=["start"])
@@ -196,6 +214,12 @@ def start(msg):
         f"/help\n"
         f"/ping\n"
         f"/test"
+    )
+
+    bot.reply_to(
+    msg,
+    "🚀 Welcome to MaveConnect!",
+    reply_markup=main_menu()
     )
     
 @bot.message_handler(commands=["ping"])
