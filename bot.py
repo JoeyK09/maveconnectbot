@@ -92,7 +92,6 @@ DASHBOARD_BUTTONS = [
 ]
 
 # ================= MEME COINS ============
-
 "🐕 DOGE": "doge",
 "🐶 SHIB": "shib",
 "🐸 PEPE": "pepe",
