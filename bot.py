@@ -9,9 +9,12 @@ from database import (
     cursor,
     get_balance,
     add_plats,
+    remove_plats,
     get_profile,
     update_mine,
-    update_daily
+    update_daily,
+    add_win,
+    leaderboard
 )
 import telebot
 
@@ -497,14 +500,14 @@ def leaderboard(msg):
         "SELECT user_id, balance FROM plats ORDER BY balance DESC LIMIT 10"
     )
 
-    top = cursor.fetchall()
+    top = leaderboard()
 
-    text = "🏆 TOP PLATYPUS MINERS\n\n"
+text = "🏆 TOP PLATYPUS MINERS\n\n"
 
-    for i, (uid, bal) in enumerate(top, 1):
-        text += f"{i}. User {uid} - {bal} PLATS\n"
+for i, (uid, bal) in enumerate(top, 1):
+    text += f"{i}. {bal} PLATS\n"
 
-    bot.reply_to(msg, text)
+bot.reply_to(msg, text)
     
 @bot.message_handler(commands=["daily"])
 def daily(msg):
