@@ -615,14 +615,25 @@ def mine_btn(msg):
     mine(msg)
 
 
-@bot.message_handler(func=lambda m: m.text=="📈 Trading")
+@bot.message_handler(func=lambda m: m.text == "📈 Trading")
 def trading_btn(msg):
-    bot.reply_to(
-        msg,
-        "📈 Trading Menu\n\n"
-        "/price btc\n"
-        "/signal btc\n"
-        "/scan"
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("💲 Price"),
+        KeyboardButton("🤖 Signal")
+    )
+
+    markup.row(
+        KeyboardButton("📊 Scan"),
+        KeyboardButton("🏠 Home")
+    )
+
+    bot.send_message(
+        msg.chat.id,
+        "📈 Trading Center\n\nChoose an option:",
+        reply_markup=markup
     )
 
 
@@ -654,6 +665,44 @@ def settings_btn(msg):
         "⚙️ Settings\n\n"
         "Coming Soon!"
     )
+
+
+@bot.message_handler(func=lambda m: m.text == "🏠 Home")
+def home_btn(msg):
+
+    bot.send_message(
+        msg.chat.id,
+        "🏠 Main Menu",
+        reply_markup=main_menu()
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "💲 Price")
+def price_menu(msg):
+
+    bot.reply_to(
+        msg,
+        "Send a command like:\n\n"
+        "/price btc\n"
+        "/price eth\n"
+        "/price sol"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "🤖 Signal")
+def signal_menu(msg):
+
+    bot.reply_to(
+        msg,
+        "Send a command like:\n\n"
+        "/signal btc\n"
+        "/signal eth"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "📊 Scan")
+def scan_menu(msg):
+    scan(msg)
     
 # ================= FALLBACK =================
 
