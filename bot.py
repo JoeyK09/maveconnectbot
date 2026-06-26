@@ -439,6 +439,31 @@ def dashboard_menu():
     )
 
     return markup
+
+def meme_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🐕 DOGE"),
+        KeyboardButton("🐶 SHIB"),
+        KeyboardButton("🐸 PEPE")
+    )
+
+    markup.row(
+        KeyboardButton("🐕 FLOKI"),
+        KeyboardButton("🦴 BONK"),
+        KeyboardButton("🐶 WIF")
+    )
+
+    markup.row(
+        KeyboardButton("🍞 BRETT")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
     
 # ================= TOP COINS ================
 
