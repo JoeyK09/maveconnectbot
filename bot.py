@@ -5,6 +5,7 @@ import time
 import requests
 from flask import Flask
 from threading import Thread
+from database import conn, cursor
 import telebot
 
 # ================= BOT =================
@@ -65,6 +66,51 @@ def save_plats():
     with open("plats.json", "w") as f:
         json.dump(plats, f, indent=4)
 
+import sqlite3
+
+# ================= DATABASE =================
+
+conn = sqlite3.connect("plats.db", check_same_thread=False)
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS plats (
+    user_id TEXT PRIMARY KEY,
+    balance INTEGER DEFAULT 0
+)
+""")
+
+conn.commit()
+
+# ================= DATABASE FUNCTIONS =================
+
+def get_balance(user_id):
+    cursor.execute(
+        "SELECT balance FROM plats WHERE user_id=?",
+        (user_id,)
+    )
+
+    row = cursor.fetchone()
+
+    return row[0] if row else 0
+
+
+def add_plats(user_id, amount):
+    balance = get_balance(user_id)
+
+    if balance == 0:
+        cursor.execute(
+            "INSERT OR IGNORE INTO plats(user_id, balance) VALUES(?, ?)",
+            (user_id, amount)
+        )
+    else:
+        cursor.execute(
+            "UPDATE plats SET balance=? WHERE user_id=?",
+            (balance + amount, user_id)
+        )
+
+    conn.commit()
+    
 # ================= PRICE ENGINE ===============
 
 def get_price(coin):
@@ -427,26 +473,23 @@ def mine(msg):
 
     reward = random.randint(5,25)
 
-    if user not in plats:
-        plats[user]=0
+    add_plats(user, reward)
 
-    plats[user]+=reward
+balance = get_balance(user)
 
-    save_plats()
-
-    bot.reply_to(
-        msg,
-        f"🦆 Platypus mined!\n\n"
-        f"+{reward} PLATS\n\n"
-        f"Balance: {plats[user]} PLATS"
-    )
+bot.reply_to(
+    msg,
+    f"🦆 Platypus mined!\n\n"
+    f"+{reward} PLATS\n\n"
+    f"Balance: {balance} PLATS"
+)
 
 @bot.message_handler(commands=["balance"])
 def balance(msg):
 
     user=str(msg.from_user.id)
 
-    bal=plats.get(user,0)
+    bal = get_balance(user)
 
     bot.reply_to(
         msg,
@@ -480,9 +523,7 @@ def daily(msg):
     if user not in plats:
         plats[user]=0
 
-    plats[user]+=reward
-
-    save_plats()
+    add_plats(user, reward)
 
     bot.reply_to(
         msg,
