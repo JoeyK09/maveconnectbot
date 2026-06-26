@@ -80,6 +80,8 @@ def add_plats(user_id, amount):
 
 
 def remove_plats(user_id, amount):
+    get_profile(user_id)
+    
     balance = get_balance(user_id)
 
     new_balance = max(0, balance - amount)
@@ -95,6 +97,8 @@ def remove_plats(user_id, amount):
 
 
 def update_mine(user_id, balance, xp, level, last_mine):
+    get_profile(user_id)
+
     cursor.execute("""
         UPDATE plats
         SET balance=%s,
@@ -112,6 +116,8 @@ def update_mine(user_id, balance, xp, level, last_mine):
 
 
 def update_daily(user_id, balance, last_daily):
+    get_profile(user_id)
+    
     cursor.execute("""
         UPDATE plats
         SET balance=%s,
@@ -125,6 +131,8 @@ def update_daily(user_id, balance, last_daily):
 
 
 def add_win(user_id):
+    get_profile(user_id)
+    
     cursor.execute("""
         UPDATE plats
         SET wins = wins + 1
