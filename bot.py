@@ -1,11 +1,15 @@
-import json
 import random
 import os
 import time
 import requests
 from flask import Flask
 from threading import Thread
-from database import conn, cursor
+from database import (
+    conn,
+    cursor,
+    get_balance,
+    add_plats
+)
 import telebot
 
 # ================= BOT =================
@@ -48,8 +52,6 @@ COINS = {
 
 # ================= CACHE =================
 
-import json
-
 price_cache = {}
 CACHE_TIME = 30
 vip_users = set()
@@ -60,51 +62,6 @@ if os.path.exists("plats.json"):
     with open("plats.json", "r") as f:
         plats = json.load(f)
 
-import sqlite3
-
-# ================= DATABASE =================
-
-conn = sqlite3.connect("plats.db", check_same_thread=False)
-cursor = conn.cursor()
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS plats (
-    user_id TEXT PRIMARY KEY,
-    balance INTEGER DEFAULT 0
-)
-""")
-
-conn.commit()
-
-# ================= DATABASE FUNCTIONS =================
-
-def get_balance(user_id):
-    cursor.execute(
-        "SELECT balance FROM plats WHERE user_id=?",
-        (user_id,)
-    )
-
-    row = cursor.fetchone()
-
-    return row[0] if row else 0
-
-
-def add_plats(user_id, amount):
-    balance = get_balance(user_id)
-
-    if balance == 0:
-        cursor.execute(
-            "INSERT OR IGNORE INTO plats(user_id, balance) VALUES(?, ?)",
-            (user_id, amount)
-        )
-    else:
-        cursor.execute(
-            "UPDATE plats SET balance=? WHERE user_id=?",
-            (balance + amount, user_id)
-        )
-
-    conn.commit()
-    
 # ================= PRICE ENGINE ===============
 
 def get_price(coin):
