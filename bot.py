@@ -394,21 +394,17 @@ def paprika_test(msg):
 
 @bot.message_handler(commands=["subscribe"])
 def subscribe(msg):
+
     bot.reply_to(
         msg,
-        "💎 VIP MEMBERSHIP\n\n"
-        "Monthly: $10\n"
-        "Quarterly: $25\n"
-        "Yearly: $80\n\n"
-        "VIP Benefits:\n"
-        "✅ AI Buy/Sell Signals\n"
-        "✅ Market Scanner\n"
-        "✅ Early Coin Alerts\n"
-        "✅ Platypus Rewards\n\n"
-        "Contact Admin:\n"
-        "@Kab3ra"
+        "💎 LEVEL 4 VIP\n\n"
+        "Choose a plan:\n\n"
+        "⭐ 250 Stars - 1 Month VIP\n"
+        "⭐ 650 Stars - 3 Months VIP\n"
+        "⭐ 2,000 Stars - Lifetime VIP\n\n"
+        "Use /buyvip to purchase."
     )
-
+    
 @bot.message_handler(commands=["help"])
 def help_cmd(msg):
 
@@ -537,6 +533,32 @@ def profile(msg):
         f"💰 Balance: {balance} PLATS\n"
         f"🏆 Wins: {wins}"
     )
+
+@bot.message_handler(commands=["buyvip"])
+def buyvip(msg):
+    bot.reply_to(
+        msg,
+        "⭐ Telegram Stars payment is coming soon.\n\n"
+        "For now contact @Kab3ra to activate VIP."
+    )
+
+@bot.message_handler(commands=["activatevip"])
+def activate(msg):
+
+    if msg.from_user.id != ADMIN_ID:
+        return
+
+    parts = msg.text.split()
+
+    if len(parts) != 2:
+        bot.reply_to(msg, "Usage:\n/activatevip USER_ID")
+        return
+
+    user_id = parts[1]
+
+    vip_users.add(int(user_id))
+
+    bot.reply_to(msg, "✅ VIP activated.")
     
 # ================= FALLBACK =================
 
