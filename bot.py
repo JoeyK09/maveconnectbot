@@ -1279,28 +1279,29 @@ def search_coin(msg):
         "🔎 Send a coin symbol.\n\nExamples:\nBTC\nETH\nDOGE\nSUI\nONDO"
     )
 
+
 @bot.message_handler(func=lambda m: m.from_user.id in search_users)
 def search_coin_result(msg):
 
     search_users.discard(msg.from_user.id)
 
-coin = msg.text.lower().strip()
+    coin = msg.text.lower().strip()
 
-data = get_coin_data(coin)
+    data = get_coin_data(coin)
 
-if data is None:
-    bot.reply_to(msg, "❌ Coin not found.")
-    return
+    if data is None:
+        bot.reply_to(msg, "❌ Coin not found.")
+        return
 
-bot.reply_to(
-    msg,
-    f"🪙 {data['name']} ({data['symbol']})\n\n"
-    f"💰 Price: ${data['price']:,.6f}\n"
-    f"📈 24H: {data['change24']:.2f}%\n"
-    f"🏆 Rank: #{data['rank']}\n"
-    f"💎 Market Cap: ${data['marketcap']:,.0f}\n"
-    f"📊 Volume: ${data['volume']:,.0f}"
-)
+    bot.reply_to(
+        msg,
+        f"🪙 {data['name']} ({data['symbol']})\n\n"
+        f"💰 Price: ${data['price']:,.6f}\n"
+        f"📈 24H: {data['change24']:.2f}%\n"
+        f"🏆 Rank: #{data['rank']}\n"
+        f"💎 Market Cap: ${data['marketcap']:,.0f}\n"
+        f"📊 Volume: ${data['volume']:,.0f}"
+    )
 
 # ================= FALLBACK =================
 
