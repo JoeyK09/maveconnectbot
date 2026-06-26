@@ -389,7 +389,8 @@ def get_coin_data(coin):
 
     except Exception as e:
         print(e)
-        return None
+        
+    return None
         
 # ================= FLASK =================
 
