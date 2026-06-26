@@ -42,3 +42,57 @@ def add_plats(user_id, amount):
         )
 
     conn.commit()
+
+def get_profile(user_id):
+    cursor.execute(
+        """
+        SELECT balance, xp, level, last_daily,
+               last_mine, wins
+        FROM plats
+        WHERE user_id=?
+        """,
+        (user_id,)
+    )
+
+    row = cursor.fetchone()
+
+    if row:
+        return row
+
+    cursor.execute(
+        """
+        INSERT INTO plats(user_id)
+        VALUES(?)
+        """,
+        (user_id,)
+    )
+
+    conn.commit()
+
+    return (0,0,1,0,0,0)
+
+def update_mine(user_id, balance, xp, level, last_mine):
+
+    cursor.execute("""
+    UPDATE plats
+    SET balance=?,
+        xp=?,
+        level=?,
+        last_mine=?
+    WHERE user_id=?
+    """,
+    (balance, xp, level, last_mine, user_id))
+
+    conn.commit()
+
+def update_daily(user_id, balance, last_daily):
+
+    cursor.execute("""
+    UPDATE plats
+    SET balance=?,
+        last_daily=?
+    WHERE user_id=?
+    """,
+    (balance, last_daily, user_id))
+
+    conn.commit()
