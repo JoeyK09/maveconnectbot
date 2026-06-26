@@ -234,7 +234,9 @@ def get_price(coin):
         print("CoinPaprika error:", e)
 
     return None
+    
     # ===== CACHE CHECK =====
+    
     now = time.time()
 
     if coin in price_cache:
