@@ -96,10 +96,7 @@ price_cache = {}
 CACHE_TIME = 30
 vip_users = set()
 
-# ================= PRICE ENGINE ===============
-
-def get_price(coin):
-    coin = coin.lower().strip()
+# ================= COINPAPRIKA IDS =================
 
 COINPAPRIKA_IDS = {
 
@@ -206,9 +203,37 @@ COINPAPRIKA_IDS = {
     "dai": "dai-dai"
 }
 
-    if coin not in COINCAP_IDS:
+# ================= PRICE ENGINE =================
+
+def get_price(coin):
+    coin = coin.lower().strip()
+
+    if coin not in COINPAPRIKA_IDS:
         return None
 
+    now = time.time()
+
+    if coin in price_cache:
+        price, timestamp = price_cache[coin]
+        if now - timestamp < CACHE_TIME:
+            return price
+
+    try:
+        r = requests.get(
+            f"https://api.coinpaprika.com/v1/tickers/{COINPAPRIKA_IDS[coin]}",
+            timeout=10
+        )
+
+        if r.status_code == 200:
+            data = r.json()
+            price = float(data["quotes"]["USD"]["price"])
+            price_cache[coin] = (price, now)
+            return price
+
+    except Exception as e:
+        print("CoinPaprika error:", e)
+
+    return None
     # ===== CACHE CHECK =====
     now = time.time()
 
