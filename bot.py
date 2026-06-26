@@ -79,6 +79,13 @@ PRICE_BUTTONS = {
     "🛰 AKT":"akt",
     "💎 GRT":"grt"
 
+    "🐶 SHIB":"shib",
+    "🐸 PEPE":"pepe",
+    "🐕 FLOKI":"floki",
+    "🦴 BONK":"bonk",
+    "🐶 WIF":"wif",
+    "🍞 BRETT":"brett",
+
 }
 
 DASHBOARD_BUTTONS = [
@@ -1089,6 +1096,15 @@ def favorites(msg):
         "⭐ Favorites feature coming soon."
     )
 
+@bot.message_handler(func=lambda m: m.text == "🐸 Meme Coins")
+def meme_coins(msg):
+
+    bot.send_message(
+        msg.chat.id,
+        "🐸 Meme Coins",
+        reply_markup=memecoins_menu()
+    )
+    
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
