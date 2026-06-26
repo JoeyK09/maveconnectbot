@@ -70,10 +70,26 @@ PRICE_BUTTONS = {
     "⚡ LTC":"ltc",
     "🔺 TRX":"trx",
     "🏔 AVAX":"avax",
-    "🔗 LINK":"link"
+    "🔗 LINK":"link",
+
+    "🧠 FET":"fet",
+    "⚡ TAO":"tao",
+    "🤖 ICP":"icp",
+    "🔷 RENDER":"render",
+    "🛰 AKT":"akt",
+    "💎 GRT":"grt"
 
 }
 
+DASHBOARD_BUTTONS = [
+    "🏦 DeFi",
+    "⚡ Layer 1",
+    "💎 RWA",
+    "🎮 Games",
+    "🔎 Coin Search",
+    "⭐ Favorites",
+    "🏠 Home"
+]
 # ================= CACHE =================
 
 price_cache = {}
@@ -85,21 +101,110 @@ vip_users = set()
 def get_price(coin):
     coin = coin.lower().strip()
 
-    COINCAP_IDS = {
-        "btc": "btc-bitcoin",
-        "eth": "eth-ethereum",
-        "bnb": "bnb-binance-coin",
-        "sol": "sol-solana",
-        "xrp": "xrp-xrp",
-        "ada": "ada-cardano",
-        "doge": "doge-dogecoin",
-        "dot": "dot-polkadot",
-        "ltc": "ltc-litecoin",
-        "trx": "trx-tron",
-        "avax": "avax-avalanche",
-        "shib": "shib-shiba-inu",
-        "link": "link-chainlink"
-    }
+COINPAPRIKA_IDS = {
+
+    # Top Coins
+    "btc": "btc-bitcoin",
+    "eth": "eth-ethereum",
+    "bnb": "bnb-binance-coin",
+    "sol": "sol-solana",
+    "xrp": "xrp-xrp",
+    "ada": "ada-cardano",
+    "doge": "doge-dogecoin",
+    "trx": "trx-tron",
+    "avax": "avax-avalanche",
+    "dot": "dot-polkadot",
+    "link": "link-chainlink",
+    "ltc": "ltc-litecoin",
+    "bch": "bch-bitcoin-cash",
+    "etc": "etc-ethereum-classic",
+    "xlm": "xlm-stellar",
+    "atom": "atom-cosmos",
+    "near": "near-near-protocol",
+    "algo": "algo-algorand",
+    "vet": "vet-vechain",
+    "fil": "fil-filecoin",
+    "icp": "icp-internet-computer",
+    "apt": "apt-aptos",
+    "sui": "sui-sui",
+    "ton": "ton-toncoin",
+    "hbar": "hbar-hedera",
+    "kas": "kas-kaspa",
+    "cro": "cro-cronos",
+    "qnt": "qnt-quant",
+    "egld": "egld-multiversx",
+    "xtz": "xtz-tezos",
+
+    # DeFi
+    "uni": "uni-uniswap",
+    "aave": "aave-aave",
+    "comp": "comp-compound",
+    "crv": "crv-curve-dao-token",
+    "mkr": "mkr-maker",
+    "snx": "snx-synthetix",
+    "cake": "cake-pancakeswap",
+    "sushi": "sushi-sushiswap",
+    "1inch": "1inch-1inch",
+    "ldo": "ldo-lido-dao",
+
+    # AI
+    "fet": "fet-artificial-superintelligence-alliance",
+    "tao": "tao-bittensor",
+    "grt": "grt-the-graph",
+    "render": "render-render",
+    "akt": "akt-akash-network",
+    "oas": "oas-oasys",
+
+    # Meme
+    "shib": "shib-shiba-inu",
+    "pepe": "pepe-pepe",
+    "floki": "floki-floki",
+    "bonk": "bonk-bonk",
+    "wif": "wif-dogwifcoin",
+    "brett": "brett-brett",
+
+    # Layer 2
+    "arb": "arb-arbitrum",
+    "op": "op-optimism",
+    "imx": "imx-immutable-x",
+    "zk": "zk-zksync",
+    "strk": "strk-starknet",
+
+    # Gaming
+    "sand": "sand-the-sandbox",
+    "mana": "mana-decentraland",
+    "axs": "axs-axie-infinity",
+    "gala": "gala-gala",
+    "enj": "enj-enjin-coin",
+
+    # RWA
+    "ondo": "ondo-ondo-finance",
+    "pendle": "pendle-pendle",
+    "om": "om-mantra",
+
+    # Privacy
+    "xmr": "xmr-monero",
+    "zec": "zec-zcash",
+
+    # Storage
+    "ar": "ar-arweave",
+    "storj": "storj-storj",
+    "sc": "sc-siacoin",
+
+    # Oracle
+    "band": "band-band-protocol",
+    "api3": "api3-api3",
+
+    # Exchange
+    "okb": "okb-okb",
+    "leo": "leo-unus-sed-leo",
+    "bgb": "bgb-bitget-token",
+
+    # Stablecoins
+    "usdt": "usdt-tether",
+    "usdc": "usdc-usd-coin",
+    "dai": "dai-dai"
+}
 
     if coin not in COINCAP_IDS:
         return None
@@ -252,6 +357,54 @@ def trading_menu():
 
     return markup
 
+def ai_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🧠 FET"),
+        KeyboardButton("⚡ TAO"),
+        KeyboardButton("🤖 ICP")
+    )
+
+    markup.row(
+        KeyboardButton("🔷 RENDER"),
+        KeyboardButton("🛰 AKT"),
+        KeyboardButton("💎 GRT")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
+
+
+def dashboard_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🏦 DeFi"),
+        KeyboardButton("⚡ Layer 1")
+    )
+
+    markup.row(
+        KeyboardButton("💎 RWA"),
+        KeyboardButton("🎮 Games")
+    )
+
+    markup.row(
+        KeyboardButton("🔎 Coin Search"),
+        KeyboardButton("⭐ Favorites")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
+    
 # ================= TOP COINS ================
 
 def topcoins_menu():
@@ -807,7 +960,108 @@ def home_button(msg):
         "🏠 Main Menu",
         reply_markup=main_menu()
     )
-    
+
+@bot.message_handler(func=lambda m: m.text == "🤖 AI Coins")
+def ai_coins(msg):
+
+    bot.send_message(
+        msg.chat.id,
+        "🤖 AI Coins",
+        reply_markup=ai_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text=="📊 Market Dashboard")
+def dashboard(msg):
+
+    bot.reply_to(
+        msg,
+        "📊 Market Dashboard\n\nChoose a category:",
+        reply_markup=dashboard_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text=="🏦 DeFi")
+def defi(msg):
+
+    text = (
+        "🏦 Top DeFi Coins\n\n"
+        "💰 UNI\n"
+        "💰 AAVE\n"
+        "💰 MKR\n"
+        "💰 CRV\n"
+        "💰 COMP\n"
+        "💰 SUSHI\n"
+        "💰 LDO\n"
+        "💰 PENDLE"
+    )
+
+    bot.reply_to(msg, text)
+
+@bot.message_handler(func=lambda m: m.text=="⚡ Layer 1")
+def layer1(msg):
+
+    text = (
+        "⚡ Layer 1 Coins\n\n"
+        "BTC\n"
+        "ETH\n"
+        "SOL\n"
+        "BNB\n"
+        "ADA\n"
+        "AVAX\n"
+        "SUI\n"
+        "APT\n"
+        "ATOM"
+    )
+
+    bot.reply_to(msg, text)
+
+@bot.message_handler(func=lambda m: m.text=="💎 RWA")
+def rwa(msg):
+
+    text = (
+        "💎 Real World Asset Coins\n\n"
+        "ONDO\n"
+        "LINK\n"
+        "POLYX\n"
+        "CFG\n"
+        "OM\n"
+        "MPL"
+    )
+
+    bot.reply_to(msg, text)
+
+@bot.message_handler(func=lambda m: m.text=="🎮 Games")
+def games(msg):
+
+    text = (
+        "🎮 Gaming Coins\n\n"
+        "IMX\n"
+        "GALA\n"
+        "BEAM\n"
+        "RON\n"
+        "PIXEL\n"
+        "SAND\n"
+        "MANA\n"
+        "AXS"
+    )
+
+    bot.reply_to(msg, text)
+
+@bot.message_handler(func=lambda m: m.text=="🔎 Coin Search")
+def coin_search(msg):
+
+    bot.reply_to(
+        msg,
+        "🔎 Send:\n\n/price BTC\n\nor\n\n/signal ETH"
+    )
+
+@bot.message_handler(func=lambda m: m.text=="⭐ Favorites")
+def favorites(msg):
+
+    bot.reply_to(
+        msg,
+        "⭐ Favorites feature coming soon."
+    )
+
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
