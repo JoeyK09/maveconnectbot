@@ -8,7 +8,10 @@ from database import (
     conn,
     cursor,
     get_balance,
-    add_plats
+    add_plats,
+    get_profile,
+    update_mine,
+    update_daily
 )
 import telebot
 
@@ -399,52 +402,92 @@ def subscribe(msg):
         "✅ Early Coin Alerts\n"
         "✅ Platypus Rewards\n\n"
         "Contact Admin:\n"
-        "@YourTelegramUsername"
+        "@Kab3ra"
     )
 
 @bot.message_handler(commands=["help"])
 def help_cmd(msg):
+
     bot.reply_to(
         msg,
         "🤖 LEVEL 4 AI BOT\n\n"
-        "/price btc - Live price\n"
-        "/signal btc - VIP signal\n"
-        "/scan - VIP scanner\n"
-        "/mine - Mine Plats\n"
-        "/balance - Check Plats\n"
-        "/leaderboard - Top miners\n"
-        "/subscribe - VIP plans\n"
-        "/help - Show commands"
+        "📈 Trading\n"
+        "/price btc\n"
+        "/signal btc\n"
+        "/scan\n\n"
+        "🦆 Platypus Game\n"
+        "/mine\n"
+        "/daily\n"
+        "/balance\n"
+        "/profile\n"
+        "/leaderboard\n\n"
+        "💎 VIP\n"
+        "/subscribe\n"
+        "/help"
     )
 
 @bot.message_handler(commands=["mine"])
 def mine(msg):
+
     user = str(msg.from_user.id)
 
-    reward = random.randint(5, 25)
+    balance, xp, level, last_daily, last_mine, wins = get_profile(user)
 
-    add_plats(user, reward)
+    now = int(time.time())
 
-    balance = get_balance(user)
+    cooldown = 1800
+
+    if now - last_mine < cooldown:
+
+        left = cooldown - (now-last_mine)
+
+        mins = left // 60
+        secs = left % 60
+
+        bot.reply_to(
+            msg,
+            f"⛏ Mine cooling down.\n\n"
+            f"Try again in {mins}m {secs}s"
+        )
+
+        return
+
+    reward = random.randint(10,30)
+
+    xp += 5
+
+    balance += reward
+
+    if xp >= 100:
+        xp = 0
+        level += 1
+        balance += 50
+
+        levelup = (
+            f"\n\n🎉 LEVEL UP!\n"
+            f"You reached Level {level}\n"
+            f"+50 Bonus PLATS"
+        )
+    else:
+        levelup = ""
+
+    update_mine(
+        user,
+        balance,
+        xp,
+        level,
+        now
+    )
 
     bot.reply_to(
         msg,
-        f"🦆 Platypus mined!\n\n"
-        f"+{reward} PLATS\n\n"
-        f"Balance: {balance} PLATS"
-)
-    
-@bot.message_handler(commands=["balance"])
-def balance(msg):
-
-    user=str(msg.from_user.id)
-
-    bal = get_balance(user)
-
-    bot.reply_to(
-        msg,
-        f"💰 Your Balance\n\n"
-        f"{bal} PLATS"
+        f"🦆 Mining Complete!\n\n"
+        f"+{reward} PLATS\n"
+        f"+5 XP\n\n"
+        f"💰 Balance: {balance}\n"
+        f"⭐ XP: {xp}/100\n"
+        f"🏅 Level: {level}"
+        f"{levelup}"
     )
 
 @bot.message_handler(commands=["leaderboard"])
@@ -468,17 +511,58 @@ def daily(msg):
 
     user = str(msg.from_user.id)
 
+    balance, xp, level, last_daily, last_mine, wins = get_profile(user)
+
+    now = int(time.time())
+
+    cooldown = 86400
+
+    if now-last_daily < cooldown:
+
+        left = cooldown-(now-last_daily)
+
+        hrs = left//3600
+        mins = (left%3600)//60
+
+        bot.reply_to(
+            msg,
+            f"🎁 Daily already claimed.\n\n"
+            f"Come back in {hrs}h {mins}m"
+        )
+
+        return
+
     reward = 100
 
-    add_plats(user, reward)
+    balance += reward
 
-    balance = get_balance(user)
+    update_daily(
+        user,
+        balance,
+        now
+    )
 
     bot.reply_to(
         msg,
         f"🎁 Daily Reward\n\n"
         f"+100 PLATS\n\n"
-        f"Balance: {balance} PLATS"
+        f"Balance: {balance}"
+    )
+
+@bot.message_handler(commands=["profile"])
+def profile(msg):
+
+    user = str(msg.from_user.id)
+
+    balance, xp, level, last_daily, last_mine, wins = get_profile(user)
+
+    bot.reply_to(
+        msg,
+        f"👤 {msg.from_user.first_name}\n\n"
+        f"🏅 Level: {level}\n"
+        f"⭐ XP: {xp}/100\n\n"
+        f"💰 Balance: {balance} PLATS\n"
+        f"🏆 Wins: {wins}"
     )
     
 # ================= FALLBACK =================
