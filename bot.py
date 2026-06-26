@@ -86,6 +86,16 @@ PRICE_BUTTONS = {
     "🦴 BONK": "bonk",
     "🐶 WIF": "wif",
     "🍞 BRETT": "brett",
+    # ================= DEFI =================
+
+    "🦄 UNI": "uni",
+    "👻 AAVE": "aave",
+    "🏦 MKR": "mkr",
+    "📈 CRV": "crv",
+    "🥞 CAKE": "cake",
+    "🍣 SUSHI": "sushi",
+    "🔀 1INCH": "1inch",
+    "💧 LDO": "ldo",
   
 }
 
@@ -466,6 +476,34 @@ def memecoins_menu():
     )
 
     return markup
+
+#=============== DEFI MENU ================
+def defi_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🦄 UNI"),
+        KeyboardButton("👻 AAVE"),
+        KeyboardButton("🏦 MKR")
+    )
+
+    markup.row(
+        KeyboardButton("📈 CRV"),
+        KeyboardButton("🥞 CAKE"),
+        KeyboardButton("🍣 SUSHI")
+    )
+
+    markup.row(
+        KeyboardButton("🔀 1INCH"),
+        KeyboardButton("💧 LDO")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
     
 # ================= TOP COINS ===============
 
@@ -503,7 +541,7 @@ def topcoins_menu():
 
     return markup
     
-# ================= COMMANDS =================
+# ================= COMMANDS ================
 
 @bot.message_handler(commands=["start"])
 def start(msg):
@@ -1131,6 +1169,15 @@ def meme_coins(msg):
         msg.chat.id,
         "🐸 Meme Coins",
         reply_markup=memecoins_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🏦 DeFi")
+def defi(msg):
+
+    bot.send_message(
+        msg.chat.id,
+        "🏦 DeFi Coins",
+        reply_markup=defi_menu()
     )
     
 # ================= FALLBACK =================
