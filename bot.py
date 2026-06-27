@@ -1387,16 +1387,33 @@ def search_coin_result(msg):
 
 @bot.message_handler(func=lambda m: m.text == "📊 Chart")
 def chart(msg):
+
+    coin = user_last_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "❌ Open a coin first.")
+        return
+
     bot.reply_to(
         msg,
-        "📈 TradingView charts coming soon!"
+        f"📈 {coin.upper()} Chart\n\n"
+        f"https://www.tradingview.com/symbols/{coin.upper()}USDT/"
     )
+
 
 @bot.message_handler(func=lambda m: m.text == "📰 News")
 def news(msg):
+
+    coin = user_last_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "❌ Open a coin first.")
+        return
+
     bot.reply_to(
         msg,
-        "📰 Latest crypto news coming soon!"
+        f"📰 Latest {coin.upper()} News\n\n"
+        f"https://www.coingecko.com/en/coins/{coin}"
     )
 
 @bot.message_handler(func=lambda m: m.text == "⭐ Favorite")
