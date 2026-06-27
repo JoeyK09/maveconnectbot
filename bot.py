@@ -309,7 +309,7 @@ def get_price(symbol):
 
 def get_signal(coin):
 
-    price = safe_get_price(coin)
+    price =get_price(coin)
 
     if price is None:
         return None
@@ -347,7 +347,7 @@ def is_vip(user_id):
 
 def get_ai_analysis(coin):
 
-    price = safe_get_price(coin)
+    price =get_price(coin)
 
     if price is None:
         return {
@@ -385,7 +385,8 @@ def get_ai_analysis(coin):
 
 def get_coin_data(coin):
 
-    coin_id = resolve_coin(coin.lower().strip())
+    coin = coin.lower().strip()
+    coin_id = COINPAPRIKA_IDS.get(coin)
 
     if not coin_id:
         return None
@@ -406,9 +407,7 @@ def get_coin_data(coin):
             "symbol": data["symbol"],
             "price": data["quotes"]["USD"]["price"],
             "change24": data["quotes"]["USD"]["percent_change_24h"],
-            "marketcap": data["quotes"]["USD"]["market_cap"],
-            "volume": data["quotes"]["USD"]["volume_24h"],
-            "rank": data["rank"]
+            "signal": "⚪ HOLD"
         }
 
     except Exception as e:
@@ -832,7 +831,7 @@ def price_cmd(msg):
         #Save the last coin viewed
         user_last_coin[msg.from_user.id] = coin
         
-        price = safe_get_price(coin)
+        price =get_price(coin)
 
         if price is not None:
             bot.reply_to(
@@ -1297,7 +1296,7 @@ def coin_price(msg):
 
     coin = PRICE_BUTTONS[msg.text]
 
-    price = safe_get_price(coin)
+    price =get_price(coin)
 
     if price is None:
         bot.reply_to(msg, "❌ Price unavailable.")
@@ -1420,7 +1419,7 @@ def favorites(msg):
     text = "⭐ Your Favorite Coins\n\n"
 
     for coin in favs:
-        price = safe_get_price(coin)
+        price = get_price(coin)
 
         if price:
             text += f"• {coin.upper()} — ${price:,.4f}\n"
@@ -1756,7 +1755,7 @@ def alert_checker():
 
         for user, coin, target in get_alerts():
 
-            price = safe_get_price(coin)
+            price = get_price(coin)
 
             if price and price >= target:
 
