@@ -1517,6 +1517,10 @@ def search_coin_result(msg):
 
     coin = msg.text.lower().strip()
     
+    print("RAW MESSAGE:", repr(msg.text))
+    print("COIN:", repr(coin))
+    print("FOUND:", coin in COINPAPRIKA_IDS)
+    
     # Save the last coin viewed
     user_last_coin[msg.from_user.id] = coin
 
