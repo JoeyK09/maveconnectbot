@@ -29,11 +29,9 @@ CREATE TABLE IF NOT EXISTS plats(
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS favorites(
     user_id TEXT,
-    coin TEXT,
-    PRIMARY KEY(user_id, coin)
+    coin TEXT
 )
 """)
-conn.commit()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS alerts(
@@ -42,6 +40,7 @@ CREATE TABLE IF NOT EXISTS alerts(
     target REAL
 )
 """)
+
 conn.commit()
 
 # ================= FUNCTIONS =================
@@ -182,7 +181,7 @@ def leaderboard(limit=10):
 
 def add_favorite(user, coin):
     cursor.execute(
-        "INSERT OR IGNORE INTO favorites(user_id, coin) VALUES(?, ?)",
+        "INSERT INTO favorites VALUES (%s,%s)",
         (user, coin)
     )
     conn.commit()
@@ -190,14 +189,15 @@ def add_favorite(user, coin):
 
 def get_favorites(user):
     cursor.execute(
-        "SELECT coin FROM favorites WHERE user_id=?",
+        "SELECT coin FROM favorites WHERE user_id=%s",
         (user,)
     )
-    return [row[0] for row in cursor.fetchall()]
-    
+    return [x[0] for x in cursor.fetchall()]
+
+
 def add_alert(user, coin, target):
     cursor.execute(
-        "INSERT INTO alerts(user_id, coin, target) VALUES(?,?,?)",
+        "INSERT INTO alerts VALUES (%s,%s,%s)",
         (user, coin, target)
     )
     conn.commit()
@@ -212,7 +212,8 @@ def get_alerts():
 
 def delete_alert(user, coin, target):
     cursor.execute(
-        "DELETE FROM alerts WHERE user_id=? AND coin=? AND target=?",
+        "DELETE FROM alerts WHERE user_id=%s AND coin=%s AND target=%s",
         (user, coin, target)
     )
     conn.commit()
+    
