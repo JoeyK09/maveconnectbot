@@ -257,6 +257,7 @@ COINPAPRIKA_IDS = {
 # ================= PRICE ENGINE =================
 
 def get_price(coin):
+
     coin = coin.lower().strip()
 
     if coin not in COINPAPRIKA_IDS:
@@ -278,56 +279,13 @@ def get_price(coin):
         if r.status_code == 200:
             data = r.json()
             price = float(data["quotes"]["USD"]["price"])
-            price_cache[coin] = (price, now)
-            return price
 
-    except Exception as e:
-        print("CoinPaprika error:", e)
-
-    return None
-    
-    # ===== CACHE CHECK =====
-    
-    now = time.time()
-
-    if coin in price_cache:
-        price, timestamp = price_cache[coin]
-
-        if now - timestamp < CACHE_TIME:
-            return price
-
-    try:
-        r = requests.get(
-            f"https://api.coinpaprika.com/v1/tickers/{COINCAP_IDS[coin]}",
-            timeout=10
-        )
-
-        if r.status_code == 200:
-            data = r.json()
-            price = float(data["quotes"]["USD"]["price"])
-
-            # ===== SAVE TO CACHE =====
             price_cache[coin] = (price, now)
 
             return price
 
     except Exception as e:
         print("CoinPaprika error:", repr(e))
-
-    return None
-
-def safe_get_price(coin):
-    for _ in range(3):
-        try:
-            price = get_price(coin)
-
-            if price is not None:
-                return price
-
-        except Exception as e:
-            print("Retry error:", e)
-
-        time.sleep(1)
 
     return None
     
@@ -407,7 +365,7 @@ def get_ai_analysis(coin):
         "resistance": round(price * 1.03, 4)
     }
     
-# ================= COIN DETAILS ===============
+# ================== COIN DETAILS ===============
 
 def get_coin_data(coin):
 
@@ -427,17 +385,7 @@ def get_coin_data(coin):
 
         data = r.json()
 
-        ai = get_ai_analysis(coin)
-
-        if ai is None:
-            ai = {
-                "signal": "⚪ HOLD",
-                "trend": "Unknown",
-                "confidence": 50,
-                "risk": "Medium",
-                "support": data["quotes"]["USD"]["price"] * 0.97,
-                "resistance": data["quotes"]["USD"]["price"] * 1.03
-            }
+        analysis = get_ai_analysis(coin)
 
         return {
             "name": data["name"],
@@ -447,15 +395,16 @@ def get_coin_data(coin):
             "marketcap": data["quotes"]["USD"]["market_cap"],
             "volume": data["quotes"]["USD"]["volume_24h"],
             "rank": data["rank"],
-            "signal": ai["signal"],
-            "strength": ai["confidence"],
-            "trend": ai["trend"],
-            "support": ai["support"],
-            "resistance": ai["resistance"]
+
+            "signal": analysis["signal"] if analysis else "N/A",
+            "strength": analysis["confidence"] if analysis else 0,
+            "trend": analysis["trend"] if analysis else "Unknown",
+            "support": analysis["support"] if analysis else 0,
+            "resistance": analysis["resistance"] if analysis else 0
         }
 
     except Exception as e:
-        print("Coin details error:", e)
+        print("Coin data error:", repr(e))
         return None
         
 # ================= CRYPTO NEWS =================
