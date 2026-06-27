@@ -366,6 +366,59 @@ def is_vip(user_id):
         print("VIP check error:", e)
         return False
 
+# ================= AI ANALYSIS =================
+
+def get_ai_analysis(coin):
+
+    data = get_coin_data(coin)
+
+    if data is None:
+        return None
+
+    change = data["change24"]
+
+    if change >= 5:
+        trend = "🟢 Strong Bullish"
+        signal = "🟢 BUY"
+        confidence = 90
+        risk = "Medium"
+
+    elif change >= 1:
+        trend = "🟢 Bullish"
+        signal = "🟢 BUY"
+        confidence = 75
+        risk = "Low"
+
+    elif change <= -5:
+        trend = "🔴 Strong Bearish"
+        signal = "🔴 SELL"
+        confidence = 90
+        risk = "High"
+
+    elif change <= -1:
+        trend = "🟠 Bearish"
+        signal = "🟠 SELL"
+        confidence = 70
+        risk = "Medium"
+
+    else:
+        trend = "⚪ Sideways"
+        signal = "⚪ HOLD"
+        confidence = 60
+        risk = "Low"
+
+    support = data["price"] * 0.97
+    resistance = data["price"] * 1.03
+
+    return {
+        "trend": trend,
+        "signal": signal,
+        "confidence": confidence,
+        "risk": risk,
+        "support": support,
+        "resistance": resistance
+    }
+    
 # ================= COIN DETAILS ===============
 
 def get_coin_data(coin):
@@ -546,6 +599,10 @@ def coin_actions():
     markup.row(
         KeyboardButton("🔔 Set Alert"),
         KeyboardButton("🏠 Home")
+    )
+
+    markup.row(
+    KeyboardButton("🤖 AI Analysis")
     )
 
     return markup
@@ -1556,6 +1613,32 @@ def save_alert(msg):
     bot.reply_to(
         msg,
         f"✅ Alert created!\n\n{coin.upper()} → ${target:,.2f}"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🤖 AI Analysis")
+def ai_analysis(msg):
+
+    coin = user_last_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "Open a coin first.")
+        return
+
+    result = get_ai_analysis(coin)
+
+    if result is None:
+        bot.reply_to(msg, "Unable to analyze this coin.")
+        return
+
+    bot.reply_to(
+        msg,
+        f"🤖 AI Analysis for {coin.upper()}\n\n"
+        f"📈 Trend: {result['trend']}\n"
+        f"🎯 Signal: {result['signal']}\n"
+        f"🛡 Risk: {result['risk']}\n"
+        f"💪 Confidence: {result['confidence']}%\n\n"
+        f"🟢 Support: ${result['support']:,.4f}\n"
+        f"🔴 Resistance: ${result['resistance']:,.4f}"
     )
     
 # ================= FALLBACK =================
