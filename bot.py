@@ -142,6 +142,7 @@ search_users = set()
 current_coin = {}
 alert_users = set()
 waiting_alert = {}
+user_last_coin = {}
 
 # ================= COINPAPRIKA IDS =================
 
@@ -724,7 +725,10 @@ def price_cmd(msg):
             return
 
         coin = parts[1].lower().strip()
-
+        
+        #Save the last coin viewed
+        user_last_coin[msg.from_user.id] = coin
+        
         price = safe_get_price(coin)
 
         if price is not None:
@@ -1358,6 +1362,9 @@ def search_coin_result(msg):
     search_users.discard(msg.from_user.id)
 
     coin = msg.text.lower().strip()
+    
+    # Save the last coin viewed
+    user_last_coin[msg.from_user.id] = coin
 
     data = get_coin_data(coin)
 
