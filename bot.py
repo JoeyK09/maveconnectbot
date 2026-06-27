@@ -1496,6 +1496,20 @@ def search_coin_result(msg):
        f"Resistance: ${data['resistance']:,.4f}"
     )
 
+@bot.message_handler(func=lambda m: m.from_user.id in search_users)
+def handle_coin_input(msg):
+
+    coin = msg.text.upper().strip()
+
+    user_last_coin[msg.from_user.id] = coin
+    search_users.discard(msg.from_user.id)
+
+    bot.reply_to(
+        msg,
+        f"✅ Coin selected: {coin}\n\n"
+        f"You can now use:\n📊 Chart\n📰 News\n🔔 Set Alert"
+    )
+    
 @bot.message_handler(func=lambda m: m.text == "📊 Chart")
 def chart(msg):
 
