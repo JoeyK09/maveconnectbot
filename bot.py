@@ -263,20 +263,6 @@ def resolve_coin(symbol):
 
     return None
     
-# ================= COIN HELPERS =================
-
-def normalize_coin(symbol):
-    return str(symbol).strip().lower()
-
-
-def resolve_coin(symbol):
-    symbol = normalize_coin(symbol)
-
-    if symbol in COINPAPRIKA_IDS:
-        return COINPAPRIKA_IDS[symbol]
-
-    return None
-
 def get_price(symbol):
 
     coin = normalize_coin(symbol)
@@ -355,7 +341,7 @@ def is_vip(user_id):
         print("VIP check error:", e)
         return False
 
-# ================= AI ANALYSIS ==============
+# ================== AI ANALYSIS ==============
 
 def get_ai_analysis(coin):
 
@@ -408,19 +394,21 @@ def get_ai_analysis(coin):
         "resistance": resistance
     }
     
-# ================== COIN DETAILS ===============
+# ================= COIN DETAILS ===============
 
 def get_coin_data(coin):
 
     coin = coin.lower().strip()
-    coin_id = COINPAPRIKA_IDS.get(coin)
 
-    if not coin_id:
+    if coin not in COINPAPRIKA_IDS:
         return None
+
+    # AI analysis
+    analysis = ai_analysis(coin)
 
     try:
         r = requests.get(
-            f"https://api.coinpaprika.com/v1/tickers/{coin_id}",
+            f"https://api.coinpaprika.com/v1/tickers/{COINPAPRIKA_IDS[coin]}",
             timeout=10
         )
 
@@ -434,12 +422,22 @@ def get_coin_data(coin):
             "symbol": data["symbol"],
             "price": data["quotes"]["USD"]["price"],
             "change24": data["quotes"]["USD"]["percent_change_24h"],
-            "signal": "⚪ HOLD"
+            "marketcap": data["quotes"]["USD"]["market_cap"],
+            "volume": data["quotes"]["USD"]["volume_24h"],
+            "rank": data["rank"],
+
+            # AI fields
+            "signal": analysis["signal"],
+            "strength": analysis["strength"],
+            "trend": analysis["trend"],
+            "support": analysis["support"],
+            "resistance": analysis["resistance"]
         }
 
     except Exception as e:
-        print("Coin data error:", e)
-        return None
+        print(e)
+
+    return None
         
 # ================= CRYPTO NEWS =================
 
@@ -468,13 +466,7 @@ def get_ai_analysis(coin):
     df = get_history(coin)
 
     if df is None or len(df) < 60:
-        return {
-            "signal": "⚪ HOLD",
-            "strength": 50,
-            "trend": "Unknown",
-            "support": 0,
-            "resistance": 0
-        }
+        return None
 
     rsi = calculate_rsi(df)
     trend = calculate_trend(df)
@@ -484,46 +476,66 @@ def get_ai_analysis(coin):
 
     if trend == "Bullish" and rsi < 35:
         signal = "🟢 BUY"
-        strength = 90
+        confidence = 90
+        risk = "Low"
 
     elif trend == "Bearish" and rsi > 70:
         signal = "🔴 SELL"
-        strength = 90
+        confidence = 90
+        risk = "High"
 
     else:
         signal = "⚪ HOLD"
-        strength = 70
+        confidence = 70
+        risk = "Medium"
 
     return {
-        "signal": signal,
-        "strength": strength,
         "trend": trend,
+        "signal": signal,
+        "confidence": confidence,
+        "risk": risk,
         "support": support,
         "resistance": resistance
     }
+    
+def calculate_rsi(df):
 
-# ================== HISTORY ===============
+    rsi = RSIIndicator(df["close"]).rsi()
+
+    return float(rsi.iloc[-1])
+
+def calculate_trend(df):
+
+    ema20 = EMAIndicator(df["close"], window=20).ema_indicator()
+
+    ema50 = EMAIndicator(df["close"], window=50).ema_indicator()
+
+    if ema20.iloc[-1] > ema50.iloc[-1]:
+        return "Bullish"
+
+    return "Bearish"
+    
+# =================== HISTORY ===============
 
 def get_history(coin):
 
-    coin_id = resolve_coin(coin.lower().strip())
-
-    if not coin_id:
+    if coin not in COINPAPRIKA_IDS:
         return None
 
     try:
-        url = f"https://api.coinpaprika.com/v1/coins/{coin_id}/ohlcv/historical?start=2026-05-01"
-
-        r = requests.get(url, timeout=10)
+        r = requests.get(
+            f"https://api.coinpaprika.com/v1/coins/{COINPAPRIKA_IDS[coin]}/ohlcv/historical?start=2026-05-01",
+            timeout=10
+        )
 
         if r.status_code != 200:
             return None
 
         data = r.json()
+
         return pd.DataFrame(data)
 
-    except Exception as e:
-        print("History exception:", e)
+    except:
         return None
     
 # ================= FLASK =================
@@ -1087,7 +1099,7 @@ def mine(msg):
 
         bot.reply_to(
             msg,
-            f"⛏ Mine cooling down.\n\n"
+            f"⛏️ Mine cooling down.\n\n"
             f"Try again in {mins}m {secs}s"
         )
 
