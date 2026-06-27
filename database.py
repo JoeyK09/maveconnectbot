@@ -26,6 +26,15 @@ CREATE TABLE IF NOT EXISTS plats(
 )
 """)
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS favorites(
+    user_id TEXT,
+    coin TEXT,
+    PRIMARY KEY(user_id, coin)
+)
+""")
+conn.commit()
+
 # ================= FUNCTIONS =================
 
 def get_profile(user_id):
@@ -161,3 +170,19 @@ def leaderboard(limit=10):
     """, (limit,))
 
     return cursor.fetchall()
+
+def add_favorite(user, coin):
+    cursor.execute(
+        "INSERT OR IGNORE INTO favorites(user_id, coin) VALUES(?, ?)",
+        (user, coin)
+    )
+    conn.commit()
+
+
+def get_favorites(user):
+    cursor.execute(
+        "SELECT coin FROM favorites WHERE user_id=?",
+        (user,)
+    )
+    return [row[0] for row in cursor.fetchall()]
+    
