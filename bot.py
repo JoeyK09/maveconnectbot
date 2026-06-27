@@ -418,6 +418,7 @@ def get_coin_data(coin):
 
     # AI analysis
     analysis = get_ai_analysis(coin)
+    print("AI:", analysis)
 
     try:
         r = requests.get(
@@ -429,6 +430,10 @@ def get_coin_data(coin):
             return None
 
         data = r.json()
+        
+        print(data.keys())
+        print(data["quotes"]["USD"])
+        print(analysis)
 
         return {
             "name": data["name"],
@@ -448,9 +453,10 @@ def get_coin_data(coin):
         }
 
     except Exception as e:
-        print(e)
+      import traceback
+      traceback.print_exc()
 
-    return None
+        return None
 
 # ================= CRYPTO NEWS =================
 
