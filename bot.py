@@ -426,10 +426,18 @@ def get_coin_data(coin):
             return None
 
         data = r.json()
-        
-        print(data.keys())
-        print(data["quotes"]["USD"])
-        print(analysis)
+
+        ai = get_ai_analysis(coin)
+
+        if ai is None:
+            ai = {
+                "signal": "⚪ HOLD",
+                "trend": "Unknown",
+                "confidence": 50,
+                "risk": "Medium",
+                "support": data["quotes"]["USD"]["price"] * 0.97,
+                "resistance": data["quotes"]["USD"]["price"] * 1.03
+            }
 
         return {
             "name": data["name"],
@@ -439,21 +447,17 @@ def get_coin_data(coin):
             "marketcap": data["quotes"]["USD"]["market_cap"],
             "volume": data["quotes"]["USD"]["volume_24h"],
             "rank": data["rank"],
-
-            # AI fields
-            "signal": analysis["signal"],
-            "strength": analysis["strength"],
-            "trend": analysis["trend"],
-            "support": analysis["support"],
-            "resistance": analysis["resistance"]
+            "signal": ai["signal"],
+            "strength": ai["confidence"],
+            "trend": ai["trend"],
+            "support": ai["support"],
+            "resistance": ai["resistance"]
         }
 
     except Exception as e:
-      import traceback
-      traceback.print_exc()
-
-    return None
-
+        print("Coin details error:", e)
+        return None
+        
 # ================= CRYPTO NEWS =================
 
 def get_crypto_news(coin):
@@ -481,7 +485,13 @@ def get_ai_analysis(coin):
     df = get_history(coin)
 
     if df is None or len(df) < 60:
-        return None
+        return {
+            "signal": "⚪ HOLD",
+            "strength": 50,
+            "trend": "Unknown",
+            "support": 0,
+            "resistance": 0
+        }
 
     rsi = calculate_rsi(df)
     trend = calculate_trend(df)
@@ -491,29 +501,25 @@ def get_ai_analysis(coin):
 
     if trend == "Bullish" and rsi < 35:
         signal = "🟢 BUY"
-        confidence = 90
-        risk = "Low"
+        strength = 90
 
     elif trend == "Bearish" and rsi > 70:
         signal = "🔴 SELL"
-        confidence = 90
-        risk = "High"
+        strength = 90
 
     else:
         signal = "⚪ HOLD"
-        confidence = 70
-        risk = "Medium"
+        strength = 70
 
     return {
-        "trend": trend,
         "signal": signal,
-        "confidence": confidence,
-        "risk": risk,
+        "strength": strength,
+        "trend": trend,
         "support": support,
         "resistance": resistance
     }
 
-# ================= HISTORY ==============
+# ================= HISTORY ===============
 
 def get_history(coin):
 
@@ -521,37 +527,24 @@ def get_history(coin):
         return None
 
     try:
-        r = requests.get(
-            f"https://api.coinpaprika.com/v1/coins/{COINPAPRIKA_IDS[coin]}/ohlcv/historical?start=2026-05-01",
-            timeout=10
-        )
+        url = f"https://api.coinpaprika.com/v1/coins/{COINPAPRIKA_IDS[coin]}/ohlcv/historical?start=2026-05-01"
+
+        r = requests.get(url, timeout=10)
 
         if r.status_code != 200:
+            print("History error:", r.status_code, r.text)
             return None
 
         data = r.json()
 
+        if not data:
+            return None
+
         return pd.DataFrame(data)
 
-    except:
+    except Exception as e:
+        print("History exception:", e)
         return None
-
-def calculate_rsi(df):
-
-    rsi = RSIIndicator(df["close"]).rsi()
-
-    return float(rsi.iloc[-1])
-
-def calculate_trend(df):
-
-    ema20 = EMAIndicator(df["close"], window=20).ema_indicator()
-
-    ema50 = EMAIndicator(df["close"], window=50).ema_indicator()
-
-    if ema20.iloc[-1] > ema50.iloc[-1]:
-        return "Bullish"
-
-    return "Bearish"
     
 # ================= FLASK =================
 
