@@ -416,10 +416,6 @@ def get_coin_data(coin):
     if coin not in COINPAPRIKA_IDS:
         return None
 
-    # AI analysis
-    analysis = get_ai_analysis(coin)
-    print("AI:", analysis)
-
     try:
         r = requests.get(
             f"https://api.coinpaprika.com/v1/tickers/{COINPAPRIKA_IDS[coin]}",
@@ -1530,13 +1526,9 @@ def search_coin_result(msg):
     search_users.discard(msg.from_user.id)
 
     coin = msg.text.lower().strip()
-    
-    print("RAW MESSAGE:", repr(msg.text))
-    print("COIN:", repr(coin))
-    print("FOUND:", coin in COINPAPRIKA_IDS)
-    
-    # Save the last coin viewed
+
     user_last_coin[msg.from_user.id] = coin
+    current_coin[msg.from_user.id] = coin
 
     data = get_coin_data(coin)
 
