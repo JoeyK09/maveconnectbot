@@ -134,6 +134,7 @@ price_cache = {}
 CACHE_TIME = 30
 vip_users = set()
 search_users = set()
+current_coin = {}
 
 # ================= COINPAPRIKA IDS =================
 
@@ -506,6 +507,41 @@ def dashboard_menu():
 
     return markup
 
+def coin_actions():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("📊 Chart"),
+        KeyboardButton("📰 News")
+    )
+
+    markup.row(
+        KeyboardButton("⭐ Favorite"),
+        KeyboardButton("🔔 Set Alert")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    markup.row(
+        KeyboardButton("🤖 AI Analysis"),
+        KeyboardButton("📊 Chart")
+    )
+
+    markup.row(
+        KeyboardButton("📰 News"),
+        KeyboardButton("⭐ Favorite") 
+    )
+
+    markup.row(
+        KeyboardButton("🔔 Set Alert"),
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
+    
 # ================ MEME COINS ================
 def memecoins_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -1293,16 +1329,104 @@ def search_coin_result(msg):
         bot.reply_to(msg, "❌ Coin not found.")
         return
 
-    bot.reply_to(
-        msg,
+    current_coin[msg.from_user.id] = coin
+    
+    bot.send_message(
+        msg.chat.id,
         f"🪙 {data['name']} ({data['symbol']})\n\n"
         f"💰 Price: ${data['price']:,.6f}\n"
         f"📈 24H: {data['change24']:.2f}%\n"
         f"🏆 Rank: #{data['rank']}\n"
         f"💎 Market Cap: ${data['marketcap']:,.0f}\n"
-        f"📊 Volume: ${data['volume']:,.0f}"
+        f"📊 Volume: ${data['volume']:,.0f}",
+        reply_markup=coin_actions()
     )
 
+@bot.message_handler(func=lambda m: m.text == "📊 Chart")
+def chart(msg):
+    bot.reply_to(
+        msg,
+        "📈 TradingView charts coming soon!"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "📰 News")
+def news(msg):
+    bot.reply_to(
+        msg,
+        "📰 Latest crypto news coming soon!"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "⭐ Favorite")
+def favorite(msg):
+    bot.reply_to(
+        msg,
+        "⭐ Added to Favorites!"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🔔 Set Alert")
+def alert(msg):
+    bot.reply_to(
+        msg,
+        "🔔 Price alerts coming soon!"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "📊 Chart")
+def chart(msg):
+
+    coin = current_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "❌ Open a coin first.")
+        return
+
+    bot.reply_to(
+        msg,
+        f"📈 {coin.upper()} Chart\n\n"
+        f"https://www.tradingview.com/symbols/{coin.upper()}USDT/"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "📰 News")
+def news(msg):
+
+    coin = current_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "❌ Open a coin first.")
+        return
+
+    bot.reply_to(
+        msg,
+        f"📰 Fetching the latest news for {coin.upper()}..."
+    )
+
+@bot.message_handler(func=lambda m: m.text == "⭐ Favorite")
+def favorite(msg):
+
+    coin = current_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "❌ Open a coin first.")
+        return
+
+    bot.reply_to(
+        msg,
+        f"⭐ {coin.upper()} added to your favorites."
+    )
+    
+@bot.message_handler(func=lambda m: m.text == "🔔 Set Alert")
+def alert(msg):
+
+    coin = current_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "❌ Open a coin first.")
+        return
+
+    bot.reply_to(
+        msg,
+        f"🔔 Enter the target price for {coin.upper()}."
+    )
+    
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
