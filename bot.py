@@ -1426,13 +1426,21 @@ def games(msg):
     )
 
     bot.reply_to(msg, text)
-
-@bot.message_handler(func=lambda m: m.text=="🔎 Coin Search")
+    
+@bot.message_handler(func=lambda m: m.text == "🔎 Coin Search")
 def coin_search(msg):
+
+    search_users.add(msg.from_user.id)
 
     bot.reply_to(
         msg,
-        "🔎 Send:\n\n/price BTC\n\nor\n\n/signal ETH"
+        "🔎 Send a coin symbol.\n\n"
+        "Examples:\n"
+        "BTC\n"
+        "ETH\n"
+        "SOL\n"
+        "SUI\n"
+        "ONDO"
     )
 
 @bot.message_handler(func=lambda m: m.text == "⭐ Favorite")
@@ -1835,7 +1843,7 @@ if __name__ == "__main__":
 
         me = bot.get_me()
         print(f"Connected as @{me.username}")
-        bot.send_message(7988782705, "✅ Bot restarted successfully")
+        bot.send_message(6384391560, "✅ Bot restarted successfully")
 
     except Exception as e:
         print("Startup error:", repr(e))
