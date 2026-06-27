@@ -298,6 +298,22 @@ def safe_get_price(symbol):
         return data["price"]
 
     return None
+
+def scan_coin(symbol):
+    data = get_coin_data(symbol)
+    history = get_history(symbol)
+
+    if not data or history is None:
+        return None
+
+    analysis = ai_analysis(symbol)
+
+    return {
+        "price": data["price"],
+        "change24": data["change24"],
+        "analysis": analysis,
+        "history": history
+    }
     
 def get_price(symbol):
     return safe_get_price(symbol)
@@ -459,9 +475,6 @@ def calculate_trend(df):
 
 def get_history(symbol, days=60):
     coin_id = get_coin_id(symbol)
-
-    df = get_history("btc")
-    print(df.tail())
 
     if not coin_id:
         return None
