@@ -135,6 +135,7 @@ CACHE_TIME = 30
 vip_users = set()
 search_users = set()
 current_coin = {}
+alert_users = set()
 
 # ================= COINPAPRIKA IDS =================
 
@@ -1455,6 +1456,47 @@ def alert(msg):
         msg,
         f"🔔 Enter the target price for {coin.upper()}."
     )
+
+@bot.message_handler(func=lambda m: m.text == "🔔 Set Alert")
+def alert(msg):
+
+    coin = current_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "❌ Open a coin first.")
+        return
+
+    alert_users.add(msg.from_user.id)
+
+    bot.reply_to(
+        msg,
+        f"Enter the target price for {coin.upper()}.\n\nExample:\n120000"
+    )
+
+@bot.message_handler(func=lambda m: m.from_user.id in alert_users)
+def save_alert(msg):
+
+    alert_users.discard(msg.from_user.id)
+
+    coin = current_coin[msg.from_user.id]
+
+    try:
+        target = float(msg.text)
+
+    except ValueError:
+        bot.reply_to(msg, "❌ Invalid price.")
+        return
+
+    add_alert(
+        str(msg.from_user.id),
+        coin,
+        target
+    )
+
+    bot.reply_to(
+        msg,
+        f"✅ Alert created!\n\n{coin.upper()} → ${target:,.2f}"
+    )
     
 # ================= FALLBACK =================
 
@@ -1480,7 +1522,26 @@ def unknown(msg):
 @bot.message_handler(commands=["debug"])
 def debug(msg):
     bot.reply_to(msg, "✅ Debug command works")
-    
+
+def alert_checker():
+
+    while True:
+
+        for user, coin, target in get_alerts():
+
+            price = safe_get_price(coin)
+
+            if price and price >= target:
+
+                bot.send_message(
+                  int(user),
+                  f"🚨 {coin.upper()} has reached ${price:,.2f}!"
+                )
+
+                delete_alert(user, coin, target)
+
+        time.sleep(60)   # Check every 60 seconds
+        
 # ================= BOT LOOP =================
 
 def run_bot():
@@ -1519,6 +1580,10 @@ if __name__ == "__main__":
     except Exception as e:
         print("Startup error:", repr(e))
 
+    # Start alert checker
+    Thread(target=alert_checker, daemon=True).start()
+
+    # Start Telegram bot
     Thread(target=run_bot, daemon=True).start()
 
     print("Bot thread started")
@@ -1528,4 +1593,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port
-)
+    )
