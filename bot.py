@@ -263,7 +263,19 @@ def resolve_coin(symbol):
 
     return None
     
-# ================= PRICE ENGINE =================
+# ================= COIN HELPERS =================
+
+def normalize_coin(symbol):
+    return str(symbol).strip().lower()
+
+
+def resolve_coin(symbol):
+    symbol = normalize_coin(symbol)
+
+    if symbol in COINPAPRIKA_IDS:
+        return COINPAPRIKA_IDS[symbol]
+
+    return None
 
 def get_price(symbol):
 
@@ -475,7 +487,7 @@ def get_ai_analysis(coin):
         "resistance": resistance
     }
 
-# ================= HISTORY ===============
+# ================== HISTORY ===============
 
 def get_history(coin):
 
