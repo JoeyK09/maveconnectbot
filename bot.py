@@ -368,7 +368,7 @@ def is_vip(user_id):
 
 # ================= AI ANALYSIS =================
 
-def ai_analysis(coin):
+def get_ai_analysis(coin):
 
     price = safe_get_price(coin)
 
@@ -414,7 +414,7 @@ def get_coin_data(coin):
         return None
 
     # AI analysis
-    analysis = ai_analysis(coin)
+    analysis = get_ai_analysis(coin)
 
     try:
         r = requests.get(
