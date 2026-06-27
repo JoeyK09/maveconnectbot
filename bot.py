@@ -14,7 +14,12 @@ from database import (
     update_mine,
     update_daily,
     add_win,
-    leaderboard
+    leaderboard,
+    add_favorite,
+    get_favorites,
+    add_alert,
+    get_alerts,
+    delete_alert
 )
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import telebot
