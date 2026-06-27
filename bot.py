@@ -2,6 +2,9 @@ import random
 import os
 import time
 import requests
+import pandas as pd
+from ta.momentum import RSIIndicator
+from ta.trend import EMAIndicator
 from flask import Flask
 from threading import Thread
 from database import (
@@ -471,42 +474,82 @@ def get_crypto_news(coin):
 
 # ================= ANALYSIS ============
 
-def ai_analysis(coin):
+def get_ai_analysis(coin):
 
-    data = get_coin_data(coin)
+    df = get_history(coin)
 
-    if data is None:
+    if df is None or len(df) < 60:
         return None
 
-    price = data["price"]
+    rsi = calculate_rsi(df)
+    trend = calculate_trend(df)
 
-    trend = random.choice([
-        "🟢 Bullish",
-        "🔴 Bearish",
-        "🟡 Sideways"
-    ])
+    support = float(df["low"].tail(20).min())
+    resistance = float(df["high"].tail(20).max())
 
-    signal = random.choice([
-        "BUY",
-        "SELL",
-        "HOLD"
-    ])
+    if trend == "Bullish" and rsi < 35:
+        signal = "🟢 BUY"
+        confidence = 90
+        risk = "Low"
 
-    rsi = random.randint(25, 80)
+    elif trend == "Bearish" and rsi > 70:
+        signal = "🔴 SELL"
+        confidence = 90
+        risk = "High"
 
-    support = price * 0.98
-    resistance = price * 1.02
-
-    strength = random.randint(60, 95)
+    else:
+        signal = "⚪ HOLD"
+        confidence = 70
+        risk = "Medium"
 
     return {
         "trend": trend,
         "signal": signal,
-        "rsi": rsi,
+        "confidence": confidence,
+        "risk": risk,
         "support": support,
-        "resistance": resistance,
-        "strength": strength
+        "resistance": resistance
     }
+
+# ================= HISTORY ==============
+
+def get_history(coin):
+
+    if coin not in COINPAPRIKA_IDS:
+        return None
+
+    try:
+        r = requests.get(
+            f"https://api.coinpaprika.com/v1/coins/{COINPAPRIKA_IDS[coin]}/ohlcv/historical?start=2026-05-01",
+            timeout=10
+        )
+
+        if r.status_code != 200:
+            return None
+
+        data = r.json()
+
+        return pd.DataFrame(data)
+
+    except:
+        return None
+
+def calculate_rsi(df):
+
+    rsi = RSIIndicator(df["close"]).rsi()
+
+    return float(rsi.iloc[-1])
+
+def calculate_trend(df):
+
+    ema20 = EMAIndicator(df["close"], window=20).ema_indicator()
+
+    ema50 = EMAIndicator(df["close"], window=50).ema_indicator()
+
+    if ema20.iloc[-1] > ema50.iloc[-1]:
+        return "Bullish"
+
+    return "Bearish"
     
 # ================= FLASK =================
 
