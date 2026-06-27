@@ -35,6 +35,15 @@ CREATE TABLE IF NOT EXISTS favorites(
 """)
 conn.commit()
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS alerts(
+    user_id TEXT,
+    coin TEXT,
+    target REAL
+)
+""")
+conn.commit()
+
 # ================= FUNCTIONS =================
 
 def get_profile(user_id):
@@ -186,3 +195,24 @@ def get_favorites(user):
     )
     return [row[0] for row in cursor.fetchall()]
     
+def add_alert(user, coin, target):
+    cursor.execute(
+        "INSERT INTO alerts(user_id, coin, target) VALUES(?,?,?)",
+        (user, coin, target)
+    )
+    conn.commit()
+
+
+def get_alerts():
+    cursor.execute(
+        "SELECT user_id, coin, target FROM alerts"
+    )
+    return cursor.fetchall()
+
+
+def delete_alert(user, coin, target):
+    cursor.execute(
+        "DELETE FROM alerts WHERE user_id=? AND coin=? AND target=?",
+        (user, coin, target)
+    )
+    conn.commit()
