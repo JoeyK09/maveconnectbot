@@ -141,6 +141,7 @@ vip_users = set()
 search_users = set()
 current_coin = {}
 alert_users = set()
+waiting_alert = {}
 
 # ================= COINPAPRIKA IDS =================
 
@@ -1399,11 +1400,41 @@ def favorite(msg):
     )
 
 @bot.message_handler(func=lambda m: m.text == "🔔 Set Alert")
-def alert(msg):
+def set_alert(msg):
+    coin = user_last_coin.get(msg.from_user.id)
+
+    if not coin:
+        bot.reply_to(msg, "Search a coin first.")
+        return
+
+    waiting_alert[msg.from_user.id] = coin
+
     bot.reply_to(
         msg,
-        "🔔 Price alerts coming soon!"
+        f"Enter the target price for {coin.upper()}.\n\nExample:\n120000"
     )
+
+
+@bot.message_handler(func=lambda m: m.from_user.id in waiting_alert)
+def save_alert(msg):
+    coin = waiting_alert.pop(msg.from_user.id)
+
+    try:
+        target = float(msg.text)
+
+        add_alert(
+            str(msg.from_user.id),
+            coin,
+            target
+        )
+
+        bot.reply_to(
+            msg,
+            f"✅ Alert set!\n{coin.upper()} → ${target:,.2f}"
+        )
+
+    except:
+        bot.reply_to(msg, "Invalid price.")
 
 @bot.message_handler(func=lambda m: m.text == "📊 Chart")
 def chart(msg):
