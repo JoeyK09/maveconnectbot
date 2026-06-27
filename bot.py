@@ -456,7 +456,7 @@ def get_coin_data(coin):
       import traceback
       traceback.print_exc()
 
-        return None
+    return None
 
 # ================= CRYPTO NEWS =================
 
