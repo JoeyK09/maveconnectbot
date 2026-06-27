@@ -254,16 +254,53 @@ COINPAPRIKA_IDS = {
     "dai": "dai-dai"
 }
 
-def resolve_coin(symbol):
+def get_coin_id(symbol):
+    if not symbol:
+        return None
+    return COINPAPRIKA_IDS.get(symbol.lower().strip())
 
-    symbol = str(symbol).lower().strip()
+def get_coin_data(symbol):
+    coin_id = get_coin_id(symbol)
 
-    if symbol in COINPAPRIKA_IDS:
-        return COINPAPRIKA_IDS[symbol]
+    if not coin_id:
+        return None
 
-    return None
+    try:
+        url = f"https://api.coinpaprika.com/v1/tickers/{coin_id}"
+        r = requests.get(url, timeout=10)
+
+        if r.status_code != 200:
+            return None
+
+        data = r.json()
+        quotes = data["quotes"]["USD"]
+
+        return {
+            "symbol": data["symbol"],
+            "name": data["name"],
+            "price": quotes["price"],
+            "change24": quotes["percent_change_24h"],
+            "market_cap": quotes["market_cap"],
+            "volume": quotes["volume_24h"],
+            "rank": data["rank"]
+        }
+
+    except Exception as e:
+        print(f"CoinPaprika error: {e}")
+        return None
+
+def safe_get_price(symbol):
+    data = get_coin_data(symbol)
+
+    print(get_coin_data("btc"))
+    
+    if not data:
+        return None
+
+    return data["price"]
     
 def get_price(symbol):
+    return safe_get_price(symbol)
 
     coin = normalize_coin(symbol)
 
@@ -394,51 +431,6 @@ def get_ai_analysis(coin):
         "resistance": resistance
     }
     
-# ================= COIN DETAILS ===============
-
-def get_coin_data(coin):
-
-    coin = coin.lower().strip()
-
-    if coin not in COINPAPRIKA_IDS:
-        return None
-
-    # AI analysis
-    analysis = ai_analysis(coin)
-
-    try:
-        r = requests.get(
-            f"https://api.coinpaprika.com/v1/tickers/{COINPAPRIKA_IDS[coin]}",
-            timeout=10
-        )
-
-        if r.status_code != 200:
-            return None
-
-        data = r.json()
-
-        return {
-            "name": data["name"],
-            "symbol": data["symbol"],
-            "price": data["quotes"]["USD"]["price"],
-            "change24": data["quotes"]["USD"]["percent_change_24h"],
-            "marketcap": data["quotes"]["USD"]["market_cap"],
-            "volume": data["quotes"]["USD"]["volume_24h"],
-            "rank": data["rank"],
-
-            # AI fields
-            "signal": analysis["signal"],
-            "strength": analysis["strength"],
-            "trend": analysis["trend"],
-            "support": analysis["support"],
-            "resistance": analysis["resistance"]
-        }
-
-    except Exception as e:
-        print(e)
-
-    return None
-        
 # ================= CRYPTO NEWS =================
 
 def get_crypto_news(coin):
