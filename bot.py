@@ -254,6 +254,15 @@ COINPAPRIKA_IDS = {
     "dai": "dai-dai"
 }
 
+def resolve_coin(symbol):
+
+    symbol = str(symbol).lower().strip()
+
+    if symbol in COINPAPRIKA_IDS:
+        return COINPAPRIKA_IDS[symbol]
+
+    return None
+    
 # ================= PRICE ENGINE =================
 
 def get_price(symbol):
@@ -376,14 +385,14 @@ def get_ai_analysis(coin):
 
 def get_coin_data(coin):
 
-    coin = coin.lower().strip()
+    coin_id = resolve_coin(coin.lower().strip())
 
-    if coin not in COINPAPRIKA_IDS:
+    if not coin_id:
         return None
 
     try:
         r = requests.get(
-            f"https://api.coinpaprika.com/v1/tickers/{COINPAPRIKA_IDS[coin]}",
+            f"https://api.coinpaprika.com/v1/tickers/{coin_id}",
             timeout=10
         )
 
@@ -392,8 +401,6 @@ def get_coin_data(coin):
 
         data = r.json()
 
-        analysis = get_ai_analysis(coin)
-
         return {
             "name": data["name"],
             "symbol": data["symbol"],
@@ -401,17 +408,11 @@ def get_coin_data(coin):
             "change24": data["quotes"]["USD"]["percent_change_24h"],
             "marketcap": data["quotes"]["USD"]["market_cap"],
             "volume": data["quotes"]["USD"]["volume_24h"],
-            "rank": data["rank"],
-
-            "signal": analysis["signal"] if analysis else "N/A",
-            "strength": analysis["confidence"] if analysis else 0,
-            "trend": analysis["trend"] if analysis else "Unknown",
-            "support": analysis["support"] if analysis else 0,
-            "resistance": analysis["resistance"] if analysis else 0
+            "rank": data["rank"]
         }
 
     except Exception as e:
-        print("Coin data error:", repr(e))
+        print("Coin data error:", e)
         return None
         
 # ================= CRYPTO NEWS =================
@@ -479,23 +480,20 @@ def get_ai_analysis(coin):
 
 def get_history(coin):
 
-    if coin not in COINPAPRIKA_IDS:
+    coin_id = resolve_coin(coin.lower().strip())
+
+    if not coin_id:
         return None
 
     try:
-        url = f"https://api.coinpaprika.com/v1/coins/{COINPAPRIKA_IDS[coin]}/ohlcv/historical?start=2026-05-01"
+        url = f"https://api.coinpaprika.com/v1/coins/{coin_id}/ohlcv/historical?start=2026-05-01"
 
         r = requests.get(url, timeout=10)
 
         if r.status_code != 200:
-            print("History error:", r.status_code, r.text)
             return None
 
         data = r.json()
-
-        if not data:
-            return None
-
         return pd.DataFrame(data)
 
     except Exception as e:
