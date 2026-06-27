@@ -2,6 +2,7 @@ import random
 import os
 import time
 import requests
+from datetime import datetime, timedelta
 import pandas as pd
 from ta.momentum import RSIIndicator
 from ta.trend import EMAIndicator
@@ -267,37 +268,36 @@ def get_coin_data(symbol):
 
     try:
         url = f"https://api.coinpaprika.com/v1/tickers/{coin_id}"
-        r = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=10)
 
-        if r.status_code != 200:
+        if response.status_code != 200:
             return None
 
-        data = r.json()
-        quotes = data["quotes"]["USD"]
+        data = response.json()
+        usd = data["quotes"]["USD"]
 
         return {
+            "id": coin_id,
             "symbol": data["symbol"],
             "name": data["name"],
-            "price": quotes["price"],
-            "change24": quotes["percent_change_24h"],
-            "market_cap": quotes["market_cap"],
-            "volume": quotes["volume_24h"],
-            "rank": data["rank"]
+            "rank": data["rank"],
+            "price": usd["price"],
+            "change24": usd["percent_change_24h"],
+            "market_cap": usd["market_cap"],
+            "volume": usd["volume_24h"]
         }
 
     except Exception as e:
-        print(f"CoinPaprika error: {e}")
+        print(f"CoinPaprika Error: {e}")
         return None
-
+        
 def safe_get_price(symbol):
     data = get_coin_data(symbol)
 
-    print(get_coin_data("btc"))
-    
-    if not data:
-        return None
+    if data:
+        return data["price"]
 
-    return data["price"]
+    return None
     
 def get_price(symbol):
     return safe_get_price(symbol)
@@ -380,55 +380,42 @@ def is_vip(user_id):
 
 # ================== AI ANALYSIS ==============
 
-def get_ai_analysis(coin):
+def ai_analysis(symbol):
+    data = get_coin_data(symbol)
 
-    data = get_coin_data(coin)
+    if not data:
+        return {
+            "signal": "UNKNOWN",
+            "strength": 0,
+            "trend": "Unknown",
+            "support": 0,
+            "resistance": 0
+        }
 
-    if data is None:
-        return None
-
+    price = data["price"]
     change = data["change24"]
 
     if change >= 5:
-        trend = "🟢 Strong Bullish"
         signal = "🟢 BUY"
-        confidence = 90
-        risk = "Medium"
-
-    elif change >= 1:
-        trend = "🟢 Bullish"
-        signal = "🟢 BUY"
-        confidence = 75
-        risk = "Low"
+        trend = "Bullish"
+        strength = 85
 
     elif change <= -5:
-        trend = "🔴 Strong Bearish"
         signal = "🔴 SELL"
-        confidence = 90
-        risk = "High"
-
-    elif change <= -1:
-        trend = "🟠 Bearish"
-        signal = "🟠 SELL"
-        confidence = 70
-        risk = "Medium"
+        trend = "Bearish"
+        strength = 80
 
     else:
-        trend = "⚪ Sideways"
         signal = "⚪ HOLD"
-        confidence = 60
-        risk = "Low"
-
-    support = data["price"] * 0.97
-    resistance = data["price"] * 1.03
+        trend = "Sideways"
+        strength = 65
 
     return {
-        "trend": trend,
         "signal": signal,
-        "confidence": confidence,
-        "risk": risk,
-        "support": support,
-        "resistance": resistance
+        "strength": strength,
+        "trend": trend,
+        "support": round(price * 0.97, 4),
+        "resistance": round(price * 1.03, 4)
     }
     
 # ================= CRYPTO NEWS =================
@@ -451,44 +438,6 @@ def get_crypto_news(coin):
         print("News error:", e)
         return None
 
-# ================= ANALYSIS ============
-
-def ai_analysis(coin):
-
-    price = safe_get_price(coin)
-
-    if price is None:
-        return {
-            "signal": "UNKNOWN",
-            "strength": 0,
-            "trend": "Unknown",
-            "support": 0,
-            "resistance": 0
-        }
-
-    change = get_coin_data(coin)["change24"] if False else 0
-
-    if change > 5:
-        signal = "🟢 BUY"
-        trend = "Bullish"
-        strength = 85
-    elif change < -5:
-        signal = "🔴 SELL"
-        trend = "Bearish"
-        strength = 80
-    else:
-        signal = "⚪ HOLD"
-        trend = "Sideways"
-        strength = 65
-
-    return {
-        "signal": signal,
-        "strength": strength,
-        "trend": trend,
-        "support": round(price * 0.97, 4),
-        "resistance": round(price * 1.03, 4)
-    }
-    
 def calculate_rsi(df):
 
     rsi = RSIIndicator(df["close"]).rsi()
@@ -508,25 +457,40 @@ def calculate_trend(df):
     
 # =================== HISTORY ===============
 
-def get_history(coin):
+def get_history(symbol, days=60):
+    coin_id = get_coin_id(symbol)
 
-    if coin not in COINPAPRIKA_IDS:
+    df = get_history("btc")
+    print(df.tail())
+
+    if not coin_id:
         return None
 
+    start = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+
     try:
-        r = requests.get(
-            f"https://api.coinpaprika.com/v1/coins/{COINPAPRIKA_IDS[coin]}/ohlcv/historical?start=2026-05-01",
-            timeout=10
+        url = (
+            f"https://api.coinpaprika.com/v1/coins/"
+            f"{coin_id}/ohlcv/historical?start={start}"
         )
 
-        if r.status_code != 200:
+        response = requests.get(url, timeout=10)
+
+        if response.status_code != 200:
             return None
 
-        data = r.json()
+        df = pd.DataFrame(response.json())
 
-        return pd.DataFrame(data)
+        if df.empty:
+            return None
 
-    except:
+        df["time_open"] = pd.to_datetime(df["time_open"])
+        df.set_index("time_open", inplace=True)
+
+        return df
+
+    except Exception as e:
+        print(f"History Error: {e}")
         return None
     
 # ================= FLASK =================
