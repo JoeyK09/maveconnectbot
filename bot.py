@@ -368,55 +368,40 @@ def is_vip(user_id):
 
 # ================= AI ANALYSIS =================
 
-def get_ai_analysis(coin):
+def ai_analysis(coin):
 
-    data = get_coin_data(coin)
+    price = safe_get_price(coin)
 
-    if data is None:
-        return None
+    if price is None:
+        return {
+            "signal": "UNKNOWN",
+            "strength": 0,
+            "trend": "Unknown",
+            "support": 0,
+            "resistance": 0
+        }
 
-    change = data["change24"]
+    change = get_coin_data(coin)["change24"] if False else 0
 
-    if change >= 5:
-        trend = "🟢 Strong Bullish"
+    if change > 5:
         signal = "🟢 BUY"
-        confidence = 90
-        risk = "Medium"
-
-    elif change >= 1:
-        trend = "🟢 Bullish"
-        signal = "🟢 BUY"
-        confidence = 75
-        risk = "Low"
-
-    elif change <= -5:
-        trend = "🔴 Strong Bearish"
+        trend = "Bullish"
+        strength = 85
+    elif change < -5:
         signal = "🔴 SELL"
-        confidence = 90
-        risk = "High"
-
-    elif change <= -1:
-        trend = "🟠 Bearish"
-        signal = "🟠 SELL"
-        confidence = 70
-        risk = "Medium"
-
+        trend = "Bearish"
+        strength = 80
     else:
-        trend = "⚪ Sideways"
         signal = "⚪ HOLD"
-        confidence = 60
-        risk = "Low"
-
-    support = data["price"] * 0.97
-    resistance = data["price"] * 1.03
+        trend = "Sideways"
+        strength = 65
 
     return {
-        "trend": trend,
         "signal": signal,
-        "confidence": confidence,
-        "risk": risk,
-        "support": support,
-        "resistance": resistance
+        "strength": strength,
+        "trend": trend,
+        "support": round(price * 0.97, 4),
+        "resistance": round(price * 1.03, 4)
     }
     
 # ================= COIN DETAILS ===============
