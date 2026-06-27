@@ -4,3 +4,4 @@ flask
 psycopg2-binary
 pandas
 ta
+numpy
