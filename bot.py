@@ -461,41 +461,40 @@ def get_crypto_news(coin):
 
 # ================= ANALYSIS ============
 
-def get_ai_analysis(coin):
+def ai_analysis(coin):
 
-    df = get_history(coin)
+    price = safe_get_price(coin)
 
-    if df is None or len(df) < 60:
-        return None
+    if price is None:
+        return {
+            "signal": "UNKNOWN",
+            "strength": 0,
+            "trend": "Unknown",
+            "support": 0,
+            "resistance": 0
+        }
 
-    rsi = calculate_rsi(df)
-    trend = calculate_trend(df)
+    change = get_coin_data(coin)["change24"] if False else 0
 
-    support = float(df["low"].tail(20).min())
-    resistance = float(df["high"].tail(20).max())
-
-    if trend == "Bullish" and rsi < 35:
+    if change > 5:
         signal = "🟢 BUY"
-        confidence = 90
-        risk = "Low"
-
-    elif trend == "Bearish" and rsi > 70:
+        trend = "Bullish"
+        strength = 85
+    elif change < -5:
         signal = "🔴 SELL"
-        confidence = 90
-        risk = "High"
-
+        trend = "Bearish"
+        strength = 80
     else:
         signal = "⚪ HOLD"
-        confidence = 70
-        risk = "Medium"
+        trend = "Sideways"
+        strength = 65
 
     return {
-        "trend": trend,
         "signal": signal,
-        "confidence": confidence,
-        "risk": risk,
-        "support": support,
-        "resistance": resistance
+        "strength": strength,
+        "trend": trend,
+        "support": round(price * 0.97, 4),
+        "resistance": round(price * 1.03, 4)
     }
     
 def calculate_rsi(df):
