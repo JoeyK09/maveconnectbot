@@ -1520,17 +1520,19 @@ def save_alert(msg):
 @bot.message_handler(func=lambda m: m.text == "📊 Chart")
 def chart(msg):
 
-    coin = current_coin.get(msg.from_user.id)
+    coin = user_last_coin.get(msg.from_user.id)
 
     if not coin:
-        bot.reply_to(msg, "❌ Open a coin first.")
+        bot.reply_to(msg, "❌ View a coin first.")
         return
+
+    symbol = coin.upper()
 
     bot.reply_to(
         msg,
-        f"📈 {coin.upper()} Chart\n\n"
-        f"https://www.tradingview.com/symbols/{coin.upper()}USDT/"
-    )
+        f"📈 Live {symbol} Chart\n\n"
+        f"https://www.tradingview.com/chart/?symbol=BINANCE:{symbol}USDT"
+)
 
 @bot.message_handler(func=lambda m: m.text == "📰 News")
 def news(msg):
