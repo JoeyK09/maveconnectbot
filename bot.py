@@ -260,34 +260,41 @@ def get_price(coin):
 
     coin = coin.lower().strip()
 
-    if coin not in COINPAPRIKA_IDS:
-        return None
-
     now = time.time()
 
+    # cache check
     if coin in price_cache:
         price, timestamp = price_cache[coin]
         if now - timestamp < CACHE_TIME:
             return price
 
+    # validate mapping safely
+    coin_id = COINPAPRIKA_IDS.get(coin)
+
+    if not coin_id:
+        print(f"[WARN] Unknown coin: {coin}")
+        return None
+
     try:
         r = requests.get(
-            f"https://api.coinpaprika.com/v1/tickers/{COINPAPRIKA_IDS[coin]}",
+            f"https://api.coinpaprika.com/v1/tickers/{coin_id}",
             timeout=10
         )
 
-        if r.status_code == 200:
-            data = r.json()
-            price = float(data["quotes"]["USD"]["price"])
+        if r.status_code != 200:
+            print(f"[API ERROR] {coin} -> {r.status_code}")
+            return None
 
-            price_cache[coin] = (price, now)
+        data = r.json()
+        price = float(data["quotes"]["USD"]["price"])
 
-            return price
+        price_cache[coin] = (price, now)
+
+        return price
 
     except Exception as e:
         print("CoinPaprika error:", repr(e))
-
-    return None
+        return None
     
 # ================= SIGNAL ENGINE =================
 
