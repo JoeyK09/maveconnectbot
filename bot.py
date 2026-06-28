@@ -300,33 +300,33 @@ def safe_get_price(symbol):
     return None
 
 def scan_coin(symbol):
-    # Get live market data
+    print(f"[SCAN] {symbol}")
+
     data = get_coin_data(symbol)
 
     if not data:
+        print("[SCAN] get_coin_data failed")
         return None
 
-    # Get historical data
+    print("[SCAN] get_coin_data OK")
+
     history = get_history(symbol)
 
-    if history is None or history.empty:
-        print(f"History failed for {symbol}")
-        history = None
+    if history is None:
+        print("[SCAN] history is None")
+    elif history.empty:
+        print("[SCAN] history is empty")
+    else:
+        print(f"[SCAN] history rows: {len(history)}")
 
-   # history["rsi"] = RSIIndicator(
-        #close=history["close"],
-      #  window=14
-    #).rsi()
-
-   # rsi = round(history["rsi"].iloc[-1], 2)
-
-    # Get AI analysis
     analysis = ai_analysis(symbol)
 
     if not analysis:
+        print("[SCAN] ai_analysis failed")
         return None
 
-    # Return everything in one dictionary
+    print("[SCAN] ai_analysis OK")
+
     return {
         "coin": data["name"],
         "symbol": data["symbol"],
@@ -1515,11 +1515,14 @@ def search_coin_result(msg):
         bot.reply_to(msg, "❌ Coin not found.")
         return
 
+    if isinstance(scan["rsi"], (int, float)):
     rsi_status = (
-    "Oversold 🟢" if scan["rsi"] < 30 else
-    "Overbought 🔴" if scan["rsi"] > 70 else
-    "Neutral ⚪"
-    )
+        "Oversold 🟢" if scan["rsi"] < 30 else
+        "Overbought 🔴" if scan["rsi"] > 70 else
+        "Neutral ⚪"
+       )
+    else:
+       rsi_status = "Unavailable"
     
     current_coin[msg.from_user.id] = coin
     
@@ -1540,19 +1543,19 @@ def search_coin_result(msg):
     f"Resistance: ${scan['resistance']:,.4f}"
     )
 
-@bot.message_handler(func=lambda m: m.from_user.id in search_users)
-def handle_coin_input(msg):
+#@bot.message_handler(func=lambda m: m.from_user.id in search_users)
+#def handle_coin_input(msg):
 
-    coin = msg.text.upper().strip()
+   # coin = msg.text.upper().strip()
 
-    user_last_coin[msg.from_user.id] = coin
-    search_users.discard(msg.from_user.id)
+    #user_last_coin[msg.from_user.id] = coin
+    #search_users.discard(msg.from_user.id)
 
-    bot.reply_to(
-        msg,
-        f"✅ Coin selected: {coin}\n\n"
-        f"You can now use:\n📊 Chart\n📰 News\n🔔 Set Alert"
-    )
+   # bot.reply_to(
+      #  msg,
+       # f"✅ Coin selected: {coin}\n\n"
+       # f"You can now use:\n📊 Chart\n📰 News\n🔔 Set Alert"
+  #  )
     
 @bot.message_handler(func=lambda m: m.text == "📊 Chart")
 def chart(msg):
