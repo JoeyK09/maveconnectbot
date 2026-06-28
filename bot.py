@@ -308,18 +308,17 @@ def scan_coin(symbol):
 
     # Get historical data
     history = get_history(symbol)
-    
-    print(history.columns.tolist())
 
     if history is None or history.empty:
-        return None
+        print(f"History failed for {symbol}")
+        history = None
 
-    history["rsi"] = RSIIndicator(
+   # history["rsi"] = RSIIndicator(
         close=history["close"],
         window=14
     ).rsi()
 
-    rsi = round(history["rsi"].iloc[-1], 2)
+   # rsi = round(history["rsi"].iloc[-1], 2)
 
     # Get AI analysis
     analysis = ai_analysis(symbol)
@@ -336,7 +335,7 @@ def scan_coin(symbol):
         "rank": data["rank"],
         "market_cap": data["market_cap"],
         "volume": data["volume"],
-        "rsi": rsi,
+        "rsi": N/A,
         "signal": analysis["signal"],
         "strength": analysis["strength"],
         "trend": analysis["trend"],
