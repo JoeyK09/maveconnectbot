@@ -1382,7 +1382,7 @@ def daily_btn(msg):
     daily(msg)
 
 
-@bot.message_handler(func=lambda m: m.text=="⛏ Mine")
+@bot.message_handler(func=lambda m: m.text=="⛏️ Mine")
 def mine_btn(msg):
     mine(msg)
 
