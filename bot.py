@@ -921,6 +921,20 @@ def mine_menu():
 
     return markup
 
+def shop_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("⚒️ Upgrade Pickaxe")
+    )
+
+    markup.row(
+        KeyboardButton("🔙 Back")
+    )
+
+    return markup
+    
 def wallet_menu():
 
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -1287,6 +1301,44 @@ def do_mine(msg):
        f"🏅 Level: {level}\n"
        f"{levelup}",
        reply_markup=mine_menu()
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "🏪 Shop")
+def shop(msg):
+
+    user = str(msg.from_user.id)
+
+    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+
+    # Already at max level
+    if pickaxe == max(PICKAXES.keys()):
+        bot.reply_to(
+            msg,
+            "🏪 SHOP\n\n"
+            "🏆 You already own the best pickaxe!\n\n"
+            f"⚒ Current: {PICKAXES[pickaxe]['name']}",
+            reply_markup=shop_menu()
+        )
+        return
+
+    next_pickaxe = pickaxe + 1
+
+    bot.reply_to(
+        msg,
+        f"🏪 PICKAXE SHOP\n\n"
+        f"💰 Balance: {balance} PLATS\n\n"
+
+        f"⚒ Current:\n"
+        f"{PICKAXES[pickaxe]['name']}\n\n"
+
+        f"⬆ Next Upgrade:\n"
+        f"{PICKAXES[next_pickaxe]['name']}\n\n"
+
+        f"💵 Cost: {PICKAXES[next_pickaxe]['price']} PLATS\n"
+        f"💎 Reward: {PICKAXES[next_pickaxe]['min']}-{PICKAXES[next_pickaxe]['max']} PLATS\n"
+        f"⏳ Cooldown: {PICKAXES[next_pickaxe]['cooldown']//60} mins",
+        reply_markup=shop_menu()
     )
 
 
