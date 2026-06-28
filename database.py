@@ -187,14 +187,33 @@ def leaderboard(limit=10):
     """, (limit,))
 
     return cursor.fetchall()
+    
 
 def add_favorite(user, coin):
+
     cursor.execute(
-        "INSERT INTO favorites VALUES (%s,%s)",
+        """
+        SELECT 1
+        FROM favorites
+        WHERE user_id=%s
+        AND coin=%s
+        """,
         (user, coin)
     )
-    conn.commit()
 
+    if cursor.fetchone():
+        return
+
+    cursor.execute(
+        """
+        INSERT INTO favorites(user_id, coin)
+        VALUES(%s, %s)
+        """,
+        (user, coin)
+    )
+
+    conn.commit()
+    
 
 def get_favorites(user):
     cursor.execute(
