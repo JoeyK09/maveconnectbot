@@ -1433,41 +1433,32 @@ def coin_search(msg):
     )
 
 @bot.message_handler(func=lambda m: m.text == "⭐ Favorite")
-def favorite(msg):
+def favorite_coin(msg):
 
     coin = current_coin.get(msg.from_user.id)
 
     if not coin:
-        bot.reply_to(msg, "❌ Open a coin first.")
+        bot.reply_to(msg, "❌ Search a coin first.")
         return
 
-    add_favorite(str(msg.from_user.id), coin)
+    favorites = get_favorites(str(msg.from_user.id))
+
+    if coin in favorites:
+        bot.reply_to(
+            msg,
+            f"⭐ {coin.upper()} is already in your favorites."
+        )
+        return
+
+    add_favorite(
+        str(msg.from_user.id),
+        coin
+    )
 
     bot.reply_to(
         msg,
-        f"⭐ {coin.upper()} saved to Favorites!"
+        f"✅ {coin.upper()} added to favorites."
     )
-
-@bot.message_handler(func=lambda m: m.text == "⭐ Favorites")
-def favorites(msg):
-
-    favs = get_favorites(str(msg.from_user.id))
-
-    if not favs:
-        bot.reply_to(msg, "⭐ You don't have any favorite coins yet.")
-        return
-
-    text = "⭐ Your Favorite Coins\n\n"
-
-    for coin in favs:
-        price = get_price(coin)
-
-        if price:
-            text += f"• {coin.upper()} — ${price:,.4f}\n"
-        else:
-            text += f"• {coin.upper()}\n"
-
-    bot.reply_to(msg, text)
     
 @bot.message_handler(func=lambda m: m.text == "🐸 Meme Coins")
 def meme_coins(msg):
