@@ -306,6 +306,12 @@ def scan_coin(symbol):
     if not data:
         return None
 
+    # Get historical data
+    history = get_history(symbol)
+
+    if history is none or history.empty:
+        return none
+        
     # Get AI analysis
     analysis = ai_analysis(symbol)
 
@@ -321,6 +327,7 @@ def scan_coin(symbol):
         "rank": data["rank"],
         "market_cap": data["market_cap"],
         "volume": data["volume"],
+        "rsi": rsi,
         "signal": analysis["signal"],
         "strength": analysis["strength"],
         "trend": analysis["trend"],
@@ -369,7 +376,7 @@ def get_price(symbol):
         print("[ERROR]", repr(e))
         return None
         
-# ================= SIGNAL ENGINE =================
+# ================== SIGNAL ENGINE =================
 
 def get_signal(coin):
 
@@ -445,6 +452,13 @@ def ai_analysis(symbol):
         "resistance": round(price * 1.03, 4)
     }
     
+history["rsi"] = RSIIndicator(
+    close=history["close"],
+    window=14
+).rsi()
+
+rsi = round(history["rsi"].iloc[-1], 2)
+
 # ================= CRYPTO NEWS =================
 
 def get_crypto_news(coin):
@@ -490,6 +504,8 @@ def get_history(symbol, days=60):
     if not coin_id:
         return None
 
+    print(history.columns)
+    
     start = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
 
     try:
@@ -1500,6 +1516,12 @@ def search_coin_result(msg):
         bot.reply_to(msg, "❌ Coin not found.")
         return
 
+    rsi_status = (
+    "Oversold 🟢" if scan["rsi"] < 30 else
+    "Overbought 🔴" if scan["rsi"] > 70 else
+    "Neutral ⚪"
+    )
+    
     current_coin[msg.from_user.id] = coin
     
     bot.reply_to(
@@ -1511,6 +1533,7 @@ def search_coin_result(msg):
     f"💎 Market Cap: ${scan['market_cap']:,.0f}\n"
     f"📊 Volume: ${scan['volume']:,.0f}\n\n"
     f"🤖 AI Analysis\n"
+    f"📊 RSI (14): {scan['rsi']} ({rsi_status})\n"
     f"Signal: {scan['signal']}\n"
     f"Strength: {scan['strength']}/100\n"
     f"Trend: {scan['trend']}\n"
