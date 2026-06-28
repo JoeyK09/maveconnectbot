@@ -151,13 +151,14 @@ CREATE TABLE IF NOT EXISTS alerts (
 """)
 conn.commit()
 
+
 def update_mine(
-    user,
+    user_id,
     balance,
     xp,
     level,
     pickaxe,
-    now
+    last_mine
 ):
     get_profile(user_id)
 
@@ -166,6 +167,7 @@ def update_mine(
         SET balance=%s,
             xp=%s,
             level=%s,
+            pickaxe=%s,
             last_mine=%s
         WHERE user_id=%s
     """, (
@@ -176,6 +178,8 @@ def update_mine(
         last_mine,
         user_id
     ))
+
+    conn.commit()
 
 
 def update_daily(user_id, balance, last_daily):
