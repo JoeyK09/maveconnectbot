@@ -1343,7 +1343,7 @@ def shop(msg):
     )
 
 
-@bot.message_handler(func=lambda m: m.text == "⚒ Upgrade Pickaxe")
+@bot.message_handler(func=lambda m: m.text == "⚒️ Upgrade Pickaxe")
 def upgrade_pickaxe(msg):
 
     user = str(msg.from_user.id)
@@ -1380,7 +1380,7 @@ def upgrade_pickaxe(msg):
     bot.reply_to(
         msg,
         f"🎉 Upgrade Successful!\n\n"
-        f"⚒ New Pickaxe: {PICKAXES[pickaxe]['name']}\n"
+        f"⚒️ New Pickaxe: {PICKAXES[pickaxe]['name']}\n"
         f"💎 Reward: {PICKAXES[pickaxe]['min']}-{PICKAXES[pickaxe]['max']} PLATS\n"
         f"⏳ Cooldown: {PICKAXES[pickaxe]['cooldown']//60} mins\n\n"
         f"💰 Remaining Balance: {balance} PLATS",
