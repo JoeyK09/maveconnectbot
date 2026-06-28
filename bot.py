@@ -2,6 +2,7 @@ import random
 import os
 import time
 import requests
+import feedparser
 from datetime import datetime, timedelta, timezone
 from datetime import datetime, timedelta
 from datetime import datetime
@@ -129,17 +130,15 @@ PRICE_BUTTONS = {
     
 }
 
-NEWS_CATEGORY = {
+NEWS_NAMES = {
     "btc": "Bitcoin",
     "eth": "Ethereum",
-    "bnb": "Binance",
-    "xrp": "Ripple",
+    "bnb": "BNB",
+    "xrp": "XRP",
     "sol": "Solana",
     "doge": "Dogecoin",
     "ada": "Cardano",
-    "trx": "Tron",
-    "link": "Chainlink",
-    "avax": "Avalanche"
+    "trx": "Tron"
 }
 
 DASHBOARD_BUTTONS = [
@@ -480,26 +479,32 @@ def ai_analysis(symbol):
 
 def get_crypto_news(coin):
     try:
-        category = NEWS_CATEGORY.get(coin.lower(), "Bitcoin")
-
-        url = (
-            f"https://min-api.cryptocompare.com/data/v2/news/"
-            f"?categories={category}"
+        feed = feedparser.parse(
+            "https://www.coindesk.com/arc/outboundfeeds/rss/"
         )
 
-        r = requests.get(url, timeout=10)
+        articles = []
 
-        if r.status_code != 200:
-            return None
+        coin = coin.upper()
 
-        data = r.json().get("Data", [])
+        for entry in feed.entries:
+            title = entry.title
 
-        return data[:5]
+            if coin in title.upper():
+                articles.append({
+                    "title": title,
+                    "url": entry.link
+                })
+
+            if len(articles) == 5:
+                break
+
+        return articles
 
     except Exception as e:
-        print("News error:", e)
+        print("News Error:", e)
         return None
-
+        
 def calculate_rsi(df):
 
     rsi = RSIIndicator(df["close"]).rsi()
@@ -1612,34 +1617,28 @@ def news(msg):
     coin = user_last_coin.get(msg.from_user.id)
 
     if not coin:
-        bot.reply_to(msg, "❌ Search a coin first.")
+        bot.reply_to(msg, "❌ Open a coin first.")
         return
 
     articles = get_crypto_news(coin)
 
     if not articles:
-        bot.reply_to(msg, "❌ No news available.")
+        bot.reply_to(
+            msg,
+            f"❌ No recent news found for {coin.upper()}."
+        )
         return
 
     text = f"📰 Latest {coin.upper()} News\n\n"
 
-    for i, article in enumerate(articles, 1):
-
-        source = article.get("source", "Unknown")
-
-        published = datetime.fromtimestamp(
-            article["published_on"]
-        ).strftime("%d %b %Y %H:%M UTC")
-
+    for article in articles:
         text += (
-            f"{i}. {article['title']}\n"
-            f"📰 {source}\n"
-            f"🕒 {published}\n"
+            f"📰 {article['title']}\n"
             f"🔗 {article['url']}\n\n"
         )
 
     bot.reply_to(msg, text)
-
+    
 @bot.message_handler(func=lambda m: m.text == "⭐ Favorite")
 def favorite(msg):
     bot.reply_to(
