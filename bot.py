@@ -1516,10 +1516,10 @@ def search_coin_result(msg):
         return
 
     if isinstance(scan["rsi"], (int, float)):
-    rsi_status = (
-        "Oversold 🟢" if scan["rsi"] < 30 else
-        "Overbought 🔴" if scan["rsi"] > 70 else
-        "Neutral ⚪"
+        rsi_status = (
+           "Oversold 🟢" if scan["rsi"] < 30 else
+           "Overbought 🔴" if scan["rsi"] > 70 else
+           "Neutral ⚪"
        )
     else:
        rsi_status = "Unavailable"
