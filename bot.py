@@ -1285,17 +1285,18 @@ def profile(msg):
 
     user = str(msg.from_user.id)
 
-    balance, xp, level, last_daily, last_mine, wins = get_profile(user)
+    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
 
     bot.reply_to(
         msg,
         f"👤 {msg.from_user.first_name}\n\n"
         f"🏅 Level: {level}\n"
-        f"⭐ XP: {xp}/100\n\n"
+        f"⭐ XP: {xp}/100\n"
+        f"⚒ Pickaxe: {PICKAXES[pickaxe]['name']}\n\n"
         f"💰 Balance: {balance} PLATS\n"
         f"🏆 Wins: {wins}"
     )
-
+    
 @bot.message_handler(commands=["buyvip"])
 def buyvip(msg):
     bot.reply_to(
