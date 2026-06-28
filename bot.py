@@ -308,10 +308,19 @@ def scan_coin(symbol):
 
     # Get historical data
     history = get_history(symbol)
+    
+    print(history.columns.tolist())
 
-    if history is none or history.empty:
-        return none
-        
+    if history is None or history.empty:
+        return None
+
+    history["rsi"] = RSIIndicator(
+        close=history["close"],
+        window=14
+    ).rsi()
+
+    rsi = round(history["rsi"].iloc[-1], 2)
+
     # Get AI analysis
     analysis = ai_analysis(symbol)
 
