@@ -1706,7 +1706,8 @@ def alert(msg):
     bot.reply_to(
         msg,
         f"🔔 Enter the target price for {coin.upper()}."
-
+    )
+    
 @bot.message_handler(func=lambda m: m.from_user.id in alert_users)
 def save_alert(msg):
 
