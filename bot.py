@@ -1218,29 +1218,16 @@ def mine(msg):
     found = random.choice(finds)
     
     bot.reply_to(
-        msg,
-        f"🦆 Mining Complete!\n\n"
-        f"+{reward} PLATS\n"
-        f"+5 XP\n\n"
-        f"💰 Balance: {balance}\n"
-        f"⭐ XP: {xp}/100\n"
-        f"🏅 Level: {level}"
-        f"{levelup}"
-   ⛏️ Mining Complete!
-
-   You discovered:
-    {found}
-    
-    💰 Earned: {reward} Plats
-    
-    ⭐ XP: +{xp}
-    
-    🏅 Level: {level}
-    
-    💳 Balance:{balance} Plats
-    """,
-         reply_markup=mine_menu()
-        
+       msg,
+       f"⛏️ Mining Complete!\n\n"
+       f"You discovered:\n"
+       f"{found}\n\n"
+       f"💰 Earned: +{reward} PLATS\n"
+       f"⭐ XP: +5\n\n"
+       f"💳 Balance: {balance} PLATS\n"
+       f"🏅 Level: {level}\n"
+       f"{levelup}",
+       reply_markup=mine_menu()
     )
 
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
