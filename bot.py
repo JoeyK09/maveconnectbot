@@ -129,6 +129,19 @@ PRICE_BUTTONS = {
     
 }
 
+NEWS_CATEGORY = {
+    "btc": "Bitcoin",
+    "eth": "Ethereum",
+    "bnb": "Binance",
+    "xrp": "Ripple",
+    "sol": "Solana",
+    "doge": "Dogecoin",
+    "ada": "Cardano",
+    "trx": "Tron",
+    "link": "Chainlink",
+    "avax": "Avalanche"
+}
+
 DASHBOARD_BUTTONS = [
     "🏦 DeFi",
     "⚡ Layer 1",
@@ -466,18 +479,22 @@ def ai_analysis(symbol):
 # ================= CRYPTO NEWS =================
 
 def get_crypto_news(coin):
-
     try:
-        url = f"https://min-api.cryptocompare.com/data/v2/news/?categories={coin.upper()}"
+        category = NEWS_CATEGORY.get(coin.lower(), "Bitcoin")
+
+        url = (
+            f"https://min-api.cryptocompare.com/data/v2/news/"
+            f"?categories={category}"
+        )
 
         r = requests.get(url, timeout=10)
 
         if r.status_code != 200:
             return None
 
-        data = r.json()["Data"][:5]
+        data = r.json().get("Data", [])
 
-        return data
+        return data[:5]
 
     except Exception as e:
         print("News error:", e)
