@@ -1757,7 +1757,37 @@ def ai_analysis_handler(msg):
         f"🟢 Support: ${result['support']:,.4f}\n"
         f"🔴 Resistance: ${result['resistance']:,.4f}"
     )
-    
+
+# ================= ALERTS =================
+
+def alert_checker():
+
+    while True:
+
+        try:
+            for user, coin, target in get_alerts():
+
+                price = get_price(coin)
+
+                if price is None:
+                    continue
+
+                if price >= target:
+
+                    bot.send_message(
+                        int(user),
+                        f"🚨 Price Alert!\n\n"
+                        f"{coin.upper()} has reached ${price:,.2f}\n"
+                        f"Target: ${target:,.2f}"
+                    )
+
+                    delete_alert(user, coin, target)
+
+        except Exception as e:
+            print(f"Alert Checker Error: {e}")
+
+        time.sleep(60)
+        
 # ================= FALLBACK =================
 
 @bot.message_handler(func=lambda m: True)
@@ -1783,25 +1813,6 @@ def unknown(msg):
 def debug(msg):
     bot.reply_to(msg, "✅ Debug command works")
 
-def alert_checker():
-
-    while True:
-
-        for user, coin, target in get_alerts():
-
-            price = get_price(coin)
-
-            if price and price >= target:
-
-                bot.send_message(
-                  int(user),
-                  f"🚨 {coin.upper()} has reached ${price:,.2f}!"
-                )
-
-                delete_alert(user, coin, target)
-
-        time.sleep(60)   # Check every 60 seconds
-        
 # ================= BOT LOOP =================
 
 def run_bot():
