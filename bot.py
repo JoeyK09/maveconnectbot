@@ -1158,7 +1158,7 @@ def mine(msg):
 
     user = str(msg.from_user.id)
 
-    balance, xp, level, last_daily, last_mine, wins = get_profile(user)
+    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
 
     now = int(time.time())
 
