@@ -863,7 +863,7 @@ def mine_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
-        KeyboardButton("⛏️ Start Mine"),
+        KeyboardButton("⛏️ Mine"),
         KeyboardButton("🎁 Daily")
     )
 
