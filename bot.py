@@ -303,18 +303,30 @@ def scan_coin(symbol):
     data = get_coin_data(symbol)
     history = get_history(symbol)
 
-    if not data or history is None:
+    if not data or history is None or history.empty:
         return None
 
-    analysis = ai_analysis(symbol)
+    try:
+        # RSI
+        history["rsi"] = RSIIndicator(
+            close=history["close"],
+            window=14
+        ).rsi()
 
-    return {
-        "price": data["price"],
-        "change24": data["change24"],
-        "analysis": analysis,
-        "history": history
-    }
-    
+        rsi = round(history["rsi"].iloc[-1], 2)
+
+        analysis = ai_analysis(symbol)
+
+        return {
+            "price": data["price"],
+            "change24": data["change24"],
+            "rsi": rsi,
+            "analysis": analysis
+        }
+
+    except Exception as e:
+        print(f"Scan Error: {e}")
+        return None
 def get_price(symbol):
     return safe_get_price(symbol)
 
