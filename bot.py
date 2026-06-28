@@ -1622,7 +1622,7 @@ def news(msg):
         )
 
     bot.reply_to(msg, text)
-    
+
 @bot.message_handler(func=lambda m: m.text == "⭐ Favorite")
 def favorite(msg):
     bot.reply_to(
