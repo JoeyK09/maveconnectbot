@@ -857,6 +857,55 @@ def rwa_menu():
     )
 
     return markup
+
+def mine_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("⛏️ Start Mine"),
+        KeyboardButton("🎁 Daily")
+    )
+
+    markup.row(
+        KeyboardButton("💰 Balance"),
+        KeyboardButton("🏆 Leaderboard")
+    )
+
+    markup.row(
+        KeyboardButton("📈 Profile")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
+
+def wallet_menu():
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("💰 Balance"),
+        KeyboardButton("⭐ Favorites")
+    )
+
+    markup.row(
+        KeyboardButton("🔔 Alerts"),
+        KeyboardButton("📜 History")
+    )
+
+    markup.row(
+        KeyboardButton("💸 Withdraw"),
+        KeyboardButton("💵 Deposit")
+    )
+
+    markup.row(
+        KeyboardButton("🏠 Home")
+    )
+
+    return markup
     
 # ================= COMMANDS ================
 
@@ -1168,6 +1217,15 @@ def mine(msg):
         f"{levelup}"
     )
 
+@bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
+def mine(msg):
+
+    bot.reply_to(
+        msg,
+        "⛏️ Mining Center",
+        reply_markup=mine_menu()
+    )
+    
 @bot.message_handler(commands=["leaderboard"])
 def leaderboard_cmd(msg):
 
@@ -1243,9 +1301,57 @@ def account_btn(msg):
     profile(msg)
 
 
-@bot.message_handler(func=lambda m: m.text=="💳 Wallet")
-def wallet_btn(msg):
-    balance(msg)
+@bot.message_handler(func=lambda m: m.text == "💳 Wallet")
+def wallet(msg):
+
+    balance = get_balance(str(msg.from_user.id))
+
+    bot.reply_to(
+        msg,
+        f"💳 Mave Wallet\n\n"
+        f"💰 Balance: {balance:,} Plats\n\n"
+        f"Choose an option below.",
+        reply_markup=wallet_menu()
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "💰 Balance")
+def balance(msg):
+
+    balance = get_balance(str(msg.from_user.id))
+
+    bot.reply_to(
+        msg,
+        f"💰 Your Wallet\n\n"
+        f"🪙 Plats: {balance:,}"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "💵 Deposit")
+def deposit(msg):
+
+    bot.reply_to(
+        msg,
+        "🚧 Deposit feature is coming soon!"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "💸 Withdraw")
+def withdraw(msg):
+
+    bot.reply_to(
+        msg,
+        "🚧 Withdrawals will be available soon."
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "📜 History")
+def history(msg):
+
+    bot.reply_to(
+        msg,
+        "📜 No transactions yet."
+    )
 
 
 @bot.message_handler(func=lambda m: m.text=="💎 VIP")
