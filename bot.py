@@ -1214,6 +1214,7 @@ def mine(msg):
         balance,
         xp,
         level,
+        pickaxe,
         now
     )
 
