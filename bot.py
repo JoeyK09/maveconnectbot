@@ -1318,6 +1318,7 @@ def balance(msg):
         f"{balance} PLATS"
     )
 
+@bot.message_handler(func=lambda m: m.text == "📈 Profile")
 @bot.message_handler(commands=["profile"])
 def profile(msg):
 
@@ -1325,13 +1326,18 @@ def profile(msg):
 
     balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
 
+    reward = f"{PICKAXES[pickaxe]['min']}-{PICKAXES[pickaxe]['max']}"
+    cooldown = PICKAXES[pickaxe]["cooldown"] // 60
+
     bot.reply_to(
         msg,
         f"👤 {msg.from_user.first_name}\n\n"
         f"🏅 Level: {level}\n"
-        f"⭐ XP: {xp}/100\n"
-        f"⚒ Pickaxe: {PICKAXES[pickaxe]['name']}\n\n"
+        f"⭐ XP: {xp}/100\n\n"
         f"💰 Balance: {balance} PLATS\n"
+        f"⚒ Pickaxe: {PICKAXES[pickaxe]['name']}\n"
+        f"💎 Reward: {reward} PLATS\n"
+        f"⏳ Cooldown: {cooldown} mins\n\n"
         f"🏆 Wins: {wins}"
     )
     
