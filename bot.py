@@ -1548,7 +1548,7 @@ def search_coin_result(msg):
        f"Strength: {scan['strength']}/100\n"
        f"Trend: {scan['trend']}\n"
        f"Support: ${scan['support']:,.4f}\n"
-       f"Resistance: ${scan['resistance']:,.4f}"
+       f"Resistance: ${scan['resistance']:,.4f}",
        reply_markup=coin_actions()    
     )
 
