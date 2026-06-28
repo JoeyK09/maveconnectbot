@@ -19,6 +19,7 @@ from database import (
     remove_plats,
     get_profile,
     update_mine,
+    update_pickaxe,
     update_daily,
     add_win,
     leaderboard,
@@ -1338,6 +1339,51 @@ def shop(msg):
         f"💵 Cost: {PICKAXES[next_pickaxe]['price']} PLATS\n"
         f"💎 Reward: {PICKAXES[next_pickaxe]['min']}-{PICKAXES[next_pickaxe]['max']} PLATS\n"
         f"⏳ Cooldown: {PICKAXES[next_pickaxe]['cooldown']//60} mins",
+        reply_markup=shop_menu()
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "⚒ Upgrade Pickaxe")
+def upgrade_pickaxe(msg):
+
+    user = str(msg.from_user.id)
+
+    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+
+    # Already at the highest pickaxe
+    if pickaxe >= max(PICKAXES.keys()):
+        bot.reply_to(
+            msg,
+            "🏆 You already have the best pickaxe!"
+        )
+        return
+
+    next_pickaxe = pickaxe + 1
+    cost = PICKAXES[next_pickaxe]["price"]
+
+    # Not enough money
+    if balance < cost:
+        bot.reply_to(
+            msg,
+            f"❌ Not enough PLATS!\n\n"
+            f"💵 Cost: {cost} PLATS\n"
+            f"💰 Your Balance: {balance} PLATS"
+        )
+        return
+
+    # Buy the upgrade
+    balance -= cost
+    pickaxe = next_pickaxe
+
+    update_pickaxe(user, balance, pickaxe)
+
+    bot.reply_to(
+        msg,
+        f"🎉 Upgrade Successful!\n\n"
+        f"⚒ New Pickaxe: {PICKAXES[pickaxe]['name']}\n"
+        f"💎 Reward: {PICKAXES[pickaxe]['min']}-{PICKAXES[pickaxe]['max']} PLATS\n"
+        f"⏳ Cooldown: {PICKAXES[pickaxe]['cooldown']//60} mins\n\n"
+        f"💰 Remaining Balance: {balance} PLATS",
         reply_markup=shop_menu()
     )
 
