@@ -182,6 +182,21 @@ def update_mine(
     conn.commit()
 
 
+def update_pickaxe(user_id, balance, pickaxe):
+    cursor.execute("""
+        UPDATE plats
+        SET balance=%s,
+            pickaxe=%s
+        WHERE user_id=%s
+    """, (
+        balance,
+        pickaxe,
+        user_id
+    ))
+
+    conn.commit()
+
+
 def update_daily(user_id, balance, last_daily):
     get_profile(user_id)
     
