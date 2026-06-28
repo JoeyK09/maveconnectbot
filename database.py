@@ -51,6 +51,13 @@ CREATE TABLE IF NOT EXISTS alerts (
 )
 """)
 
+cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS pickaxe INTEGER DEFAULT 1
+""")
+
+conn.commit()
+
 # ================= FUNCTIONS =================
 
 def get_profile(user_id):
