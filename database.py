@@ -1,6 +1,14 @@
 import os
 import psycopg2
 
+PICKAXES = {
+    1: {"name": "🪵 Wooden", "min": 10, "max": 30, "cooldown": 1800, "price": 0},
+    2: {"name": "🪨 Stone", "min": 20, "max": 45, "cooldown": 1680, "price": 500},
+    3: {"name": "⛓ Iron", "min": 35, "max": 65, "cooldown": 1500, "price": 1500},
+    4: {"name": "🥇 Gold", "min": 55, "max": 90, "cooldown": 1320, "price": 4000},
+    5: {"name": "💎 Diamond", "min": 80, "max": 120, "cooldown": 1200, "price": 10000},
+}
+
 # ================= DATABASE CONNECTION =================
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -20,6 +28,7 @@ CREATE TABLE IF NOT EXISTS plats(
     balance INTEGER DEFAULT 0,
     xp INTEGER DEFAULT 0,
     level INTEGER DEFAULT 1,
+    pickaxe INTEGER DEFAULT 1,
     last_daily BIGINT DEFAULT 0,
     last_mine BIGINT DEFAULT 0,
     wins INTEGER DEFAULT 0
@@ -49,6 +58,7 @@ def get_profile(user_id):
         SELECT balance,
                xp,
                level,
+               pickaxe,
                last_daily,
                last_mine,
                wins
@@ -66,7 +76,7 @@ def get_profile(user_id):
         VALUES(%s)
     """, (user_id,))
 
-    return (0, 0, 1, 0, 0, 0)
+    return (0, 0, 1, 1, 0, 0, 0)
 
 
 def get_balance(user_id):
@@ -134,7 +144,14 @@ CREATE TABLE IF NOT EXISTS alerts (
 """)
 conn.commit()
 
-def update_mine(user_id, balance, xp, level, last_mine):
+def update_mine(
+    user,
+    balance,
+    xp,
+    level,
+    pickaxe,
+    now
+):
     get_profile(user_id)
 
     cursor.execute("""
@@ -148,6 +165,7 @@ def update_mine(user_id, balance, xp, level, last_mine):
         balance,
         xp,
         level,
+        pickaxe,
         last_mine,
         user_id
     ))
