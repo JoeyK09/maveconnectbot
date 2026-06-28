@@ -863,24 +863,25 @@ def mine_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
-        KeyboardButton("⛏️ Mine"),
+        KeyboardButton("⛏️ Mine Now"),
         KeyboardButton("🎁 Daily")
     )
 
     markup.row(
-        KeyboardButton("💰 Balance"),
-        KeyboardButton("🏆 Leaderboard")
+        KeyboardButton("🏪 Shop"),
+        KeyboardButton("💰 Balance")
     )
 
     markup.row(
-        KeyboardButton("📈 Profile")
+        KeyboardButton("📈 Profile"),
+        KeyboardButton("🏆 Leaderboard")
     )
 
     markup.row(
         KeyboardButton("🏠 Home")
     )
 
-    return markup
+return markup
 
 def wallet_menu():
 
@@ -1154,7 +1155,23 @@ def help_cmd(msg):
     )
 
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
-def mine(msg):
+def mining_center(msg):
+    user = str(msg.from_user.id)
+
+    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+
+    bot.reply_to(
+        msg,
+        f"⛏️ Mining Center\n\n"
+        f"💰 Balance: {balance} PLATS\n"
+        f"⚒ Pickaxe: {PICKAXES[pickaxe]['name']}\n"
+        f"🏅 Level: {level}\n"
+        f"⭐ XP: {xp}/100",
+        reply_markup=mine_menu()
+    )
+    
+@bot.message_handler(func=lambda m: m.text == "⛏️ Mine Now")
+def do_mine(msg):
 
     user = str(msg.from_user.id)
 
@@ -1218,8 +1235,6 @@ def mine(msg):
         now
     )
 
-    pickaxe = get_pickaxe(user)   # We'll create this function later
-    
     finds = [
         "💎 Diamond",
         "🪙 Gold",
@@ -1244,15 +1259,7 @@ def mine(msg):
        reply_markup=mine_menu()
     )
 
-@bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
-def mine(msg):
 
-    bot.reply_to(
-        msg,
-        "⛏️ Mining Center",
-        reply_markup=mine_menu()
-    )
-    
 @bot.message_handler(commands=["leaderboard"])
 def leaderboard_cmd(msg):
 
