@@ -311,6 +311,9 @@ def scan_coin(symbol):
     print("[SCAN] get_coin_data OK")
 
     history = get_history(symbol)
+    
+    if history is not None:
+        print(history.tail())
 
     if history is None:
         print("[SCAN] history is None")
@@ -519,7 +522,10 @@ def get_history(symbol, days=60):
             return None
 
         df = pd.DataFrame(response.json())
+        
         print(df.head())
+        print(df.columns)
+        print(f"Rows: {len(df)}")
 
         if df.empty:
             return None
