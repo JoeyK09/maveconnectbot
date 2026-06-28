@@ -2,6 +2,7 @@ import random
 import os
 import time
 import requests
+from datetime import datetime, timedelta, timezone
 from datetime import datetime, timedelta
 import pandas as pd
 from ta.momentum import RSIIndicator
@@ -507,7 +508,7 @@ def get_history(symbol, days=60):
     if not coin_id:
         return None
 
-    start = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+start = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
 
     try:
         url = (
