@@ -328,10 +328,6 @@ def scan_coin(symbol):
         "resistance": analysis["resistance"]
     }
 
-    except Exception as e:
-        print(f"Scan Error: {e}")
-        return None
-    
 def get_price(symbol):
     return safe_get_price(symbol)
 
