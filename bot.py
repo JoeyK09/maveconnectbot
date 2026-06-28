@@ -1706,23 +1706,6 @@ def alert(msg):
     bot.reply_to(
         msg,
         f"🔔 Enter the target price for {coin.upper()}."
-    )
-
-@bot.message_handler(func=lambda m: m.text == "🔔 Set Alert")
-def alert(msg):
-
-    coin = current_coin.get(msg.from_user.id)
-
-    if not coin:
-        bot.reply_to(msg, "❌ Open a coin first.")
-        return
-
-    alert_users.add(msg.from_user.id)
-
-    bot.reply_to(
-        msg,
-        f"Enter the target price for {coin.upper()}.\n\nExample:\n120000"
-    )
 
 @bot.message_handler(func=lambda m: m.from_user.id in alert_users)
 def save_alert(msg):
@@ -1859,6 +1842,8 @@ if __name__ == "__main__":
 
     # Start alert checker
     Thread(target=alert_checker, daemon=True).start()
+    
+    print("Alert checker started")
 
     # Start Telegram bot
     Thread(target=run_bot, daemon=True).start()
