@@ -1459,6 +1459,22 @@ def favorite_coin(msg):
         msg,
         f"✅ {coin.upper()} added to favorites."
     )
+
+@bot.message_handler(func=lambda m: m.text == "⭐ Favorites")
+def show_favorites(msg):
+
+    coins = get_favorites(str(msg.from_user.id))
+
+    if not coins:
+        bot.reply_to(msg, "You don't have any favorite coins yet.")
+        return
+
+    text = "⭐ Your Favorite Coins\n\n"
+
+    for coin in coins:
+        text += f"• {coin.upper()}\n"
+
+    bot.reply_to(msg, text)
     
 @bot.message_handler(func=lambda m: m.text == "🐸 Meme Coins")
 def meme_coins(msg):
