@@ -300,33 +300,38 @@ def safe_get_price(symbol):
     return None
 
 def scan_coin(symbol):
+    # Get live market data
     data = get_coin_data(symbol)
-    history = get_history(symbol)
 
-    if not data or history is None or history.empty:
+    if not data:
         return None
 
-    try:
-        # RSI
-        history["rsi"] = RSIIndicator(
-            close=history["close"],
-            window=14
-        ).rsi()
+    # Get AI analysis
+    analysis = ai_analysis(symbol)
 
-        rsi = round(history["rsi"].iloc[-1], 2)
+    if not analysis:
+        return None
 
-        analysis = ai_analysis(symbol)
-
-        return {
-            "price": data["price"],
-            "change24": data["change24"],
-            "rsi": rsi,
-            "analysis": analysis
-        }
+    # Return everything in one dictionary
+    return {
+        "coin": data["name"],
+        "symbol": data["symbol"],
+        "price": data["price"],
+        "change24": data["change24"],
+        "rank": data["rank"],
+        "market_cap": data["market_cap"],
+        "volume": data["volume"],
+        "signal": analysis["signal"],
+        "strength": analysis["strength"],
+        "trend": analysis["trend"],
+        "support": analysis["support"],
+        "resistance": analysis["resistance"]
+    }
 
     except Exception as e:
         print(f"Scan Error: {e}")
         return None
+    
 def get_price(symbol):
     return safe_get_price(symbol)
 
@@ -1495,28 +1500,28 @@ def search_coin_result(msg):
     user_last_coin[msg.from_user.id] = coin
     current_coin[msg.from_user.id] = coin
 
-    data = get_coin_data(coin)
+    scan = scan_coin(coin)
 
-    if data is None:
+    if scan is None:
         bot.reply_to(msg, "❌ Coin not found.")
         return
 
     current_coin[msg.from_user.id] = coin
     
     bot.reply_to(
-       msg,
-       f"🪙 {data['name']} ({data['symbol']})\n\n"
-       f"💰 Price: ${data['price']:,.6f}\n"
-       f"📈 24H: {data['change24']:.2f}%\n"
-       f"🏆 Rank: #{data['rank']}\n"
-       f"💎 Market Cap: ${data['marketcap']:,.0f}\n"
-       f"📊 Volume: ${data['volume']:,.0f}\n\n"
-       f"🤖 AI Analysis\n"
-       f"Signal: {data['signal']}\n"
-       f"Strength: {data['strength']}/100\n"
-       f"Trend: {data['trend']}\n"
-       f"Support: ${data['support']:,.4f}\n"
-       f"Resistance: ${data['resistance']:,.4f}"
+    msg,
+    f"🪙 {scan['coin']} ({scan['symbol']})\n\n"
+    f"💰 Price: ${scan['price']:,.6f}\n"
+    f"📈 24H: {scan['change24']:.2f}%\n"
+    f"🏆 Rank: #{scan['rank']}\n"
+    f"💎 Market Cap: ${scan['market_cap']:,.0f}\n"
+    f"📊 Volume: ${scan['volume']:,.0f}\n\n"
+    f"🤖 AI Analysis\n"
+    f"Signal: {scan['signal']}\n"
+    f"Strength: {scan['strength']}/100\n"
+    f"Trend: {scan['trend']}\n"
+    f"Support: ${scan['support']:,.4f}\n"
+    f"Resistance: ${scan['resistance']:,.4f}"
     )
 
 @bot.message_handler(func=lambda m: m.from_user.id in search_users)
