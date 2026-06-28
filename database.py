@@ -125,6 +125,16 @@ ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS referred_by TEXT;
 """)
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS alerts (
+    user_id TEXT NOT NULL,
+    coin TEXT NOT NULL,
+    target DOUBLE PRECISION NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+conn.commit()
+
 def update_mine(user_id, balance, xp, level, last_mine):
     get_profile(user_id)
 
@@ -216,4 +226,5 @@ def delete_alert(user, coin, target):
         (user, coin, target)
     )
     conn.commit()
+    
     
