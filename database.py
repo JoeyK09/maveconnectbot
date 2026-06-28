@@ -34,14 +34,13 @@ CREATE TABLE IF NOT EXISTS favorites(
 """)
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS alerts(
-    user_id TEXT,
-    coin TEXT,
-    target REAL
+CREATE TABLE IF NOT EXISTS alerts (
+    user_id TEXT NOT NULL,
+    coin TEXT NOT NULL,
+    target DOUBLE PRECISION NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
-
-conn.commit()
 
 # ================= FUNCTIONS =================
 
