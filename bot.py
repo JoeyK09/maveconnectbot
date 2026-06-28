@@ -1153,7 +1153,7 @@ def help_cmd(msg):
         "/help"
     )
 
-@bot.message_handler(commands=["mine"])
+@bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
 def mine(msg):
 
     user = str(msg.from_user.id)
