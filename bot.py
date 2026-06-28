@@ -314,9 +314,9 @@ def scan_coin(symbol):
         history = None
 
    # history["rsi"] = RSIIndicator(
-        close=history["close"],
-        window=14
-    ).rsi()
+        #close=history["close"],
+      #  window=14
+    #).rsi()
 
    # rsi = round(history["rsi"].iloc[-1], 2)
 
@@ -335,7 +335,7 @@ def scan_coin(symbol):
         "rank": data["rank"],
         "market_cap": data["market_cap"],
         "volume": data["volume"],
-        "rsi": N/A,
+        "rsi": "N/A",
         "signal": analysis["signal"],
         "strength": analysis["strength"],
         "trend": analysis["trend"],
@@ -345,8 +345,6 @@ def scan_coin(symbol):
 
 def get_price(symbol):
     return safe_get_price(symbol)
-
-    coin = normalize_coin(symbol)
 
     now = time.time()
 
