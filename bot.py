@@ -4,6 +4,7 @@ import time
 import requests
 from datetime import datetime, timedelta, timezone
 from datetime import datetime, timedelta
+from datetime import datetime
 import pandas as pd
 from ta.momentum import RSIIndicator
 from ta.trend import EMAIndicator
@@ -1594,25 +1595,34 @@ def news(msg):
     coin = user_last_coin.get(msg.from_user.id)
 
     if not coin:
-        bot.reply_to(msg, "Open a coin first.")
+        bot.reply_to(msg, "❌ Search a coin first.")
         return
 
     articles = get_crypto_news(coin)
 
     if not articles:
-        bot.reply_to(msg, "No news available.")
+        bot.reply_to(msg, "❌ No news available.")
         return
 
     text = f"📰 Latest {coin.upper()} News\n\n"
 
-    for article in articles:
+    for i, article in enumerate(articles, 1):
+
+        source = article.get("source", "Unknown")
+
+        published = datetime.fromtimestamp(
+            article["published_on"]
+        ).strftime("%d %b %Y %H:%M UTC")
+
         text += (
-            f"• {article['title']}\n"
-            f"{article['url']}\n\n"
+            f"{i}. {article['title']}\n"
+            f"📰 {source}\n"
+            f"🕒 {published}\n"
+            f"🔗 {article['url']}\n\n"
         )
 
-    bot.send_message(msg.chat.id, text)
-
+    bot.reply_to(msg, text)
+    
 @bot.message_handler(func=lambda m: m.text == "⭐ Favorite")
 def favorite(msg):
     bot.reply_to(
