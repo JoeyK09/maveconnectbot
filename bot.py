@@ -495,16 +495,15 @@ def calculate_trend(df):
 
     return "Bearish"
     
-# =================== HISTORY ================
+# ==================== HISTORY ================
 
 def get_history(symbol, days=60):
     coin_id = get_coin_id(symbol)
+    print(f"Coin ID: {coin_id}")
 
     if not coin_id:
         return None
 
-    print(history.columns)
-    
     start = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
 
     try:
@@ -514,11 +513,13 @@ def get_history(symbol, days=60):
         )
 
         response = requests.get(url, timeout=10)
+        print(f"Status Code: {response.status_code}")
 
         if response.status_code != 200:
             return None
 
         df = pd.DataFrame(response.json())
+        print(df.head())
 
         if df.empty:
             return None
@@ -531,7 +532,7 @@ def get_history(symbol, days=60):
     except Exception as e:
         print(f"History Error: {e}")
         return None
-    
+
 # ================= FLASK =================
 
 @app.route("/")
