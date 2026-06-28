@@ -1535,20 +1535,21 @@ def search_coin_result(msg):
     current_coin[msg.from_user.id] = coin
     
     bot.reply_to(
-    msg,
-    f"🪙 {scan['coin']} ({scan['symbol']})\n\n"
-    f"💰 Price: ${scan['price']:,.6f}\n"
-    f"📈 24H: {scan['change24']:.2f}%\n"
-    f"🏆 Rank: #{scan['rank']}\n"
-    f"💎 Market Cap: ${scan['market_cap']:,.0f}\n"
-    f"📊 Volume: ${scan['volume']:,.0f}\n\n"
-    f"🤖 AI Analysis\n"
-    f"📊 RSI (14): {scan['rsi']} ({rsi_status})\n"
-    f"Signal: {scan['signal']}\n"
-    f"Strength: {scan['strength']}/100\n"
-    f"Trend: {scan['trend']}\n"
-    f"Support: ${scan['support']:,.4f}\n"
-    f"Resistance: ${scan['resistance']:,.4f}"
+       msg,
+       f"🪙 {scan['coin']} ({scan['symbol']})\n\n"
+       f"💰 Price: ${scan['price']:,.6f}\n"
+       f"📈 24H: {scan['change24']:.2f}%\n"
+       f"🏆 Rank: #{scan['rank']}\n"
+       f"💎 Market Cap: ${scan['market_cap']:,.0f}\n"
+       f"📊 Volume: ${scan['volume']:,.0f}\n\n"
+       f"🤖 AI Analysis\n"
+       f"📊 RSI (14): {scan['rsi']} ({rsi_status})\n"
+       f"Signal: {scan['signal']}\n"
+       f"Strength: {scan['strength']}/100\n"
+       f"Trend: {scan['trend']}\n"
+       f"Support: ${scan['support']:,.4f}\n"
+       f"Resistance: ${scan['resistance']:,.4f}"
+       reply_markup=coin_actions()    
     )
 
 #@bot.message_handler(func=lambda m: m.from_user.id in search_users)
