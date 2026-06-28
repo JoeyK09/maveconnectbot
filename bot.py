@@ -410,9 +410,9 @@ def is_vip(user_id):
 # ================== AI ANALYSIS ==============
 
 def ai_analysis(symbol):
-    data = get_coin_data(symbol)
+    price = safe_get_price(symbol)
 
-    if not data:
+    if price is None:
         return {
             "signal": "UNKNOWN",
             "strength": 0,
@@ -421,19 +421,17 @@ def ai_analysis(symbol):
             "resistance": 0
         }
 
-    price = data["price"]
+    data = get_coin_data(symbol)
     change = data["change24"]
 
-    if change >= 5:
+    if change > 5:
         signal = "🟢 BUY"
         trend = "Bullish"
         strength = 85
-
-    elif change <= -5:
+    elif change < -5:
         signal = "🔴 SELL"
         trend = "Bearish"
         strength = 80
-
     else:
         signal = "⚪ HOLD"
         trend = "Sideways"
@@ -484,7 +482,7 @@ def calculate_trend(df):
 
     return "Bearish"
     
-# =================== HISTORY ===============
+# =================== HISTORY ================
 
 def get_history(symbol, days=60):
     coin_id = get_coin_id(symbol)
@@ -525,7 +523,7 @@ def get_history(symbol, days=60):
 def home():
     return "LEVEL 4 AI TRADING BOT 🚀"
 
-# =================MAIN MENU ================
+# ==================MAIN MENU ================
 
 def main_menu():
 
@@ -672,7 +670,7 @@ def coin_actions():
 
     return markup
     
-# ================ MEME COINS ================
+# ================= MEME COINS ================
 def memecoins_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
@@ -1719,7 +1717,7 @@ def save_alert(msg):
     )
 
 @bot.message_handler(func=lambda m: m.text == "🤖 AI Analysis")
-def ai_analysis(msg):
+def ai_analysis_handler(msg):
 
     coin = user_last_coin.get(msg.from_user.id)
 
