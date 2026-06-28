@@ -461,13 +461,6 @@ def ai_analysis(symbol):
         "resistance": round(price * 1.03, 4)
     }
     
-history["rsi"] = RSIIndicator(
-    close=history["close"],
-    window=14
-).rsi()
-
-rsi = round(history["rsi"].iloc[-1], 2)
-
 # ================= CRYPTO NEWS =================
 
 def get_crypto_news(coin):
