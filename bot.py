@@ -1162,7 +1162,15 @@ def mine(msg):
 
     now = int(time.time())
 
-    cooldown = 1800
+    PICKAXES = {
+    1: {"min": 10, "max": 30, "cooldown": 1800},
+    2: {"min": 20, "max": 45, "cooldown": 1680},
+    3: {"min": 35, "max": 60, "cooldown": 1500},
+    4: {"min": 50, "max": 90, "cooldown": 1320},
+    5: {"min": 80, "max": 120, "cooldown": 1200},
+    }
+
+    cooldown = PICKAXES[pickaxe]["cooldown"]
 
     if now - last_mine < cooldown:
 
@@ -1179,7 +1187,10 @@ def mine(msg):
 
         return
 
-    reward = random.randint(10,30)
+    reward = random.randint(
+       PICKAXES[pickaxe]["min"],
+       PICKAXES[pickaxe]["max"]
+    )
 
     xp += 5
 
@@ -1206,6 +1217,8 @@ def mine(msg):
         now
     )
 
+    pickaxe = get_pickaxe(user)   # We'll create this function later
+    
     finds = [
         "💎 Diamond",
         "🪙 Gold",
