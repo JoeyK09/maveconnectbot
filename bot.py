@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from database import get_mining_bonus
 from config import PICKAXES
 from database import has_achievement, unlock_achievement
 from datetime import datetime, timedelta, timezone
