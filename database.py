@@ -437,6 +437,12 @@ def get_mining_bonus(user_id):
     return row[0] if row else 0
 
 
+def get_mining_bonus(user):
+    balance, xp, level, pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
+
+    return PICKAXES[pickaxe]["bonus"]
+
+
 def upgrade_pickaxe(user_id, pickaxe, bonus):
     get_profile(user_id)
 
