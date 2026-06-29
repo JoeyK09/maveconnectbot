@@ -1562,7 +1562,16 @@ def daily(msg):
         )
         return
 
-    reward = 100
+    reward = min(200 + (streak * 50), 500)
+
+    DAY = 86400
+
+    if last_daily == 0:
+        streak = 1
+    elif now - last_daily <= DAY * 2:
+        streak += 1
+    else:
+        streak = 1
 
     balance += reward
 
