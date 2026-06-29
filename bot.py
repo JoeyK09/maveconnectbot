@@ -1461,7 +1461,7 @@ def shop(msg):
     f"⚒️ Current: {PICKAXES[pickaxe]['name']}\n\n"
     f"⬆️ Next Upgrade: {PICKAXES[next_pickaxe]['name']}\n\n"
     f"💵 Cost: {PICKAXES[next_pickaxe]['price']} PLATS\n"
-    f"💎 Mining Bonus: +{PICKAXES[next_pickaxe]['bonus']} PLATS\n"
+    f"💎 Reward: {PICKAXES[next_pickaxe]['min']} - {PICKAXES[next_pickaxe]['max']} PLATS\n"
     f"⏳ Cooldown: {PICKAXES[next_pickaxe]['cooldown']//60} mins",
     reply_markup=shop_menu()
     )
