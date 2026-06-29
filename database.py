@@ -39,6 +39,17 @@ CREATE TABLE IF NOT EXISTS favorites(
 """)
 
 cursor.execute("""
+CREATE TABLE IF NOT EXISTS withdrawals(
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    phone TEXT NOT NULL,
+    status TEXT DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+cursor.execute("""
 CREATE TABLE IF NOT EXISTS alerts (
     user_id TEXT NOT NULL,
     coin TEXT NOT NULL,
@@ -472,6 +483,24 @@ def create_deposit(user_id, amount, method):
         method
     ))
 
+    cursor.close()
+    conn.close()
+
+
+def add_withdrawal(user_id, amount, phone):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO withdrawals(user_id, amount, phone)
+        VALUES(%s, %s, %s)
+    """, (
+        user_id,
+        amount,
+        phone
+    ))
+
+    conn.commit()
     cursor.close()
     conn.close()
 
