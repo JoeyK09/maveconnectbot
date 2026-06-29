@@ -1027,7 +1027,21 @@ def wallet_keyboard():
     )
 
     return markup
-    
+
+def deposit_keyboard():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("📱 M-Pesa"),
+        KeyboardButton("🪙 USDT")
+    )
+
+    markup.row(
+        KeyboardButton("⬅️ Wallet")
+    )
+
+    return markup
+
 # ================= COMMANDS ================
 
 @bot.message_handler(commands=["start"])
@@ -1252,7 +1266,7 @@ def subscribe(msg):
         "⭐ 2,000 Stars - Lifetime VIP\n\n"
         "Use /buyvip to purchase."
     )
-    
+
 @bot.message_handler(commands=["help"])
 def help_cmd(msg):
 
@@ -1290,7 +1304,23 @@ Choose an option below.""",
         reply_markup=wallet_keyboard(),
         parse_mode="Markdown"
     )
-    
+
+
+@bot.message_handler(func=lambda m: m.text == "➕ Deposit")
+def deposit_menu(message):
+
+    bot.send_message(
+        message.chat.id,
+        "💳 Deposit Funds\n\n"
+        "Choose your preferred payment method:",
+        reply_markup=deposit_keyboard()
+    )
+
+@bot.message_handler(func=lambda m: m.text == "⬅️ Wallet")
+def back_wallet(message):
+    wallet_menu(message)
+
+
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
 def mining_center(msg):
     user = str(msg.from_user.id)
