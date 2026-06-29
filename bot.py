@@ -207,6 +207,14 @@ PICKAXES = {
     }
 }
 
+PICKAXE_BUTTONS = [
+    "🪨 Stone Pickaxe",
+    "🥉 Bronze Pickaxe",
+    "🥈 Iron Pickaxe",
+    "🥇 Gold Pickaxe",
+    "💎 Diamond Pickaxe"
+]
+
 # ================= COINPAPRIKA IDS =================
 
 COINPAPRIKA_IDS = {
