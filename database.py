@@ -451,4 +451,5 @@ def upgrade_pickaxe(user_id, pickaxe, bonus):
     ))
 
     conn.commit()
-
+    cursor.close()
+    conn.close()
