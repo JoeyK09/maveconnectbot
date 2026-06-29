@@ -1397,6 +1397,15 @@ def upgrade_pickaxe(msg):
     )
 
 
+@bot.message_handler(func=lambda m: m.text == "⬅️ Back")
+def back_to_mine(msg):
+
+    bot.reply_to(
+        msg,
+        "⛏️ Mining Menu",
+        reply_markup=mine_menu()
+    )
+
 @bot.message_handler(commands=["leaderboard"])
 def leaderboard_cmd(msg):
 
