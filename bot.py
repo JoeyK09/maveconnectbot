@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from database import add_withdrawal
 from database import create_deposit
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from database import get_mining_bonus
@@ -169,6 +170,7 @@ waiting_alert = {}
 user_last_coin = {}
 deposit_amount = {}
 user_withdraw_amount = {}
+ADMIN_ID = 6384391560
 
 # ============== PICKAXE PRICES ================
 
@@ -760,7 +762,7 @@ def process_mpesa_amount(message):
 
     # Save amount temporarily
     user_withdraw_amount[user] = amount
-
+    
     msg = bot.send_message(
         message.chat.id,
         """📱 Enter your M-Pesa phone number.
@@ -787,6 +789,19 @@ def process_mpesa_number(message):
         return
 
     amount = user_withdraw_amount.get(user)
+
+    add_withdrawal(user, amount, phone)
+
+    bot.send_message(
+    ADMIN_ID,
+    f"""💸 New Withdrawal Request
+
+👤 User: {user}
+💰 Amount: {amount:,} Plats
+📱 Phone: {phone}
+
+Status: Pending"""
+    )
 
     bot.send_message(
         message.chat.id,
