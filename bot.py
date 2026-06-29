@@ -1397,7 +1397,7 @@ def upgrade_pickaxe(msg):
     )
 
 
-@bot.message_handler(func=lambda m: m.text == "⬅️ Back")
+@bot.message_handler(func=lambda m: m.text == "🔙 Back")
 def back_to_mine(msg):
 
     bot.reply_to(
