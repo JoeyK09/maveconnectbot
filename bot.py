@@ -4,6 +4,7 @@ import time
 import requests
 import feedparser
 from config import PICKAXES
+from database import has_achievement, unlock_achievement
 from datetime import datetime, timedelta, timezone
 from datetime import datetime, timedelta
 from datetime import datetime
