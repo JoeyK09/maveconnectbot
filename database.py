@@ -457,3 +457,21 @@ def upgrade_pickaxe(user_id, pickaxe, bonus):
     conn.commit()
     cursor.close()
     conn.close()
+
+
+def create_deposit(user_id, amount, method):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO deposits(user_id, amount, method)
+        VALUES(%s, %s, %s)
+    """, (
+        user_id,
+        amount,
+        method
+    ))
+
+    cursor.close()
+    conn.close()
+
