@@ -72,6 +72,8 @@ conn.close()
 # ================= FUNCTIONS =================
 
 def get_profile(user_id):
+    conn, cursor = get_cursor()
+
     cursor.execute("""
         SELECT balance,
                xp,
@@ -86,16 +88,21 @@ def get_profile(user_id):
 
     row = cursor.fetchone()
 
-    if row:
-        return row
+    if not row:
+        cursor.execute("""
+            INSERT INTO plats(user_id)
+            VALUES(%s)
+        """, (user_id,))
 
-    cursor.execute("""
-        INSERT INTO plats(user_id)
-        VALUES(%s)
-    """, (user_id,))
+        conn.commit()
 
-    return (0, 0, 1, 1, 0, 0, 0)
+        row = (0, 0, 1, 1, 0, 0, 0)
 
+    cursor.close()
+    conn.close()
+
+    return row
+    
 
 def get_balance(user_id):
     cursor.execute(
