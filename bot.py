@@ -1301,7 +1301,7 @@ def mining_center(msg):
         msg,
         f"⛏️ Mining Center\n\n"
         f"💰 Balance: {balance} PLATS\n"
-        f"⚒ Pickaxe: {PICKAXES[pickaxe]['name']}\n"
+        f"⚒️ Pickaxe: {PICKAXES[pickaxe]['name']}\n"
         f"🏅 Level: {level}\n"
         f"⭐ XP: {xp}/100",
         reply_markup=mine_menu()
@@ -1407,7 +1407,7 @@ def shop(msg):
             msg,
             "🏪 SHOP\n\n"
             "🏆 You already own the best pickaxe!\n\n"
-            f"⚒ Current: {PICKAXES[pickaxe]['name']}",
+            f"⚒️ Current: {PICKAXES[pickaxe]['name']}",
             reply_markup=shop_menu()
         )
         return
@@ -1415,20 +1415,15 @@ def shop(msg):
     next_pickaxe = pickaxe + 1
 
     bot.reply_to(
-        msg,
-        f"🏪 PICKAXE SHOP\n\n"
-        f"💰 Balance: {balance} PLATS\n\n"
-
-        f"⚒️ Current:\n"
-        f"{PICKAXES[pickaxe]['name']}\n\n"
-
-        f"⬆ Next Upgrade:\n"
-        f"{PICKAXES[next_pickaxe]['name']}\n\n"
-
-        f"💵 Cost: {PICKAXES[next_pickaxe]['price']} PLATS\n"
-        f"💎 Reward: {PICKAXES[next_pickaxe]['min']}-{PICKAXES[next_pickaxe]['max']} PLATS\n"
-        f"⏳ Cooldown: {PICKAXES[next_pickaxe]['cooldown']//60} mins",
-        reply_markup=shop_menu()
+    msg,
+    f"🏪 PICKAXE SHOP\n\n"
+    f"💰 Balance: {balance} PLATS\n\n"
+    f"⚒️ Current: {PICKAXES[pickaxe]['name']}\n\n"
+    f"⬆️ Next Upgrade: {PICKAXES[next_pickaxe]['name']}\n\n"
+    f"💵 Cost: {PICKAXES[next_pickaxe]['price']} PLATS\n"
+    f"💎 Mining Bonus: +{PICKAXES[next_pickaxe]['bonus']} PLATS\n"
+    f"⏳ Cooldown: {PICKAXES[next_pickaxe]['cooldown']//60} mins",
+    reply_markup=shop_menu()
     )
 
 @bot.message_handler(func=lambda m: m.text == "⚒️ Upgrade Pickaxe")
@@ -1459,12 +1454,18 @@ Higher pickaxes increase mining rewards and may reduce cooldown.
     )
 
 
-@bot.message_handler(func=lambda m: m.text in PICKAXES)
+@bot.message_handler(func=lambda m: m.text in PICKAXE_BUTTONS)
 def buy_pickaxe(msg):
 
     user = str(msg.from_user.id)
 
-    name, price, bonus = PICKAXES[msg.text]
+    level = PICKAXE_BUTTONS[msg.text]
+
+    pickaxe = PICKAXES[level]
+
+    name = pickaxe["name"]
+    price = pickaxe["price"]
+    bonus = pickaxe["bonus"]
 
     balance = get_balance(user)
 
@@ -1477,11 +1478,11 @@ def buy_pickaxe(msg):
         return
 
     remove_plats(user, price)
-    upgrade_pickaxe(user, name, bonus)
+    update_pickaxe(user, level)
 
     bot.reply_to(
         msg,
-        f"🎉 {name} purchased!\n\n"
+        f"🎉 {name} Pickaxe purchased!\n\n"
         f"💰 Cost: {price:,} PLATS\n"
         f"⛏️ Mining Bonus: +{bonus}\n\n"
         f"Happy mining!",
