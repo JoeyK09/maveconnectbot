@@ -16,9 +16,18 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise Exception("DATABASE_URL not found")
 
-conn = psycopg2.connect(DATABASE_URL)
-conn.autocommit = True
-cursor = conn.cursor()
+
+def get_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    conn.autocommit = True
+    return conn
+
+
+def get_cursor():
+    conn = get_connection()
+    return conn, conn.cursor()
+
+conn, cursor = get_cursor()
 
 # ================= CREATE TABLE =================
 
@@ -57,6 +66,8 @@ ADD COLUMN IF NOT EXISTS pickaxe INTEGER DEFAULT 1
 """)
 
 conn.commit()
+cursor.close()
+conn.close()
 
 # ================= FUNCTIONS =================
 
@@ -149,7 +160,9 @@ CREATE TABLE IF NOT EXISTS alerts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
-conn.commit()
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 
 def update_mine(
@@ -180,6 +193,8 @@ def update_mine(
     ))
 
     conn.commit()
+    cursor.close()
+    conn.close()
 
 
 def update_pickaxe(user_id, balance, pickaxe):
@@ -195,6 +210,8 @@ def update_pickaxe(user_id, balance, pickaxe):
     ))
 
     conn.commit()
+    cursor.close()
+    conn.close()
 
 
 def update_daily(user_id, balance, last_daily):
@@ -257,6 +274,8 @@ def add_favorite(user, coin):
     )
 
     conn.commit()
+    cursor.close()
+    conn.close()
     
 
 def get_favorites(user):
@@ -273,6 +292,8 @@ def add_alert(user, coin, target):
         (user, coin, target)
     )
     conn.commit()
+    cursor.close()
+    conn.close()
 
 
 def get_alerts():
@@ -288,5 +309,7 @@ def delete_alert(user, coin, target):
         (user, coin, target)
     )
     conn.commit()
+    cursor.close()
+    conn.close()
     
     
