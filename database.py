@@ -56,14 +56,14 @@ ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS pickaxe INTEGER DEFAULT 1
 """)
 
-conn.commit()
-cursor.close()
-conn.close()
-
 cursor.execute("""
 ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS streak INTEGER DEFAULT 0
 """)
+
+conn.commit()
+cursor.close()
+conn.close()
 
 # ================= FUNCTIONS =================
 
