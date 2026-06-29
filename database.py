@@ -61,6 +61,14 @@ ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS streak INTEGER DEFAULT 0
 """)
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS achievements(
+    user_id TEXT,
+    achievement TEXT,
+    PRIMARY KEY(user_id, achievement)
+)
+""")
+
 conn.commit()
 cursor.close()
 conn.close()
@@ -329,3 +337,32 @@ def delete_alert(user, coin, target):
     conn.close()
     
     
+def has_achievement(user_id, achievement):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 1 FROM achievements
+        WHERE user_id=%s AND achievement=%s
+    """, (user_id, achievement))
+
+    found = cursor.fetchone() is not None
+
+    cursor.close()
+    conn.close()
+
+    return found
+
+def unlock_achievement(user_id, achievement):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO achievements(user_id, achievement)
+        VALUES(%s, %s)
+        ON CONFLICT DO NOTHING
+    """, (user_id, achievement))
+
+    cursor.close()
+    conn.close()
+
