@@ -165,6 +165,16 @@ alert_users = set()
 waiting_alert = {}
 user_last_coin = {}
 
+# ============== PICKAXE PRICES ================
+
+PICKAXES = {
+    "🪨 Stone Pickaxe": ("Stone", 500, 5),
+    "🥉 Bronze Pickaxe": ("Bronze", 2000, 10),
+    "🥈 Iron Pickaxe": ("Iron", 5000, 20),
+    "🥇 Gold Pickaxe": ("Gold", 10000, 35),
+    "💎 Diamond Pickaxe": ("Diamond", 25000, 50),
+}
+
 # ================= COINPAPRIKA IDS =================
 
 COINPAPRIKA_IDS = {
@@ -1274,10 +1284,8 @@ def do_mine(msg):
 
         return
 
-    reward = random.randint(
-       PICKAXES[pickaxe]["min"],
-       PICKAXES[pickaxe]["max"]
-    )
+    bonus = get_mining_bonus(user)
+    reward = random.randint(20, 80) + level * 5 + bonus
 
     xp += 5
 
@@ -1362,7 +1370,7 @@ def shop(msg):
         f"🏪 PICKAXE SHOP\n\n"
         f"💰 Balance: {balance} PLATS\n\n"
 
-        f"⚒ Current:\n"
+        f"⚒️ Current:\n"
         f"{PICKAXES[pickaxe]['name']}\n\n"
 
         f"⬆ Next Upgrade:\n"
@@ -1430,7 +1438,7 @@ def upgrade_pickaxe(msg):
     bot.reply_to(
         msg,
         f"""
-⚒ Pickaxe Upgrades
+⚒️ Pickaxe Upgrades
 
 💰 Your Balance: {balance:,} PLATS
 
