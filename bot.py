@@ -168,11 +168,42 @@ user_last_coin = {}
 # ============== PICKAXE PRICES ================
 
 PICKAXES = {
-    "🪨 Stone Pickaxe": ("Stone", 500, 5),
-    "🥉 Bronze Pickaxe": ("Bronze", 2000, 10),
-    "🥈 Iron Pickaxe": ("Iron", 5000, 20),
-    "🥇 Gold Pickaxe": ("Gold", 10000, 35),
-    "💎 Diamond Pickaxe": ("Diamond", 25000, 50),
+    1: {
+        "name": "Wood",
+        "price": 0,
+        "bonus": 0,
+        "cooldown": 3600
+    },
+    2: {
+        "name": "Stone",
+        "price": 500,
+        "bonus": 5,
+        "cooldown": 3300
+    },
+    3: {
+        "name": "Bronze",
+        "price": 2000,
+        "bonus": 10,
+        "cooldown": 3000
+    },
+    4: {
+        "name": "Iron",
+        "price": 5000,
+        "bonus": 20,
+        "cooldown": 2700
+    },
+    5: {
+        "name": "Gold",
+        "price": 10000,
+        "bonus": 35,
+        "cooldown": 2400
+    },
+    6: {
+        "name": "Diamond",
+        "price": 25000,
+        "bonus": 50,
+        "cooldown": 1800
+    }
 }
 
 # ================= COINPAPRIKA IDS =================
