@@ -504,3 +504,22 @@ def add_withdrawal(user_id, amount, phone):
     cursor.close()
     conn.close()
 
+
+def get_pending_withdrawals():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, user_id, amount, phone
+        FROM withdrawals
+        WHERE status='Pending'
+        ORDER BY id
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return rows
+
