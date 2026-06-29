@@ -632,7 +632,7 @@ def main_menu():
     )
 
     markup.row(
-        KeyboardButton("💳 Wallet"),
+        KeyboardButton("💳 Mave Wallet"),
         KeyboardButton("💎 VIP")
     )
 
@@ -1242,7 +1242,7 @@ def help_cmd(msg):
         "/help"
     )
 
-@bot.message_handler(func=lambda m: m.text == "💳 Wallet")
+@bot.message_handler(func=lambda m: m.text == "💳 Mave Wallet")
 def wallet_menu(message):
     user = str(message.from_user.id)
 
@@ -1250,7 +1250,7 @@ def wallet_menu(message):
 
     bot.send_message(
         message.chat.id,
-        f"""💳 *Wallet*
+        f"""💳 *Mave Wallet*
 
 💰 Balance: {balance:,} Plats
 
@@ -1549,7 +1549,7 @@ def account_btn(msg):
     profile(msg)
 
 
-@bot.message_handler(func=lambda m: m.text == "💳 Wallet")
+@bot.message_handler(func=lambda m: m.text == "💳 Mave Wallet")
 def wallet(msg):
 
     balance = get_balance(str(msg.from_user.id))
