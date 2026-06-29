@@ -1543,6 +1543,8 @@ def buy_pickaxe(msg):
 
     level = PICKAXE_BUTTONS[msg.text]
 
+    balance, xp, user_level, current_pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
+
     pickaxe = PICKAXES[level]
 
     name = pickaxe["name"]
@@ -1566,8 +1568,8 @@ def buy_pickaxe(msg):
         msg,
         f"🎉 {name} Pickaxe purchased!\n\n"
         f"💰 Cost: {price:,} PLATS\n"
-        f"⛏️ Mining Bonus: +{bonus}\n\n"
-        f"Happy mining!",
+        f"💎 Mining Reward: {pickaxe['min']} - {pickaxe['max']} PLATS\n\n"
+        f"Happy mining!"
         reply_markup=shop_menu()
     )
 
@@ -1581,6 +1583,14 @@ def back_to_mine(msg):
         reply_markup=mine_menu()
     )
 
+@bot.message_handler(func=lambda m: m.text == "🔙 Back")
+def back_from_upgrade(msg):
+    bot.reply_to(
+        msg,
+        "⛏️ Mining Menu",
+        reply_markup=mine_menu()
+    )
+    
 @bot.message_handler(commands=["leaderboard"])
 def leaderboard_cmd(msg):
 
