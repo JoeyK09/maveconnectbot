@@ -23,15 +23,14 @@ conn, cursor = get_cursor()
 # ================= CREATE TABLE =================
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS plats(
-    user_id TEXT PRIMARY KEY,
-    balance INTEGER DEFAULT 0,
-    xp INTEGER DEFAULT 0,
-    level INTEGER DEFAULT 1,
-    pickaxe INTEGER DEFAULT 1,
-    last_daily BIGINT DEFAULT 0,
-    last_mine BIGINT DEFAULT 0,
-    wins INTEGER DEFAULT 0
+PICKAXES = {
+    1: {"name": "Wood", "price": 0, "bonus": 0},
+    2: {"name": "Stone", "price": 500, "bonus": 5},
+    3: {"name": "Bronze", "price": 2000, "bonus": 10},
+    4: {"name": "Iron", "price": 5000, "bonus": 20},
+    5: {"name": "Gold", "price": 10000, "bonus": 35},
+    6: {"name": "Diamond", "price": 25000, "bonus": 50},
+}
 )
 """)
 
@@ -111,7 +110,6 @@ cursor.execute("""
 ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS mining_bonus INTEGER DEFAULT 0;
 """)
-
 
 conn.commit()
 cursor.close()
