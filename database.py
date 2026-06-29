@@ -102,6 +102,17 @@ CREATE TABLE IF NOT EXISTS transactions(
 )
 """)
 
+cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS pickaxe TEXT DEFAULT 'Wood';
+""")
+
+cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS mining_bonus INTEGER DEFAULT 0;
+""")
+
+
 conn.commit()
 cursor.close()
 conn.close()
@@ -398,4 +409,47 @@ def unlock_achievement(user_id, achievement):
 
     cursor.close()
     conn.close()
+
+
+def get_pickaxe(user_id):
+    get_profile(user_id)
+
+    cursor.execute(
+        "SELECT pickaxe FROM plats WHERE user_id=%s",
+        (user_id,)
+    )
+
+    row = cursor.fetchone()
+
+    return row[0] if row else "Wood"
+
+
+def get_mining_bonus(user_id):
+    get_profile(user_id)
+
+    cursor.execute(
+        "SELECT mining_bonus FROM plats WHERE user_id=%s",
+        (user_id,)
+    )
+
+    row = cursor.fetchone()
+
+    return row[0] if row else 0
+
+
+def upgrade_pickaxe(user_id, pickaxe, bonus):
+    get_profile(user_id)
+
+    cursor.execute("""
+        UPDATE plats
+        SET pickaxe=%s,
+            mining_bonus=%s
+        WHERE user_id=%s
+    """, (
+        pickaxe,
+        bonus,
+        user_id
+    ))
+
+    conn.commit()
 
