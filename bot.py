@@ -165,6 +165,7 @@ current_coin = {}
 alert_users = set()
 waiting_alert = {}
 user_last_coin = {}
+deposit_amount = {}
 
 # ============== PICKAXE PRICES ================
 
@@ -612,7 +613,39 @@ def calculate_trend(df):
         return "Bullish"
 
     return "Bearish"
-    
+
+# ==================== MPESA =================
+
+def get_mpesa_amount(message):
+    if not message.text.isdigit():
+        msg = bot.send_message(
+            message.chat.id,
+            "❌ Please enter numbers only."
+        )
+        bot.register_next_step_handler(msg, get_mpesa_amount)
+        return
+
+    deposit_amount[message.from_user.id] = int(message.text)
+
+    msg = bot.send_message(
+        message.chat.id,
+        "📱 Enter your M-Pesa phone number.\n\nExample: 254142047838"
+    )
+
+    bot.register_next_step_handler(msg, get_mpesa_phone)
+
+def get_mpesa_phone(message):
+    amount = deposit_amount.get(message.from_user.id)
+
+    phone = message.text.strip()
+
+    bot.send_message(
+        message.chat.id,
+        f"✅ Deposit Request Received!\n\n"
+        f"💰 Amount: KES {amount}\n"
+        f"📱 Phone: {phone}\n\n"
+        f"🚧 M-Pesa integration is coming next."
+    )
 # ==================== HISTORY ================
 
 def get_history(symbol, days=60):
@@ -1327,6 +1360,15 @@ def deposit_menu(message):
 @bot.message_handler(func=lambda m: m.text == "⬅️ Wallet")
 def back_wallet(message):
     wallet_menu(message)
+
+@bot.message_handler(func=lambda m: m.text == "📱 M-Pesa")
+def mpesa_deposit(message):
+    msg = bot.send_message(
+        message.chat.id,
+        "💵 Enter the amount you want to deposit (KES):"
+    )
+
+    bot.register_next_step_handler(msg, get_mpesa_amount)
 
 
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
