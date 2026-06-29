@@ -1282,6 +1282,13 @@ def do_mine(msg):
         now
     )
 
+    if balance >= 1000 and not has_achievement(user, "First 1000"):
+        unlock_achievement(user, "First 1000")
+        bot.send_message(
+        user,
+        "🏅 Achievement Unlocked!\n\n💰 First 1,000 Plats!"
+        )
+    
     finds = [
         "💎 Diamond",
         "🪙 Gold",
