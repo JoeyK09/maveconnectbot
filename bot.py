@@ -1320,7 +1320,7 @@ def withdraw_menu():
     )
 
     markup.row(
-        KeyboardButton("🔙 Wallet")
+        KeyboardButton("💳 Wallet")
     )
 
     return markup
@@ -1335,7 +1335,7 @@ def crypto_menu():
 
     markup.row(
         KeyboardButton("Ethereum"),
-        KeyboardButton("🔙 Deposit")
+        KeyboardButton("➕ Deposit")
     )
 
     return markup
