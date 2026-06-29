@@ -937,6 +937,29 @@ def shop_menu():
     )
 
     return markup
+
+def upgrade_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🪨 Stone Pickaxe"),
+        KeyboardButton("🥉 Bronze Pickaxe")
+    )
+
+    markup.row(
+        KeyboardButton("🥈 Iron Pickaxe"),
+        KeyboardButton("🥇 Gold Pickaxe")
+    )
+
+    markup.row(
+        KeyboardButton("💎 Diamond Pickaxe")
+    )
+
+    markup.row(
+        KeyboardButton("⬅️ Back")
+    )
+
+    return markup
     
 def wallet_menu():
 
@@ -1394,6 +1417,34 @@ def upgrade_pickaxe(msg):
         f"⏳ Cooldown: {PICKAXES[pickaxe]['cooldown']//60} mins\n\n"
         f"💰 Remaining Balance: {balance} PLATS",
         reply_markup=shop_menu()
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "⚒ Upgrade Pickaxe")
+def upgrade_pickaxe(msg):
+
+    user = str(msg.from_user.id)
+
+    balance = get_balance(user)
+
+    bot.reply_to(
+        msg,
+        f"""
+⚒ Pickaxe Upgrades
+
+💰 Your Balance: {balance:,} PLATS
+
+Choose a pickaxe to upgrade:
+
+🪨 Stone      - 500 PLATS
+🥉 Bronze     - 2,000 PLATS
+🥈 Iron       - 5,000 PLATS
+🥇 Gold       - 10,000 PLATS
+💎 Diamond    - 25,000 PLATS
+
+Higher pickaxes increase mining rewards and may reduce cooldown.
+""",
+        reply_markup=upgrade_menu()
     )
 
 
