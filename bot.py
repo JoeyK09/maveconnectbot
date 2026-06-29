@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from config import PICKAXES
 from datetime import datetime, timedelta, timezone
 from datetime import datetime, timedelta
 from datetime import datetime
