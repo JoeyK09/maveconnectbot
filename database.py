@@ -107,6 +107,9 @@ def get_balance(user_id):
     
 
 def add_plats(user_id, amount):
+    conn = get_connection()
+    cursor = conn.cursor()
+
     balance = get_balance(user_id)
 
     cursor.execute("""
@@ -120,45 +123,23 @@ def add_plats(user_id, amount):
         balance + amount
     ))
 
+    cursor.close()
+    conn.close()
+
 
 def remove_plats(user_id, amount):
-    get_profile(user_id)
-    
-    balance = get_balance(user_id)
+    conn = get_connection()
+    cursor = conn.cursor()
 
+    balance = get_balance(user_id)
     new_balance = max(0, balance - amount)
 
     cursor.execute("""
-CREATE INDEX IF NOT EXISTS idx_balance
-ON plats(balance DESC)
-""")
+        UPDATE plats
+        SET balance=%s
+        WHERE user_id=%s
+    """, (new_balance, user_id))
 
-cursor.execute("""
-CREATE INDEX IF NOT EXISTS idx_level
-ON plats(level DESC)
-""")
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS vip_users(
-    user_id TEXT PRIMARY KEY,
-    expires BIGINT
-)
-""")
-
-cursor.execute("""
-ALTER TABLE plats
-ADD COLUMN IF NOT EXISTS referred_by TEXT;
-""")
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS alerts (
-    user_id TEXT NOT NULL,
-    coin TEXT NOT NULL,
-    target DOUBLE PRECISION NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-""")
-    conn.commit()
     cursor.close()
     conn.close()
 
@@ -260,7 +241,9 @@ def leaderboard(limit=10):
     
 
 def add_favorite(user, coin):
-
+    conn = get_connection()
+    cursor = conn.cursor()
+    
     cursor.execute(
         """
         SELECT 1
@@ -288,6 +271,9 @@ def add_favorite(user, coin):
     
 
 def get_favorites(user):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
     cursor.execute(
         "SELECT coin FROM favorites WHERE user_id=%s",
         (user,)
@@ -296,6 +282,9 @@ def get_favorites(user):
 
 
 def add_alert(user, coin, target):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
     cursor.execute(
         "INSERT INTO alerts VALUES (%s,%s,%s)",
         (user, coin, target)
@@ -306,6 +295,9 @@ def add_alert(user, coin, target):
 
 
 def get_alerts():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
     cursor.execute(
         "SELECT user_id, coin, target FROM alerts"
     )
@@ -313,6 +305,9 @@ def get_alerts():
 
 
 def delete_alert(user, coin, target):
+    conn = get_connection()
+    cursor = conn.cursor()
+
     cursor.execute(
         "DELETE FROM alerts WHERE user_id=%s AND coin=%s AND target=%s",
         (user, coin, target)
