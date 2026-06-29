@@ -22,7 +22,6 @@ conn, cursor = get_cursor()
 
 # ================= CREATE TABLE =================
 
-cursor.execute("""
 PICKAXES = {
     1: {"name": "Wood", "price": 0, "bonus": 0},
     2: {"name": "Stone", "price": 500, "bonus": 5},
@@ -31,8 +30,6 @@ PICKAXES = {
     5: {"name": "Gold", "price": 10000, "bonus": 35},
     6: {"name": "Diamond", "price": 25000, "bonus": 50},
 }
-)
-""")
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS favorites(
@@ -112,8 +109,6 @@ ADD COLUMN IF NOT EXISTS mining_bonus INTEGER DEFAULT 0;
 """)
 
 conn.commit()
-cursor.close()
-conn.close()
 
 # ================= FUNCTIONS =================
 
