@@ -3,6 +3,9 @@ import os
 import time
 import requests
 import feedparser
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+from database import get_pending_withdrawals
 from database import add_withdrawal
 from database import create_deposit
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
@@ -56,6 +59,7 @@ FREE_GROUP = "https://t.me/UltimateAvian"
 VIP_GROUP = "https://t.me/UltimateAve"
 VIP_CHANNEL = "@UltimateAve"
 ADMIN_ID = 7988782705
+USDT_TRC20 = "TCHtvSHZgSzKAg85GzJoVgxBTUUauxYGna"
 
 # ================= COINS =================
 
@@ -815,6 +819,55 @@ You will receive your payment once it is approved."""
     )
 
     del user_withdraw_amount[user]
+
+@bot.message_handler(commands=["withdrawals"])
+def withdrawals(message):
+
+    if message.from_user.id != ADMIN_ID:
+        return
+
+    rows = get_pending_withdrawals()
+
+    if not rows:
+        bot.reply_to(message, "✅ No pending withdrawals.")
+        return
+
+    text = "💸 Pending Withdrawals\n\n"
+
+    for wid, user, amount, phone in rows:
+        text += (
+            f"ID: {wid}\n"
+            f"User: {user}\n"
+            f"Amount: {amount:,} Plats\n"
+            f"Phone: {phone}\n\n"
+        )
+
+    bot.send_message(message.chat.id, text)
+
+
+def receive_txid(message):
+
+    user = str(message.from_user.id)
+
+    txid = message.text.strip()
+
+    bot.send_message(
+        ADMIN_ID,
+        f"""💰 New Crypto Deposit
+
+👤 User: {user}
+
+🧾 TXID:
+{txid}
+"""
+    )
+
+    bot.send_message(
+        message.chat.id,
+        """✅ Your transaction has been submitted.
+
+Once verified, your account will be credited."""
+    )
     
 # ==================== HISTORY ================
 
@@ -1266,6 +1319,33 @@ def withdraw_menu():
     )
 
     return markup
+
+def crypto_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("USDT (TRC20)"),
+        KeyboardButton("Bitcoin")
+    )
+
+    markup.row(
+        KeyboardButton("Ethereum"),
+        KeyboardButton("🔙 Deposit")
+    )
+
+    return markup
+
+def payment_confirm_keyboard():
+    markup = InlineKeyboardMarkup()
+
+    markup.add(
+        InlineKeyboardButton(
+            "✅ I've Paid",
+            callback_data="crypto_paid"
+        )
+    )
+
+    return markup
     
 # ================= COMMANDS ================
 
@@ -1580,6 +1660,69 @@ Send the amount you want to withdraw."""
     bot.register_next_step_handler(
         message,
         process_mpesa_amount
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "💎 Crypto")
+def crypto_deposit(message):
+
+    bot.send_message(
+        message.chat.id,
+        """💎 Crypto Deposit
+
+Choose a cryptocurrency:
+
+• USDT (TRC20)
+• USDT (ERC20)
+• Bitcoin
+• Ethereum
+
+(Support for each will be added one by one.)""",
+        reply_markup=crypto_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text == "USDT (TRC20)")
+def usdt_trc20(message):
+
+    bot.send_message(
+        message.chat.id,
+        f"""💎 USDT (TRC20)
+
+Send your payment to:
+
+`{USDT_TRC20}`
+
+⚠️ Minimum deposit: 5 USDT
+
+After sending, press the button below.""",
+        parse_mode="Markdown",
+        reply_markup=payment_confirm_keyboard()
+    )
+    
+@bot.callback_query_handler(func=lambda c: c.data == "crypto_paid")
+def crypto_paid(call):
+
+    bot.answer_callback_query(
+        call.id,
+        "Request received!"
+    )
+
+    bot.send_message(
+        call.message.chat.id,
+        """📤 Deposit Submitted
+
+Please send your transaction hash (TXID).
+
+Example:
+`0x5f7b...`
+
+Our team will verify your payment shortly.""",
+        parse_mode="Markdown"
+    )
+
+    bot.register_next_step_handler(
+        call.message,
+        receive_txid
     )
 
 
