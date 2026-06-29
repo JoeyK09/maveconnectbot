@@ -218,6 +218,52 @@ PICKAXE_BUTTONS = [
     "💎 Diamond Pickaxe"
 ]
 
+@bot.message_handler(func=lambda m: m.text in PICKAXE_BUTTONS)
+def buy_pickaxe(msg):
+
+    user = str(msg.from_user.id)
+
+    level = PICKAXE_BUTTONS[msg.text]
+
+    balance, xp, user_level, current_pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
+
+    # Already owns this or a better pickaxe
+    if level <= current_pickaxe:
+        bot.reply_to(
+            msg,
+            "⚒️ You already own this pickaxe or a better one.",
+            reply_markup=upgrade_menu()
+        )
+        return
+
+    pickaxe = PICKAXES[level]
+    price = pickaxe["price"]
+
+    # Not enough PLATS
+    if balance < price:
+        bot.reply_to(
+            msg,
+            f"❌ Not enough PLATS!\n\n"
+            f"💵 Cost: {price:,} PLATS\n"
+            f"💰 Balance: {balance:,} PLATS",
+            reply_markup=upgrade_menu()
+        )
+        return
+
+    balance -= price
+
+    update_pickaxe(user, balance, level)
+
+    bot.reply_to(
+        msg,
+        f"🎉 Upgrade Successful!\n\n"
+        f"⚒️ New Pickaxe: {pickaxe['name']}\n"
+        f"💰 Mining Reward: {pickaxe['min']} - {pickaxe['max']} PLATS\n"
+        f"⏳ Cooldown: {pickaxe['cooldown']//60} minutes\n\n"
+        f"💳 Remaining Balance: {balance:,} PLATS",
+        reply_markup=mine_menu()
+    )
+    
 # ================= COINPAPRIKA IDS =================
 
 COINPAPRIKA_IDS = {
@@ -1612,11 +1658,11 @@ def upgrade_pickaxe_menu(msg):
 
 Choose a pickaxe to upgrade:
 
-🪨 Stone      - 500 PLATS
-🥉 Bronze     - 2,000 PLATS
-🥈 Iron       - 5,000 PLATS
-🥇 Gold       - 10,000 PLATS
-💎 Diamond    - 25,000 PLATS
+🪨 Stone pickaxe   - 500 PLATS
+🥉 Bronze pickaxe   - 2,000 PLATS
+🥈 Iron pickaxe      - 5,000 PLATS
+🥇 Gold pickaxe      - 10,000 PLATS
+💎 Diamond pickaxe   - 25,000 PLATS
 
 Higher pickaxes increase mining rewards and may reduce cooldown.
 """,
