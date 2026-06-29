@@ -188,8 +188,12 @@ def remove_plats(user_id, amount):
         UPDATE plats
         SET balance=%s
         WHERE user_id=%s
-    """, (new_balance, user_id))
+    """, (
+        new_balance,
+        user_id
+    ))
 
+    conn.commit()
     cursor.close()
     conn.close()
 
