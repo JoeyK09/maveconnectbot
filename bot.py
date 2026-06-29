@@ -1429,7 +1429,7 @@ def upgrade_pickaxe(msg):
 
 
 @bot.message_handler(func=lambda m: m.text == "⚒ Upgrade Pickaxe")
-def upgrade_pickaxe(msg):
+def upgrade_pickaxe_menu(msg):
 
     user = str(msg.from_user.id)
 
@@ -1453,6 +1453,36 @@ Choose a pickaxe to upgrade:
 Higher pickaxes increase mining rewards and may reduce cooldown.
 """,
         reply_markup=upgrade_menu()
+    )
+
+
+@bot.message_handler(func=lambda m: m.text in PICKAXES)
+def buy_pickaxe(msg):
+
+    user = str(msg.from_user.id)
+
+    name, price, bonus = PICKAXES[msg.text]
+
+    balance = get_balance(user)
+
+    if balance < price:
+        bot.reply_to(
+            msg,
+            f"❌ You need {price:,} PLATS.\n"
+            f"💰 Balance: {balance:,} PLATS"
+        )
+        return
+
+    remove_plats(user, price)
+    upgrade_pickaxe(user, name, bonus)
+
+    bot.reply_to(
+        msg,
+        f"🎉 {name} purchased!\n\n"
+        f"💰 Cost: {price:,} PLATS\n"
+        f"⛏️ Mining Bonus: +{bonus}\n\n"
+        f"Happy mining!",
+        reply_markup=shop_menu()
     )
 
 
