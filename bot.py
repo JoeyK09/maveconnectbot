@@ -971,7 +971,7 @@ def upgrade_menu():
 
     return markup
     
-def wallet_menu():
+def wallet_keyboard():
 
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
@@ -987,7 +987,7 @@ def wallet_menu():
 
     markup.row(
         KeyboardButton("⭐ Favorite"),
-        KeyboardButton("🔔 Alerts ")
+        KeyboardButton("🔔 Alerts")
     )
 
     markup.row(
@@ -1255,7 +1255,7 @@ def wallet_menu(message):
 💰 Balance: {balance:,} Plats
 
 Choose an option below.""",
-        reply_markup=wallet_menu(),
+        reply_markup=wallet_keyboard(),
         parse_mode="Markdown"
     )
     
@@ -1441,7 +1441,7 @@ def upgrade_pickaxe(msg):
         f"💎 Reward: {PICKAXES[pickaxe]['min']}-{PICKAXES[pickaxe]['max']} PLATS\n"
         f"⏳ Cooldown: {PICKAXES[pickaxe]['cooldown']//60} mins\n\n"
         f"💰 Remaining Balance: {balance} PLATS",
-        reply_markup=shop_menu()
+        reply_markup=upgrade_menu()
     )
 
 
