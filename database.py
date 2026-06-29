@@ -203,10 +203,12 @@ def update_daily(user_id, balance, last_daily):
         UPDATE plats
         SET balance=%s,
             last_daily=%s
+            streak=%s
         WHERE user_id=%s
     """, (
         balance,
         last_daily,
+        streak,
         user_id
     ))
 
