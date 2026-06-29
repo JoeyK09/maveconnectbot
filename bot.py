@@ -1403,7 +1403,7 @@ def back_to_mine(msg):
     bot.reply_to(
         msg,
         "⛏️ Mining Menu",
-        reply_markup=mine_menu()
+        reply_markup=shop_menu()
     )
 
 @bot.message_handler(commands=["leaderboard"])
