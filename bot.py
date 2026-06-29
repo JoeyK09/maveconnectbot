@@ -168,6 +168,7 @@ alert_users = set()
 waiting_alert = {}
 user_last_coin = {}
 deposit_amount = {}
+user_withdraw_amount = {}
 
 # ============== PICKAXE PRICES ================
 
@@ -703,6 +704,8 @@ You'll receive an M-Pesa prompt once payment integration is enabled."""
 
     deposit_amount.pop(message.from_user.id, None)
 
+user_withdraw_amount = {}
+
 def process_mpesa_amount(message):
     user = str(message.from_user.id)
 
@@ -729,14 +732,74 @@ def process_mpesa_amount(message):
         )
         return
 
+def process_mpesa_amount(message):
+    user = str(message.from_user.id)
+
+    try:
+        amount = int(message.text)
+
+    except:
+        bot.reply_to(message, "❌ Enter a valid number.")
+        return
+
+    balance = get_balance(user)
+
+    if amount < 500:
+        bot.reply_to(
+            message,
+            "❌ Minimum withdrawal is 500 Plats."
+        )
+        return
+
+    if balance < amount:
+        bot.reply_to(
+            message,
+            "❌ Insufficient balance."
+        )
+        return
+
+    # Save amount temporarily
+    user_withdraw_amount[user] = amount
+
+    msg = bot.send_message(
+        message.chat.id,
+        """📱 Enter your M-Pesa phone number.
+
+Example:
+0712345678"""
+    )
+
+    bot.register_next_step_handler(
+        msg,
+        process_mpesa_number
+    )
+
+def process_mpesa_number(message):
+    user = str(message.from_user.id)
+
+    phone = message.text.strip()
+
+    if not phone.isdigit() or len(phone) != 10:
+        bot.reply_to(
+            message,
+            "❌ Invalid phone number."
+        )
+        return
+
+    amount = user_withdraw_amount.get(user)
+
     bot.send_message(
         message.chat.id,
-        f"""✅ Withdrawal Request
+        f"""✅ Withdrawal Request Received
 
-Amount: {amount:,} Plats
+💰 Amount: {amount:,} Plats
+📱 Phone: {phone}
 
-Your request has been received and is awaiting approval."""
+⏳ Your request has been submitted for review.
+You will receive your payment once it is approved."""
     )
+
+    del user_withdraw_amount[user]
     
 # ==================== HISTORY ================
 
