@@ -60,6 +60,11 @@ conn.commit()
 cursor.close()
 conn.close()
 
+cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS streak INTEGER DEFAULT 0
+""")
+
 # ================= FUNCTIONS =================
 
 def get_profile(user_id):
@@ -68,7 +73,7 @@ def get_profile(user_id):
 
     cursor.execute("""
         SELECT balance, xp, level, pickaxe,
-               last_daily, last_mine, wins
+               last_daily, last_mine, wins,streak
         FROM plats
         WHERE user_id=%s
     """, (user_id,))
@@ -81,7 +86,7 @@ def get_profile(user_id):
             (user_id,)
         )
 
-        row = (0, 0, 1, 1, 0, 0, 0)
+        row = (0, 0, 1, 1, 0, 0, 0, 0)
 
     cursor.close()
     conn.close()
