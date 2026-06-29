@@ -1371,8 +1371,10 @@ def do_mine(msg):
 
         return
 
-    bonus = PICKAXES[pickaxe]["bonus"]
-    reward = random.randint(20, 80) + level * 5 + bonus
+    reward = random.randint(
+      PICKAXES[pickaxe]["min"],
+      PICKAXES[pickaxe]["max"]
+    ) + level * 5
 
     xp += 5
 
@@ -1503,7 +1505,7 @@ def buy_pickaxe(msg):
 
     name = pickaxe["name"]
     price = pickaxe["price"]
-    bonus = pickaxe["bonus"]
+    
 
     balance = get_balance(user)
 
