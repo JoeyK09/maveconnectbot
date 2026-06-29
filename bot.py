@@ -1212,7 +1212,7 @@ def help_cmd(msg):
 def mining_center(msg):
     user = str(msg.from_user.id)
 
-    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+    balance, xp, level, pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
 
     bot.reply_to(
         msg,
@@ -1311,7 +1311,7 @@ def shop(msg):
 
     user = str(msg.from_user.id)
 
-    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+    balance, xp, level, pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
 
     # Already at max level
     if pickaxe == max(PICKAXES.keys()):
@@ -1544,7 +1544,7 @@ def daily_btn(msg):
 def daily(msg):
     user = str(msg.from_user.id)
 
-    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+    balance, xp, level, pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
 
     now = int(time.time())
 
