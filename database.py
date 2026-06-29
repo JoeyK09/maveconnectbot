@@ -119,6 +119,17 @@ ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS mining_bonus INTEGER DEFAULT 0;
 """)
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS deposits(
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    coin TEXT NOT NULL,
+    txid TEXT NOT NULL,
+    status TEXT DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
 conn.commit()
 
 # ================= FUNCTIONS =================
@@ -522,4 +533,22 @@ def get_pending_withdrawals():
     conn.close()
 
     return rows
+
+
+def add_deposit(user_id, coin, txid):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO deposits(user_id, coin, txid)
+        VALUES(%s, %s, %s)
+    """, (
+        user_id,
+        coin,
+        txid
+    ))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
 
