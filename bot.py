@@ -1542,16 +1542,19 @@ def buy_pickaxe(msg):
     user = str(msg.from_user.id)
 
     level = PICKAXE_BUTTONS[msg.text]
-
-    balance, xp, user_level, current_pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
-
     pickaxe = PICKAXES[level]
 
     name = pickaxe["name"]
     price = pickaxe["price"]
-    
 
-    balance = get_balance(user)
+    balance, xp, user_level, current_pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
+
+    if level <= current_pickaxe:
+        bot.reply_to(
+            msg,
+            "❌ You already own this pickaxe or a better one."
+        )
+        return
 
     if balance < price:
         bot.reply_to(
@@ -1561,18 +1564,18 @@ def buy_pickaxe(msg):
         )
         return
 
-    remove_plats(user, price)
-    update_pickaxe(user, level)
+    balance -= price
+
+    update_pickaxe(user, balance, level)
 
     bot.reply_to(
         msg,
         f"🎉 {name} Pickaxe purchased!\n\n"
         f"💰 Cost: {price:,} PLATS\n"
-        f"💎 Mining Reward: {pickaxe['min']} - {pickaxe['max']} PLATS\n\n"
-        f"Happy mining!"
+        f"💎 Mining Rewards: {pickaxe['min']} - {pickaxe['max']} PLATS\n"
+        f"⏳ Cooldown: {pickaxe['cooldown']//60} mins",
         reply_markup=shop_menu()
     )
-
 
 @bot.message_handler(func=lambda m: m.text == "🔙 Back")
 def back_to_mine(msg):
