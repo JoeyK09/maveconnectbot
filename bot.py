@@ -3,6 +3,8 @@ import os
 import time
 import requests
 import feedparser
+from database import create_deposit
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from database import get_mining_bonus
 from config import PICKAXES
 from database import has_achievement, unlock_achievement
@@ -635,17 +637,61 @@ def get_mpesa_amount(message):
     bot.register_next_step_handler(msg, get_mpesa_phone)
 
 def get_mpesa_phone(message):
-    amount = deposit_amount.get(message.from_user.id)
+    user = str(message.from_user.id)
 
+    amount = deposit_amount.get(message.from_user.id)
     phone = message.text.strip()
+
+    create_deposit(user, amount, "M-Pesa")
 
     bot.send_message(
         message.chat.id,
-        f"✅ Deposit Request Received!\n\n"
-        f"💰 Amount: KES {amount}\n"
-        f"📱 Phone: {phone}\n\n"
-        f"🚧 M-Pesa integration is coming next."
+        f"""✅ Deposit request created!
+
+💰 Amount: KES {amount}
+📱 Phone: {phone}
+
+⏳ Your payment request has been recorded.
+You'll receive an M-Pesa prompt once payment integration is enabled."""
     )
+
+    deposit_amount.pop(message.from_user.id, None)
+
+def process_mpesa_amount(message):
+    user = str(message.from_user.id)
+
+    try:
+        amount = int(message.text)
+
+    except:
+        bot.reply_to(message, "❌ Enter a valid number.")
+        return
+
+    balance = get_balance(user)
+
+    if amount < 500:
+        bot.reply_to(
+            message,
+            "❌ Minimum withdrawal is 500 Plats."
+        )
+        return
+
+    if balance < amount:
+        bot.reply_to(
+            message,
+            "❌ Insufficient balance."
+        )
+        return
+
+    bot.send_message(
+        message.chat.id,
+        f"""✅ Withdrawal Request
+
+Amount: {amount:,} Plats
+
+Your request has been received and is awaiting approval."""
+    )
+    
 # ==================== HISTORY ================
 
 def get_history(symbol, days=60):
@@ -1083,6 +1129,20 @@ def deposit_keyboard():
 
     return markup
 
+def withdraw_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("📱 M-Pesa"),
+        KeyboardButton("💎 Crypto")
+    )
+
+    markup.row(
+        KeyboardButton("🔙 Wallet")
+    )
+
+    return markup
+    
 # ================= COMMANDS ================
 
 @bot.message_handler(commands=["start"])
@@ -1369,6 +1429,34 @@ def mpesa_deposit(message):
     )
 
     bot.register_next_step_handler(msg, get_mpesa_amount)
+
+@bot.message_handler(func=lambda m: m.text == "➖ Withdraw")
+def withdraw(message):
+
+    bot.send_message(
+        message.chat.id,
+        """💸 Withdraw
+
+Choose your withdrawal method.""",
+        reply_markup=withdraw_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text == "📱 M-Pesa")
+def mpesa_withdraw(message):
+
+    bot.send_message(
+        message.chat.id,
+        """📱 M-Pesa Withdrawal
+
+Minimum: 500 Plats
+
+Send the amount you want to withdraw."""
+    )
+
+    bot.register_next_step_handler(
+        message,
+        process_mpesa_amount
+    )
 
 
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
@@ -1701,25 +1789,6 @@ def balance(msg):
         f"💰 Your Wallet\n\n"
         f"🪙 Plats: {balance:,}"
     )
-
-
-@bot.message_handler(func=lambda m: m.text == "💵 Deposit")
-def deposit(msg):
-
-    bot.reply_to(
-        msg,
-        "🚧 Deposit feature is coming soon!"
-    )
-
-
-@bot.message_handler(func=lambda m: m.text == "💸 Withdraw")
-def withdraw(msg):
-
-    bot.reply_to(
-        msg,
-        "🚧 Withdrawals will be available soon."
-    )
-
 
 @bot.message_handler(func=lambda m: m.text == "📜 History")
 def history(msg):
