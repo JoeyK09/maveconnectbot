@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from database import add_deposit
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from database import get_pending_withdrawals
@@ -851,11 +852,17 @@ def receive_txid(message):
 
     txid = message.text.strip()
 
+    coin = "USDT (TRC20)"   # We'll make this dynamic later
+
+    add_deposit(user, coin, txid)
+
     bot.send_message(
         ADMIN_ID,
-        f"""💰 New Crypto Deposit
+        f"""💰 New Deposit
 
 👤 User: {user}
+
+🪙 Coin: {coin}
 
 🧾 TXID:
 {txid}
@@ -864,11 +871,9 @@ def receive_txid(message):
 
     bot.send_message(
         message.chat.id,
-        """✅ Your transaction has been submitted.
-
-Once verified, your account will be credited."""
+        "✅ Deposit submitted successfully.\n\nIt will be verified shortly."
     )
-    
+
 # ==================== HISTORY ================
 
 def get_history(symbol, days=60):
