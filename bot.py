@@ -1301,7 +1301,7 @@ def do_mine(msg):
 
         return
 
-    bonus = get_mining_bonus(user)
+    bonus = PICKAXES[pickaxe]["bonus"]
     reward = random.randint(20, 80) + level * 5 + bonus
 
     xp += 5
