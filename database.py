@@ -13,19 +13,6 @@ def get_connection():
     conn.autocommit = True
     return conn
 
-# ================= DATABASE CONNECTION =================
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise Exception("DATABASE_URL not found")
-
-
-def get_connection():
-    conn = psycopg2.connect(DATABASE_URL)
-    conn.autocommit = True
-    return conn
-
 
 def get_cursor():
     conn = get_connection()
@@ -76,16 +63,12 @@ conn.close()
 # ================= FUNCTIONS =================
 
 def get_profile(user_id):
-    conn, cursor = get_cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT balance,
-               xp,
-               level,
-               pickaxe,
-               last_daily,
-               last_mine,
-               wins
+        SELECT balance, xp, level, pickaxe,
+               last_daily, last_mine, wins
         FROM plats
         WHERE user_id=%s
     """, (user_id,))
@@ -93,12 +76,10 @@ def get_profile(user_id):
     row = cursor.fetchone()
 
     if not row:
-        cursor.execute("""
-            INSERT INTO plats(user_id)
-            VALUES(%s)
-        """, (user_id,))
-
-        conn.commit()
+        cursor.execute(
+            "INSERT INTO plats(user_id) VALUES(%s)",
+            (user_id,)
+        )
 
         row = (0, 0, 1, 1, 0, 0, 0)
 
@@ -109,6 +90,9 @@ def get_profile(user_id):
     
 
 def get_balance(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
     cursor.execute(
         "SELECT balance FROM plats WHERE user_id=%s",
         (user_id,)
@@ -116,8 +100,11 @@ def get_balance(user_id):
 
     row = cursor.fetchone()
 
-    return row[0] if row else 0
+    cursor.close()
+    conn.close()
 
+    return row[0] if row else 0
+    
 
 def add_plats(user_id, amount):
     balance = get_balance(user_id)
@@ -176,15 +163,9 @@ CREATE TABLE IF NOT EXISTS alerts (
     conn.close()
 
 
-def update_mine(
-    user_id,
-    balance,
-    xp,
-    level,
-    pickaxe,
-    last_mine
-):
-    get_profile(user_id)
+def update_mine(user_id, balance, xp, level, pickaxe, last_mine):
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         UPDATE plats
@@ -203,12 +184,14 @@ def update_mine(
         user_id
     ))
 
-    conn.commit()
     cursor.close()
     conn.close()
 
 
 def update_pickaxe(user_id, balance, pickaxe):
+    conn = get_connection()
+    cursor = conn.cursor()
+
     cursor.execute("""
         UPDATE plats
         SET balance=%s,
@@ -220,14 +203,14 @@ def update_pickaxe(user_id, balance, pickaxe):
         user_id
     ))
 
-    conn.commit()
     cursor.close()
     conn.close()
 
 
 def update_daily(user_id, balance, last_daily):
-    get_profile(user_id)
-    
+    conn = get_connection()
+    cursor = conn.cursor()
+
     cursor.execute("""
         UPDATE plats
         SET balance=%s,
@@ -239,18 +222,28 @@ def update_daily(user_id, balance, last_daily):
         user_id
     ))
 
+    cursor.close()
+    conn.close()
+    
 
 def add_win(user_id):
-    get_profile(user_id)
-    
+    conn = get_connection()
+    cursor = conn.cursor()
+
     cursor.execute("""
         UPDATE plats
         SET wins = wins + 1
         WHERE user_id=%s
     """, (user_id,))
 
+    cursor.close()
+    conn.close()
+    
 
 def leaderboard(limit=10):
+    conn = get_connection()
+    cursor = conn.cursor()
+
     cursor.execute("""
         SELECT user_id, balance
         FROM plats
@@ -258,7 +251,12 @@ def leaderboard(limit=10):
         LIMIT %s
     """, (limit,))
 
-    return cursor.fetchall()
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return rows
     
 
 def add_favorite(user, coin):
