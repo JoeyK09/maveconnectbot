@@ -1229,7 +1229,7 @@ def do_mine(msg):
 
     user = str(msg.from_user.id)
 
-    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+    balance, xp, level, pickaxe, last_daily, last_mine, wins, streak= get_profile(user)
 
     now = int(time.time())
 
@@ -1349,7 +1349,7 @@ def upgrade_pickaxe(msg):
 
     user = str(msg.from_user.id)
 
-    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+    balance, xp, level, pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
 
     # Already at the highest pickaxe
     if pickaxe >= max(PICKAXES.keys()):
@@ -1423,7 +1423,7 @@ def profile(msg):
 
     user = str(msg.from_user.id)
 
-    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+    balance, xp, level, pickaxe, last_daily, last_mine, wins, streak = get_profile(user)
 
     reward = f"{PICKAXES[pickaxe]['min']}-{PICKAXES[pickaxe]['max']}"
     cooldown = PICKAXES[pickaxe]["cooldown"] // 60
@@ -1434,7 +1434,8 @@ def profile(msg):
         f"🏅 Level: {level}\n"
         f"⭐ XP: {xp}/100\n\n"
         f"💰 Balance: {balance} PLATS\n"
-        f"⚒ Pickaxe: {PICKAXES[pickaxe]['name']}\n"
+        f"⚒️ Pickaxe: {PICKAXES[pickaxe]['name']}\n"
+        f"🔥 Daily Streak: {streak} days\n"
         f"💎 Reward: {reward} PLATS\n"
         f"⏳ Cooldown: {cooldown} mins\n\n"
         f"🏆 Wins: {wins}"
@@ -1537,6 +1538,42 @@ def leaderboard_btn(msg):
 @bot.message_handler(func=lambda m: m.text=="🎁 Daily")
 def daily_btn(msg):
     daily(msg)
+
+
+@bot.message_handler(commands=["daily"])
+def daily(msg):
+    user = str(msg.from_user.id)
+
+    balance, xp, level, pickaxe, last_daily, last_mine, wins = get_profile(user)
+
+    now = int(time.time())
+
+    cooldown = 86400  # 24 hours
+
+    if now - last_daily < cooldown:
+        left = cooldown - (now - last_daily)
+        hrs = left // 3600
+        mins = (left % 3600) // 60
+
+        bot.reply_to(
+            msg,
+            f"🎁 You've already claimed today's reward.\n\n"
+            f"Come back in {hrs}h {mins}m."
+        )
+        return
+
+    reward = 100
+
+    balance += reward
+
+    update_daily(user, balance, now)
+
+    bot.reply_to(
+        msg,
+        f"🎁 Daily Reward Claimed!\n\n"
+        f"+{reward} PLATS\n"
+        f"💳 Balance: {balance} PLATS"
+    )
 
 
 @bot.message_handler(func=lambda m: m.text=="⛏️ Mine")
