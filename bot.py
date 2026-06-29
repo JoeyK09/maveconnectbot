@@ -976,18 +976,18 @@ def wallet_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
-        KeyboardButton("💰 Balance"),
-        KeyboardButton("⭐ Favorites")
+        KeyboardButton("➕ Deposit"),
+        KeyboardButton("➖ Withdraw")
     )
 
     markup.row(
-        KeyboardButton("🔔 Alerts"),
+        KeyboardButton("💰 Balance"),
         KeyboardButton("📜 History")
     )
 
     markup.row(
-        KeyboardButton("💸 Withdraw"),
-        KeyboardButton("💵 Deposit")
+        KeyboardButton("⭐ Favorite"),
+        KeyboardButton("🔔 Alerts ")
     )
 
     markup.row(
@@ -1242,6 +1242,23 @@ def help_cmd(msg):
         "/help"
     )
 
+@bot.message_handler(func=lambda m: m.text == "💳 Wallet")
+def wallet_menu(message):
+    user = str(message.from_user.id)
+
+    balance = get_balance(user)
+
+    bot.send_message(
+        message.chat.id,
+        f"""💳 *Wallet*
+
+💰 Balance: {balance:,} Plats
+
+Choose an option below.""",
+        reply_markup=wallet_menu(),
+        parse_mode="Markdown"
+    )
+    
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
 def mining_center(msg):
     user = str(msg.from_user.id)
