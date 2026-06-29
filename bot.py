@@ -1575,12 +1575,13 @@ def daily(msg):
 
     balance += reward
 
-    update_daily(user, balance, now)
+    update_daily(user, balance, now, streak)
 
     bot.reply_to(
         msg,
         f"🎁 Daily Reward Claimed!\n\n"
         f"+{reward} PLATS\n"
+        f"🔥 Streak: {streak} day(s)"
         f"💳 Balance: {balance} PLATS"
     )
 
