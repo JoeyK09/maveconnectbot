@@ -170,6 +170,7 @@ def update_mine(user_id, balance, xp, level, pickaxe, last_mine):
         user_id
     ))
 
+    conn.commit()
     cursor.close()
     conn.close()
 
@@ -189,6 +190,7 @@ def update_pickaxe(user_id, balance, pickaxe):
         user_id
     ))
 
+    conn.commit()
     cursor.close()
     conn.close()
 
@@ -208,6 +210,7 @@ def update_daily(user_id, balance, last_daily):
         user_id
     ))
 
+    conn.commit()
     cursor.close()
     conn.close()
     
@@ -222,6 +225,7 @@ def add_win(user_id):
         WHERE user_id=%s
     """, (user_id,))
 
+    conn.commit()
     cursor.close()
     conn.close()
     
@@ -239,6 +243,7 @@ def leaderboard(limit=10):
 
     rows = cursor.fetchall()
 
+    conn.commit()
     cursor.close()
     conn.close()
 
