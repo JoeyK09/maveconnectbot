@@ -1296,7 +1296,7 @@ def upgrade_menu():
 
     return markup
     
-def wallet_keyboard():
+def wallet_menu():
 
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
@@ -1321,7 +1321,7 @@ def wallet_keyboard():
 
     return markup
 
-def deposit_keyboard():
+def deposit_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
@@ -1596,19 +1596,6 @@ def vipcount(msg):
     )
 
 
-@bot.message_handler(func=lambda m: m.text == "🔙 Back")
-def payment_back(message):
-    user = str(message.from_user.id)
-
-    pending_deposit.pop(user, None)
-
-    bot.send_message(
-        message.chat.id,
-        "💳 Wallet",
-        reply_markup=wallet_menu()
-    )
-
-
 @bot.message_handler(commands=["nettest"])
 def nettest(msg):
     try:
@@ -1692,7 +1679,7 @@ def deposit_menu(message):
         message.chat.id,
         "💳 Deposit Funds\n\n"
         "Choose your preferred payment method:",
-        reply_markup=deposit_keyboard()
+        reply_markup=deposit_menu()
     )
 
 @bot.message_handler(func=lambda m: m.text == "⬅️ Wallet")
@@ -1970,10 +1957,39 @@ def deposit_command(message):
     bot.send_message(
         message.chat.id,
         "Choose a deposit method:",
-        reply_markup=deposit_keyboard()
+        reply_markup=deposit_menu()
     )
 
+@bot.message_handler(func=lambda m: m.text == "✅ I've Sent Payment")
+def sent_payment(message):
+    user = str(message.from_user.id)
 
+    if user not in pending_deposit:
+        bot.reply_to(
+            message,
+            "❌ Start a deposit first."
+        )
+        return
+
+    msg = bot.reply_to(
+        message,
+        "📄 Send your Transaction ID (TXID):"
+    )
+
+    bot.register_next_step_handler(msg, receive_txid)
+
+@bot.message_handler(func=lambda m: m.text == "🔙 Back")
+def payment_back(message):
+    user = str(message.from_user.id)
+
+    pending_deposit.pop(user, None)
+
+    bot.send_message(
+        message.chat.id,
+        "💳 Mave Wallet",
+        reply_markup=wallet_menu()
+    )
+    
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
 def mining_center(msg):
     user = str(msg.from_user.id)
