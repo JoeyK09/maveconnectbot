@@ -1352,6 +1352,24 @@ def payment_confirm_keyboard():
     )
 
     return markup
+
+def usdt_network_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🔴 TRC20"),
+        KeyboardButton("🔵 ERC20")
+    )
+
+    markup.row(
+        KeyboardButton("🟡 BEP20")
+    )
+
+    markup.row(
+        KeyboardButton("◀ Back")
+    )
+
+    return markup
     
 # ================= COMMANDS ================
 
@@ -1687,23 +1705,94 @@ Choose a cryptocurrency:
         reply_markup=crypto_menu()
     )
 
-@bot.message_handler(func=lambda m: m.text == "USDT (TRC20)")
-def usdt_trc20(message):
-
+@bot.message_handler(func=lambda m: m.text == "💵 USDT")
+def usdt_menu(message):
     bot.send_message(
         message.chat.id,
-        f"""💎 USDT (TRC20)
+        """💵 USDT Deposit
 
-Send your payment to:
-
-`{USDT_TRC20}`
-
-⚠️ Minimum deposit: 5 USDT
-
-After sending, press the button below.""",
-        parse_mode="Markdown",
-        reply_markup=payment_confirm_keyboard()
+Choose the network you want to use.""",
+        reply_markup=usdt_network_menu()
     )
+
+@bot.message_handler(func=lambda m: m.text == "🔴 TRC20")
+def usdt_trc20(message):
+    bot.send_message(
+        message.chat.id,
+        """💵 USDT (TRC20)
+
+Network: TRON (TRC20)
+
+Send USDT to:
+
+`TCHtvSHZgSzKAg85GzJoVgxBTUUauxYGna`
+
+Minimum deposit: 5 USDT
+
+After sending, type:
+
+/deposit
+
+Then submit:
+
+TXID
+Amount
+""",
+        parse_mode="Markdown"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🔵 ERC20")
+def usdt_erc20(message):
+    bot.send_message(
+        message.chat.id,
+        """💵 USDT (ERC20)
+
+Network: Ethereum (ERC20)
+
+Send USDT to:
+
+`0x6E4B1b38f345764B430017D7885828f3d91DcaA0`
+
+Minimum deposit: 5 USDT
+
+After sending, type:
+
+/deposit
+
+Then submit:
+
+TXID
+Amount
+""",
+        parse_mode="Markdown"
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🟡 BEP20")
+def usdt_bep20(message):
+    bot.send_message(
+        message.chat.id,
+        """💵 USDT (BEP20)
+
+Network: BNB Smart Chain (BEP20)
+
+Send USDT to:
+
+`0x6E4B1b38f345764B430017D7885828f3d91DcaA0`
+
+Minimum deposit: 5 USDT
+
+After sending, type:
+
+/deposit
+
+Then submit:
+
+TXID
+Amount
+""",
+        parse_mode="Markdown"
+    )
+
 
 @bot.message_handler(func=lambda m: m.text == "₿ Bitcoin")
 def deposit_btc(message):
