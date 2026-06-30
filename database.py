@@ -473,19 +473,23 @@ def upgrade_pickaxe(user_id, pickaxe, bonus):
     conn.close()
 
 
-def create_deposit(user_id, amount, method):
+def create_deposit(user_id, coin, network, txid, amount):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO deposits(user_id, amount, method)
-        VALUES(%s, %s, %s)
+        INSERT INTO deposits
+        (user_id, coin, network, txid, amount)
+        VALUES (%s, %s, %s, %s, %s)
     """, (
         user_id,
-        amount,
-        method
+        coin,
+        network,
+        txid,
+        amount
     ))
 
+    conn.commit()
     cursor.close()
     conn.close()
 
@@ -515,7 +519,7 @@ def get_pending_withdrawals():
     cursor.execute("""
         SELECT id, user_id, amount, phone
         FROM withdrawals
-        WHERE status='Pending'
+        WHERE status='pending'
         ORDER BY id
     """)
 
@@ -552,7 +556,7 @@ def get_pending_deposits():
     cursor.execute("""
         SELECT id, user_id, coin, txid
         FROM deposits
-        WHERE status='Pending'
+        WHERE status='pending'
         ORDER BY id
     """)
 
@@ -565,17 +569,3 @@ def get_pending_deposits():
     return rows
 
     
-def create_deposit(user_id, coin, network, txid, amount):
-    cursor.execute("""
-        INSERT INTO deposits
-        (user_id, coin, network, txid, amount)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (
-        user_id,
-        coin,
-        network,
-        txid,
-        amount
-    ))
-    conn.commit()
-
