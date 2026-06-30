@@ -1398,7 +1398,7 @@ def payment_sent_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
-        KeyboardButton("📤 I've Sent Payment")
+        KeyboardButton("✅ I've Sent Payment")
     )
 
     markup.row(
