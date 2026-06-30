@@ -558,6 +558,7 @@ def get_pending_deposits():
 
     rows = cursor.fetchall()
 
+    conn.commit()
     cursor.close()
     conn.close()
 
