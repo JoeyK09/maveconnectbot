@@ -564,3 +564,17 @@ def get_pending_deposits():
     return rows
 
     
+def create_deposit(user_id, coin, network, txid, amount):
+    cursor.execute("""
+        INSERT INTO deposits
+        (user_id, coin, network, txid, amount)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (
+        user_id,
+        coin,
+        network,
+        txid,
+        amount
+    ))
+    conn.commit()
+
