@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from database import get_pending_deposits
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from database import get_pending_deposits
 from database import add_deposit
@@ -2005,7 +2006,43 @@ def mining_center(msg):
         f"⭐ XP: {xp}/100",
         reply_markup=mine_menu()
     )
-    
+
+@bot.message_handler(commands=["deposits"])
+def deposits(message):
+
+    if str(message.from_user.id) != str(ADMIN_ID):
+        return
+
+    rows = get_pending_deposits()
+
+    if not rows:
+        bot.reply_to(message, "✅ No pending deposits.")
+        return
+
+    text = "💰 Pending Deposits\n\n"
+
+    for row in rows:
+        deposit_id, user, coin, network, txid, amount = row
+
+        text += (
+            f"ID: {deposit_id}\n"
+            f"User: {user}\n"
+            f"Coin: {coin}\n"
+            f"Network: {network}\n"
+            f"Amount: {amount}\n"
+            f"TXID: {txid}\n\n"
+        )
+
+    text += (
+        "Approve:\n"
+        "/approve <id>\n\n"
+        "Reject:\n"
+        "/reject <id>"
+    )
+
+    bot.send_message(message.chat.id, text)
+
+
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine Now")
 def do_mine(msg):
 
