@@ -41,6 +41,7 @@ from database import (
     get_alerts,
     delete_alert
 )
+from database import create_deposit
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import telebot
 
