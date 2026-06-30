@@ -1667,7 +1667,7 @@ def wallet_menu(message):
 💰 Balance: {balance:,} Plats
 
 Choose an option below.""",
-        reply_markup=wallet_keyboard(),
+        reply_markup=wallet_menu(),
         parse_mode="Markdown"
     )
 
