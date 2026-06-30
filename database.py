@@ -552,3 +552,23 @@ def add_deposit(user_id, coin, txid):
     cursor.close()
     conn.close()
 
+
+def get_pending_deposits():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, user_id, coin, txid
+        FROM deposits
+        WHERE status='Pending'
+        ORDER BY id
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return rows
+
+    
