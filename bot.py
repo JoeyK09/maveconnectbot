@@ -1296,7 +1296,7 @@ def upgrade_menu():
 
     return markup
     
-def wallet_menu():
+def wallet_keyboard():
 
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
@@ -1667,7 +1667,7 @@ def wallet_menu(message):
 💰 Balance: {balance:,} Plats
 
 Choose an option below.""",
-        reply_markup=wallet_menu(),
+        reply_markup=wallet_keyboard(),
         parse_mode="Markdown"
     )
 
@@ -1684,7 +1684,7 @@ def deposit_menu(message):
 
 @bot.message_handler(func=lambda m: m.text == "⬅️ Wallet")
 def back_wallet(message):
-    wallet_menu(message)
+    wallet_keyboard(message)
 
 @bot.message_handler(func=lambda m: m.text == "📱 M-Pesa")
 def mpesa_deposit(message):
