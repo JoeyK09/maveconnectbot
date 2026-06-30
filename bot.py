@@ -178,6 +178,8 @@ user_last_coin = {}
 deposit_amount = {}
 user_withdraw_amount = {}
 ADMIN_ID = 6384391560
+pending_deposit = {}
+pending_withdrawal = {}
 
 # ============== PICKAXE PRICES ================
 
