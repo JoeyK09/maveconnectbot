@@ -1331,11 +1331,11 @@ def crypto_menu():
 
     markup.row(
         KeyboardButton("USDT (TRC20)"),
-        KeyboardButton("Bitcoin")
+        KeyboardButton("₿ Bitcoin")
     )
 
     markup.row(
-        KeyboardButton("Ethereum"),
+        KeyboardButton("Ξ Ethereum"),
         KeyboardButton("➕ Deposit")
     )
 
@@ -1704,7 +1704,64 @@ After sending, press the button below.""",
         parse_mode="Markdown",
         reply_markup=payment_confirm_keyboard()
     )
-    
+
+@bot.message_handler(func=lambda m: m.text == "₿ Bitcoin")
+def deposit_btc(message):
+    bot.send_message(
+        message.chat.id,
+        """₿ *Bitcoin Deposit*
+
+Network: Bitcoin
+
+Send BTC to:
+
+`bc1q0lr6msjjnmfw73nfdttauwhju03jvhmauu4fwk`
+
+After sending, press:
+/deposit
+
+Then submit:
+
+TXID
+Amount
+
+Example:
+
+8d6e9d7d...
+0.0012
+""",
+        parse_mode="Markdown"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "Ξ Ethereum")
+def deposit_eth(message):
+    bot.send_message(
+        message.chat.id,
+        """Ξ *Ethereum Deposit*
+
+Network: ERC20
+
+Send ETH to:
+
+`0x6e4b1b38f345764b430017d7885828f3d91dcaa0`
+
+After sending, press:
+/deposit
+
+Then submit:
+
+TXID
+Amount
+
+Example:
+
+0x7bd6ab...
+0.05
+""",
+        parse_mode="Markdown"
+    )
+
 @bot.callback_query_handler(func=lambda c: c.data == "crypto_paid")
 def crypto_paid(call):
 
