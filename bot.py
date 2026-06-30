@@ -1732,6 +1732,31 @@ Our team will verify your payment shortly.""",
     )
 
 
+@bot.message_handler(commands=["deposits"])
+def deposits(message):
+
+    if message.from_user.id != ADMIN_ID:
+        return
+
+    rows = get_pending_deposits()
+
+    if not rows:
+        bot.reply_to(message, "✅ No pending deposits.")
+        return
+
+    text = "💰 Pending Deposits\n\n"
+
+    for dep_id, user, coin, txid in rows:
+        text += (
+            f"ID: {dep_id}\n"
+            f"User: {user}\n"
+            f"Coin: {coin}\n"
+            f"TXID: {txid}\n\n"
+        )
+
+    bot.send_message(message.chat.id, text)
+
+
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
 def mining_center(msg):
     user = str(msg.from_user.id)
