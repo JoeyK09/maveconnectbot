@@ -432,7 +432,8 @@ def get_pickaxe(user_id):
 
     row = cursor.fetchone()
 
-    return row[0] if row else "Wood"
+    pickaxe = row[0] if row else 1
+    return pickaxe
 
 
 def get_mining_bonus(user_id):
