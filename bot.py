@@ -1756,6 +1756,14 @@ def deposits(message):
 
     bot.send_message(message.chat.id, text)
 
+@bot.message_handler(commands=["deposit"])
+def deposit_command(message):
+    bot.send_message(
+        message.chat.id,
+        "Choose a deposit method:",
+        reply_markup=deposit_keyboard()
+    )
+
 
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
 def mining_center(msg):
