@@ -2364,12 +2364,13 @@ def buy_pickaxe(msg):
     update_pickaxe(user, balance, level)
 
     bot.reply_to(
-        msg,
-        f"🎉 {name} Pickaxe purchased!\n\n"
-        f"💰 Cost: {price:,} PLATS\n"
-        f"💎 Mining Rewards: {pickaxe['min']} - {pickaxe['max']} PLATS\n"
-        f"⏳ Cooldown: {pickaxe['cooldown']//60} mins",
-        reply_markup=shop_menu()
+       msg,
+       f"🎉 Upgrade Successful!\n\n"
+       f"⚒️ New Pickaxe: {pickaxe['name']}\n"
+       f"⭐ Mining Bonus: +{pickaxe['bonus']} PLATS\n"
+       f"⏳ Cooldown: {pickaxe['cooldown']//60} minutes\n\n"
+       f"💳 Remaining Balance: {balance:,} PLATS",
+       reply_markup=mine_menu()
     )
 
 @bot.message_handler(func=lambda m: m.text == "🔙 Back")
