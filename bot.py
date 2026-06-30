@@ -849,35 +849,54 @@ def withdrawals(message):
 
     bot.send_message(message.chat.id, text)
 
-
 def receive_txid(message):
-
     user = str(message.from_user.id)
 
-    txid = message.text.strip()
+    pending_deposit[user]["txid"] = message.text.strip()
 
-    coin = "USDT (TRC20)"   # We'll make this dynamic later
-
-    add_deposit(user, coin, txid)
-
-    bot.send_message(
-        ADMIN_ID,
-        f"""💰 New Deposit
-
-👤 User: {user}
-
-🪙 Coin: {coin}
-
-🧾 TXID:
-{txid}
-"""
+    msg = bot.reply_to(
+        message,
+        "💰 Enter the amount you sent:"
     )
+
+    bot.register_next_step_handler(msg, receive_amount)
+
+
+def receive_amount(message):
+    user = str(message.from_user.id)
+
+    try:
+        amount = float(message.text)
+    except:
+        bot.reply_to(
+            message,
+            "❌ Invalid amount."
+        )
+        return
+
+    data = pending_deposit[user]
+
+    create_deposit(
+        user,
+        data["coin"],
+        data["network"],
+        data["txid"],
+        amount
+    )
+
+    del pending_deposit[user]
 
     bot.send_message(
         message.chat.id,
-        "✅ Deposit submitted successfully.\n\nIt will be verified shortly."
-    )
+        f"""✅ Deposit submitted!
 
+Coin: {data['coin']}
+Network: {data['network']}
+Amount: {amount}
+
+Your deposit is awaiting admin approval."""
+    )
+    
 # ==================== HISTORY ================
 
 def get_history(symbol, days=60):
@@ -1271,7 +1290,7 @@ def upgrade_menu():
     )
 
     markup.row(
-        KeyboardButton("⬅️ Back")
+        KeyboardButton("🔙 Back")
     )
 
     return markup
@@ -1369,7 +1388,7 @@ def usdt_network_menu():
     )
 
     markup.row(
-        KeyboardButton("◀ Back")
+        KeyboardButton("🔙 Back")
     )
 
     return markup
@@ -1382,7 +1401,7 @@ def payment_sent_menu():
     )
 
     markup.row(
-        KeyboardButton("◀ Back")
+        KeyboardButton("🔙 Back")
     )
 
     return markup
@@ -1574,6 +1593,20 @@ def vipcount(msg):
         msg,
         f"💎 VIP Users: {len(vip_users)}"
     )
+
+
+@bot.message_handler(func=lambda m: m.text == "🔙 Back")
+def payment_back(message):
+    user = str(message.from_user.id)
+
+    pending_deposit.pop(user, None)
+
+    bot.send_message(
+        message.chat.id,
+        "💳 Wallet",
+        reply_markup=wallet_menu()
+    )
+
 
 @bot.message_handler(commands=["nettest"])
 def nettest(msg):
@@ -1863,6 +1896,23 @@ After completing the transfer, tap the button below.
     )
 
 
+@bot.message_handler(func=lambda m: m.text == "✅ I've Sent Payment")
+def sent_payment(message):
+    user = str(message.from_user.id)
+
+    if user not in pending_deposit:
+        bot.reply_to(
+            message,
+            "❌ Start a deposit first."
+        )
+        return
+
+    msg = bot.reply_to(
+        message,
+        "📄 Send your Transaction ID (TXID):"
+    )
+
+    bot.register_next_step_handler(msg, receive_txid)
 @bot.callback_query_handler(func=lambda c: c.data == "crypto_paid")
 def crypto_paid(call):
 
