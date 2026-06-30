@@ -1330,7 +1330,7 @@ def crypto_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
-        KeyboardButton("USDT (TRC20)"),
+        KeyboardButton("💵 USDT"),
         KeyboardButton("₿ Bitcoin")
     )
 
