@@ -1321,7 +1321,7 @@ def wallet_keyboard():
 
     return markup
 
-def deposit_menu():
+def deposit_keyboard():
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
@@ -1679,7 +1679,7 @@ def deposit_menu(message):
         message.chat.id,
         "💳 Deposit Funds\n\n"
         "Choose your preferred payment method:",
-        reply_markup=deposit_menu()
+        reply_markup=deposit_keyboard()
     )
 
 @bot.message_handler(func=lambda m: m.text == "⬅️ Wallet")
@@ -1957,7 +1957,7 @@ def deposit_command(message):
     bot.send_message(
         message.chat.id,
         "Choose a deposit method:",
-        reply_markup=deposit_menu()
+        reply_markup=deposit_keyboard()
     )
 
 @bot.message_handler(func=lambda m: m.text == "✅ I've Sent Payment")
