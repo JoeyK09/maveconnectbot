@@ -32,6 +32,22 @@ PICKAXES = {
 }
 
 cursor.execute("""
+CREATE TABLE IF NOT EXISTS plats(
+    user_id TEXT PRIMARY KEY,
+    balance INTEGER DEFAULT 0,
+    xp INTEGER DEFAULT 0,
+    level INTEGER DEFAULT 1,
+    pickaxe INTEGER DEFAULT 1,
+    last_daily BIGINT DEFAULT 0,
+    last_mine BIGINT DEFAULT 0,
+    wins INTEGER DEFAULT 0,
+    streak INTEGER DEFAULT 0,
+    referred_by TEXT,
+    mining_bonus INTEGER DEFAULT 0
+)
+""")
+
+cursor.execute("""
 CREATE TABLE IF NOT EXISTS favorites(
     user_id TEXT,
     coin TEXT
@@ -39,33 +55,12 @@ CREATE TABLE IF NOT EXISTS favorites(
 """)
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS withdrawals(
-    id SERIAL PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    amount INTEGER NOT NULL,
-    phone TEXT NOT NULL,
-    status TEXT DEFAULT 'Pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-""")
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS alerts (
+CREATE TABLE IF NOT EXISTS alerts(
     user_id TEXT NOT NULL,
     coin TEXT NOT NULL,
     target DOUBLE PRECISION NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
-""")
-
-cursor.execute("""
-ALTER TABLE plats
-ADD COLUMN IF NOT EXISTS pickaxe INTEGER DEFAULT 1
-""")
-
-cursor.execute("""
-ALTER TABLE plats
-ADD COLUMN IF NOT EXISTS streak INTEGER DEFAULT 0
 """)
 
 cursor.execute("""
@@ -80,8 +75,10 @@ cursor.execute("""
 CREATE TABLE IF NOT EXISTS deposits(
     id SERIAL PRIMARY KEY,
     user_id TEXT NOT NULL,
-    amount INTEGER NOT NULL,
-    method TEXT NOT NULL,
+    coin TEXT NOT NULL,
+    network TEXT NOT NULL,
+    txid TEXT NOT NULL,
+    amount DOUBLE PRECISION NOT NULL,
     status TEXT DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
@@ -103,35 +100,16 @@ CREATE TABLE IF NOT EXISTS transactions(
     id SERIAL PRIMARY KEY,
     user_id TEXT NOT NULL,
     type TEXT NOT NULL,
-    amount INTEGER NOT NULL,
+    amount DOUBLE PRECISION NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
 
-cursor.execute("""
-ALTER TABLE plats
-ADD COLUMN IF NOT EXISTS pickaxe TEXT DEFAULT 'Wood';
-""")
+
+cursor.execute("DROP TABLE IF EXISTS deposits")
 
 cursor.execute("""
-ALTER TABLE plats
-ADD COLUMN IF NOT EXISTS mining_bonus INTEGER DEFAULT 0;
-""")
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS deposits(
-    id SERIAL PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    coin TEXT NOT NULL,
-    txid TEXT NOT NULL,
-    status TEXT DEFAULT 'Pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-""")
-
-DROP TABLE deposits;
-
 CREATE TABLE deposits(
     id SERIAL PRIMARY KEY,
     user_id TEXT,
@@ -141,7 +119,8 @@ CREATE TABLE deposits(
     amount DOUBLE PRECISION,
     status TEXT DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+)
+""")
 
 conn.commit()
 
