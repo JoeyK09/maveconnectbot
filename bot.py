@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from database import get_pending_deposits
 from database import add_deposit
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -1370,6 +1371,19 @@ def usdt_network_menu():
     )
 
     return markup
+
+def payment_sent_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("📤 I've Sent Payment")
+    )
+
+    markup.row(
+        KeyboardButton("◀ Back")
+    )
+
+    return markup
     
 # ================= COMMANDS ================
 
@@ -1717,85 +1731,91 @@ Choose the network you want to use.""",
 
 @bot.message_handler(func=lambda m: m.text == "🔴 TRC20")
 def usdt_trc20(message):
+    user = str(message.from_user.id)
+
+    pending_deposit[user] = {
+        "coin": "USDT",
+        "network": "TRC20"
+    }
+
     bot.send_message(
         message.chat.id,
-        """💵 USDT (TRC20)
+        """💵 *USDT Deposit*
 
-Network: TRON (TRC20)
+Network: TRC20
 
 Send USDT to:
 
 `TCHtvSHZgSzKAg85GzJoVgxBTUUauxYGna`
 
-Minimum deposit: 5 USDT
+Minimum Deposit: 5 USDT
 
-After sending, type:
-
-/deposit
-
-Then submit:
-
-TXID
-Amount
+After completing the transfer, tap the button below.
 """,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        reply_markup=payment_sent_menu()
     )
+
 
 @bot.message_handler(func=lambda m: m.text == "🔵 ERC20")
 def usdt_erc20(message):
+    user = str(message.from_user.id)
+
+    pending_deposit[user] = {
+        "coin": "USDT",
+        "network": "ERC20"
+    }
+
     bot.send_message(
         message.chat.id,
-        """💵 USDT (ERC20)
+        """💵 *USDT Deposit*
 
-Network: Ethereum (ERC20)
+Network: ERC20
 
 Send USDT to:
 
 `0x6E4B1b38f345764B430017D7885828f3d91DcaA0`
 
-Minimum deposit: 5 USDT
+Minimum Deposit: 5 USDT
 
-After sending, type:
-
-/deposit
-
-Then submit:
-
-TXID
-Amount
+After completing the transfer, tap the button below.
 """,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        reply_markup=payment_sent_menu()
     )
+
 
 @bot.message_handler(func=lambda m: m.text == "🟡 BEP20")
 def usdt_bep20(message):
+    user = str(message.from_user.id)
+
+    pending_deposit[user] = {
+        "coin": "USDT",
+        "network": "BEP20"
+    }
+
     bot.send_message(
         message.chat.id,
-        """💵 USDT (BEP20)
+        """💵 *USDT Deposit*
 
-Network: BNB Smart Chain (BEP20)
+Network: BEP20
 
 Send USDT to:
 
 `0x6E4B1b38f345764B430017D7885828f3d91DcaA0`
 
-Minimum deposit: 5 USDT
+Minimum Deposit: 5 USDT
 
-After sending, type:
-
-/deposit
-
-Then submit:
-
-TXID
-Amount
+After completing the transfer, tap the button below.
 """,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        reply_markup=payment_sent_menu()
     )
 
 
 @bot.message_handler(func=lambda m: m.text == "₿ Bitcoin")
 def deposit_btc(message):
+
     bot.send_message(
         message.chat.id,
         """₿ *Bitcoin Deposit*
@@ -1806,25 +1826,22 @@ Send BTC to:
 
 `bc1q0lr6msjjnmfw73nfdttauwhju03jvhmauu4fwk`
 
-After sending, press:
-/deposit
-
-Then submit:
-
-TXID
-Amount
-
-Example:
-
-8d6e9d7d...
-0.0012
+After completing the transfer, tap the button below.
 """,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        reply_markup=payment_sent_menu()
     )
 
 
 @bot.message_handler(func=lambda m: m.text == "Ξ Ethereum")
 def deposit_eth(message):
+    user = str(message.from_user.id)
+
+    pending_deposit[user] = {
+        "coin": "ETH",
+        "network": "ERC20"
+    }
+
     bot.send_message(
         message.chat.id,
         """Ξ *Ethereum Deposit*
@@ -1835,21 +1852,14 @@ Send ETH to:
 
 `0x6e4b1b38f345764b430017d7885828f3d91dcaa0`
 
-After sending, press:
-/deposit
+Minimum Deposit: 0.001 ETH
 
-Then submit:
-
-TXID
-Amount
-
-Example:
-
-0x7bd6ab...
-0.05
+After completing the transfer, tap the button below.
 """,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        reply_markup=payment_sent_menu()
     )
+
 
 @bot.callback_query_handler(func=lambda c: c.data == "crypto_paid")
 def crypto_paid(call):
