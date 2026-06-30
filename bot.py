@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from database import get_pending_deposits
 from database import add_deposit
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
