@@ -219,13 +219,13 @@ PICKAXES = {
     }
 }
 
-PICKAXE_BUTTONS = [
-    "🪨 Stone Pickaxe",
-    "🥉 Bronze Pickaxe",
-    "🥈 Iron Pickaxe",
-    "🥇 Gold Pickaxe",
-    "💎 Diamond Pickaxe"
-]
+PICKAXE_BUTTONS = {
+    "🪨 Stone Pickaxe": 2,
+    "🥉 Bronze Pickaxe": 3,
+    "⛓ Iron Pickaxe": 4,
+    "🥇 Gold Pickaxe": 5,
+    "💎 Diamond Pickaxe": 6,
+}
 
 @bot.message_handler(func=lambda m: m.text in PICKAXE_BUTTONS)
 def buy_pickaxe(msg):
