@@ -1303,7 +1303,7 @@ def deposit_keyboard():
 
     markup.row(
         KeyboardButton("📱 M-Pesa"),
-        KeyboardButton("🪙 USDT")
+        KeyboardButton("🪙 Crypto")
     )
 
     markup.row(
@@ -1317,7 +1317,7 @@ def withdraw_menu():
 
     markup.row(
         KeyboardButton("📱 M-Pesa"),
-        KeyboardButton("💎 Crypto")
+        KeyboardButton("🪙 Crypto")
     )
 
     markup.row(
@@ -1669,12 +1669,12 @@ Send the amount you want to withdraw."""
     )
 
 
-@bot.message_handler(func=lambda m: m.text == "💎 Crypto")
+@bot.message_handler(func=lambda m: m.text == "🪙 Crypto")
 def crypto_deposit(message):
 
     bot.send_message(
         message.chat.id,
-        """💎 Crypto Deposit
+        """🪙 Crypto Deposit
 
 Choose a cryptocurrency:
 
