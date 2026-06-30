@@ -182,6 +182,8 @@ user_withdraw_amount = {}
 ADMIN_ID = 6384391560
 pending_deposit = {}
 pending_withdrawal = {}
+BINANCE_REFERRAL = "https://www.binance.com/activity/referral-entry/CPA?ref=CPA_005LWI9SEA"
+OKX_REFERRAL = "https://okx.com/join/60241030"
 
 # ============== PICKAXE PRICES ================
 
@@ -676,7 +678,7 @@ def calculate_trend(df):
 
     return "Bearish"
 
-# ==================== MPESA =================
+# ===================== MPESA =================
 
 def get_mpesa_amount(message):
     if not message.text.isdigit():
@@ -977,6 +979,10 @@ def main_menu():
         KeyboardButton("⚙️ Settings")
     )
 
+    markup.row(
+        KeyboardButton("🤝 Partners")
+    )
+    
     return markup
 
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
@@ -1405,6 +1411,24 @@ def payment_sent_menu():
     markup.row(
         KeyboardButton("🔙 Back")
     )
+
+    return markup
+
+
+def partners_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("🟡 Binance"),
+        KeyboardButton("⚫ OKX")
+    )
+
+    markup.row(
+        KeyboardButton("💎 VIP Channel"),
+        KeyboardButton("📢 Telegram Channel")
+    )
+
+    markup.row(KeyboardButton("🔙 Back"))
 
     return markup
     
@@ -2041,6 +2065,121 @@ def deposits(message):
     )
 
     bot.send_message(message.chat.id, text)
+
+
+@bot.message_handler(func=lambda m: m.text == "🤝 Partners")
+def partners(message):
+
+    bot.send_message(
+        message.chat.id,
+        """
+🤝 *Official MaveConnect Partners*
+
+Support MaveConnect while enjoying exclusive offers from our trusted partners.
+
+Choose an option below.
+        """,
+        parse_mode="Markdown",
+        reply_markup=partners_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🟡 Binance")
+def binance(message):
+
+    bot.send_message(
+        message.chat.id,
+        f"""
+🟡 *Binance Official Partner*
+
+Join Binance using our referral link.
+
+🎁 Benefits
+
+✅ Welcome rewards
+✅ Spot & Futures Trading
+✅ Binance Earn
+✅ Low trading fees
+✅ Launchpool & Launchpad
+
+🔗 {BINANCE_REFERRAL}
+
+Thank you for supporting MaveConnect ❤️
+        """,
+        parse_mode="Markdown"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "⚫ OKX")
+def okx(message):
+
+    bot.send_message(
+        message.chat.id,
+        f"""
+⚫ *OKX Official Partner*
+
+Trade confidently on one of the world's leading crypto exchanges.
+
+🎁 Benefits
+
+✅ Welcome rewards
+✅ Spot & Futures Trading
+✅ Earn products
+✅ Low trading fees
+✅ Advanced trading tools
+
+🔗 {OKX_REFERRAL}
+
+Thank you for supporting MaveConnect ❤️
+        """,
+        parse_mode="Markdown"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "💎 VIP Channel")
+def vip_channel(message):
+
+    bot.send_message(
+        message.chat.id,
+        f"""
+💎 *MaveConnect VIP*
+
+Unlock premium benefits.
+
+⭐ Premium support
+⭐ Early feature access
+⭐ Exclusive rewards
+⭐ VIP announcements
+
+🔗 {VIP_GROUP}
+        """,
+        parse_mode="Markdown"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "📢 Telegram Channel")
+def telegram_channel(message):
+
+    bot.send_message(
+        message.chat.id,
+        f"""
+📢 *Official MaveConnect Channel*
+
+Stay updated with:
+
+📈 Crypto news
+🎉 Giveaways
+🚀 New features
+📢 Important announcements
+
+🔗 {FREE_GROUP}
+        """,
+        parse_mode="Markdown"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "🔙 Back")
+def back(message):
+    main_menu(message)
 
 
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine Now")
