@@ -130,6 +130,19 @@ CREATE TABLE IF NOT EXISTS deposits(
 )
 """)
 
+DROP TABLE deposits;
+
+CREATE TABLE deposits(
+    id SERIAL PRIMARY KEY,
+    user_id TEXT,
+    coin TEXT,
+    network TEXT,
+    txid TEXT,
+    amount DOUBLE PRECISION,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 conn.commit()
 
 # ================= FUNCTIONS =================
