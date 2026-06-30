@@ -1987,7 +1987,7 @@ def payment_back(message):
     bot.send_message(
         message.chat.id,
         "💳 Mave Wallet",
-        reply_markup=wallet_menu()
+        reply_markup=wallet_keyboard()
     )
     
 @bot.message_handler(func=lambda m: m.text == "⛏️ Mine")
