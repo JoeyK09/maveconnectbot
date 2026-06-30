@@ -455,25 +455,6 @@ def get_mining_bonus(user):
     return PICKAXES[pickaxe]["bonus"]
 
 
-def upgrade_pickaxe(user_id, pickaxe, bonus):
-    get_profile(user_id)
-
-    cursor.execute("""
-        UPDATE plats
-        SET pickaxe=%s,
-            mining_bonus=%s
-        WHERE user_id=%s
-    """, (
-        pickaxe,
-        bonus,
-        user_id
-    ))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-
 def create_deposit(user_id, coin, network, txid, amount):
     conn = get_connection()
     cursor = conn.cursor()
