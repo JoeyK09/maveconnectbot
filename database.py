@@ -127,17 +127,18 @@ CREATE TABLE deposits(
 )
 """)
 
+cursor.execute("""
 CREATE TABLE IF NOT EXISTS crypto_withdrawals(
     id SERIAL PRIMARY KEY,
-    user_id TEXT,
-    coin TEXT,
-    network TEXT,
-    address TEXT,
-    amount DOUBLE PRECISION,
+    user_id TEXT NOT NULL,
+    coin TEXT NOT NULL,
+    network TEXT NOT NULL,
+    address TEXT NOT NULL,
+    amount DOUBLE PRECISION NOT NULL,
     status TEXT DEFAULT 'Pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
+)
+""")
 
 conn.commit()
 
