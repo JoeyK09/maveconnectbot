@@ -1563,7 +1563,7 @@ def crypto_withdraw_menu():
     )
 
     markup.row(
-        KeyboardButton("₮ USDT TRC20"),
+        KeyboardButton("🔴 USDT TRC20"),
         KeyboardButton("🟡 USDT BEP20")
     )
 
@@ -1961,7 +1961,7 @@ Choose the network you want to use.""",
         reply_markup=usdt_network_menu()
     )
 
-@bot.message_handler(func=lambda m: m.text == "💎 Crypto")
+@bot.message_handler(func=lambda m: m.text == "🪙 Crypto")
 def crypto_withdraw(message):
 
     bot.send_message(
