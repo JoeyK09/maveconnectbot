@@ -127,6 +127,18 @@ CREATE TABLE deposits(
 )
 """)
 
+CREATE TABLE IF NOT EXISTS crypto_withdrawals(
+    id SERIAL PRIMARY KEY,
+    user_id TEXT,
+    coin TEXT,
+    network TEXT,
+    address TEXT,
+    amount DOUBLE PRECISION,
+    status TEXT DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 conn.commit()
 
 # ================= FUNCTIONS =================
@@ -620,6 +632,29 @@ def add_transaction(user_id, tx_type, amount, description):
     ))
 
     conn.commit()
+    cursor.close()
+    conn.close()
+
+
+def add_crypto_withdrawal(user_id, coin, network, address, amount):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO crypto_withdrawals
+        (user_id, coin, network, address, amount)
+        VALUES (%s,%s,%s,%s,%s)
+    """, (
+        user_id,
+        coin,
+        network,
+        address,
+        amount
+    ))
+
+    conn.commit()
+
     cursor.close()
     conn.close()
 
