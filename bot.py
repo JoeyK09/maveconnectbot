@@ -906,14 +906,14 @@ def receive_amount(message):
     ok, reason = verify_trc20_tx(
     data["txid"],
     amount
-)
-
-if not ok:
-    bot.send_message(
-        message.chat.id,
-        f"❌ {reason}"
     )
-    return
+
+    if not ok:
+        bot.send_message(
+           message.chat.id,
+           f"❌ {reason}"
+        )
+        return
 
 create_deposit(
     user,
