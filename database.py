@@ -48,6 +48,26 @@ CREATE TABLE IF NOT EXISTS plats(
 """)
 
 cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS vip BOOLEAN DEFAULT FALSE
+""")
+
+cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS vip_plan TEXT DEFAULT 'Free'
+""")
+
+cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS vip_start TIMESTAMP
+""")
+
+cursor.execute("""
+ALTER TABLE plats
+ADD COLUMN IF NOT EXISTS vip_expiry TIMESTAMP
+""")
+
+cursor.execute("""
 ALTER TABLE deposits
 ADD COLUMN IF NOT EXISTS approved_at TIMESTAMP
 """)
@@ -135,6 +155,19 @@ CREATE TABLE IF NOT EXISTS crypto_withdrawals(
     network TEXT NOT NULL,
     address TEXT NOT NULL,
     amount DOUBLE PRECISION NOT NULL,
+    status TEXT DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS vip_payments(
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    plan TEXT NOT NULL,
+    amount DOUBLE PRECISION NOT NULL,
+    method TEXT NOT NULL,
+    reference TEXT,
     status TEXT DEFAULT 'Pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
@@ -658,4 +691,34 @@ def add_crypto_withdrawal(user_id, coin, network, address, amount):
 
     cursor.close()
     conn.close()
+
+
+def is_vip(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT vip, vip_expiry
+        FROM plats
+        WHERE user_id=%s
+    """, (user_id,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        return False
+
+    vip, expiry = row
+
+    if not vip:
+        return False
+
+    if expiry and expiry < datetime.now():
+        remove_vip(user_id)
+        return False
+
+    return True
 
