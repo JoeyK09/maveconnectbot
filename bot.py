@@ -45,6 +45,41 @@ from database import (
 from database import create_deposit
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import telebot
+import os
+import requests
+
+# ========= TRONGRID API KEY ===========
+
+TRONGRID_API_KEY = os.getenv("TRONGRID_API_KEY")
+
+USDT_TRC20_ADDRESS = "TCHtvSHZgSzKAg85GzJoVgxBTUUauxYGna"
+USDT_TRC20_CONTRACT = "TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj"
+
+def verify_trc20_tx(txid, expected_amount):
+    headers = {
+        "TRON-PRO-API-KEY": TRONGRID_API_KEY
+    }
+
+    url = f"https://api.trongrid.io/v1/transactions/{txid}"
+
+    r = requests.get(url, headers=headers, timeout=15)
+
+    if r.status_code != 200:
+        return False, "Transaction not found."
+
+    data = r.json()
+
+    if not data.get("data"):
+        return False, "Invalid TXID."
+
+    # We'll expand this in the next step to:
+    # ✓ Verify recipient address
+    # ✓ Verify amount
+    # ✓ Verify token (USDT)
+    # ✓ Verify confirmations
+
+    return True, "Transaction exists."
+
 
 # ================= BOT =================
 
