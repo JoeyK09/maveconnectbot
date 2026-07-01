@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from database import update_deposit_status
 from database import txid_exists
 from database import get_pending_deposits
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
