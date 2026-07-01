@@ -2675,7 +2675,7 @@ Choose your payment method.
 """,
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
-        reply_markup=markup
+        reply_markup=vip_plan_inline()
     )
 
 @bot.message_handler(func=lambda m: m.text == "🎁 VIP Benefits")
