@@ -1910,7 +1910,7 @@ def withdraw(message):
 
     bot.send_message(
         message.chat.id,
-        """💸 Withdraw
+        """➖ Withdraw
 
 Choose your withdrawal method.""",
         reply_markup=withdraw_menu()
@@ -1934,7 +1934,7 @@ Send the amount you want to withdraw."""
     )
 
 
-@bot.message_handler(func=lambda m: m.text == "🪙 Crypto")
+@bot.message_handler(func=lambda m: m.text == "🪙 Crypto Deposit")
 def crypto_deposit(message):
 
     bot.send_message(
@@ -1962,7 +1962,7 @@ Choose the network you want to use.""",
         reply_markup=usdt_network_menu()
     )
 
-@bot.message_handler(func=lambda m: m.text == "🪙 Crypto")
+@bot.message_handler(func=lambda m: m.text == "💵 Crypto Withdraw")
 def crypto_withdraw(message):
 
     bot.send_message(
