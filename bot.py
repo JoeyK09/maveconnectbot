@@ -226,6 +226,14 @@ DASHBOARD_BUTTONS = [
     "🏠 Home"
 ]
 
+CRYPTOS = {
+‎    "₿ Bitcoin": ("BTC", "Bitcoin"),
+‎    "Ξ Ethereum": ("ETH", "ERC20"),
+‎    "₮ USDT TRC20": ("USDT", "TRC20"),
+‎    "🟡 USDT BEP20": ("USDT", "BEP20"),
+‎    "🔵 USDT ERC20": ("USDT", "ERC20"),
+‎}
+
 # ================= CACHE =================
 
 price_cache = {}
@@ -243,6 +251,7 @@ pending_deposit = {}
 pending_withdrawal = {}
 BINANCE_REFERRAL = "https://www.binance.com/activity/referral-entry/CPA?ref=CPA_005LWI9SEA"
 OKX_REFERRAL = "https://okx.com/join/60241030"
+pending_crypto_withdraw = {}
 
 # ============== PICKAXE PRICES ================
 
@@ -835,6 +844,13 @@ def process_mpesa_number(message):
 
     add_withdrawal(user, amount, phone)
 
+    add_transaction(
+    user,
+    "Withdrawal",
+    amount,
+    "M-Pesa withdrawal"
+    )
+
     bot.send_message(
     ADMIN_ID,
     f"""💸 New Withdrawal Request
@@ -943,6 +959,69 @@ def receive_amount(message):
 Thank you for using MaveConnect!"""
     )
     
+def receive_crypto_address(message):
+
+    user = str(message.from_user.id)
+
+    pending_crypto_withdraw[user]["address"] = message.text.strip()
+
+    bot.send_message(
+        message.chat.id,
+        "Enter the amount you want to withdraw."
+    )
+
+    bot.register_next_step_handler(
+        message,
+        receive_crypto_amount
+    )
+
+def receive_crypto_amount(message):
+
+    user = str(message.from_user.id)
+
+    try:
+        amount = float(message.text)
+    except:
+        bot.reply_to(message, "❌ Invalid amount.")
+        return
+
+    balance = get_balance(user)
+
+    if amount < 10:
+        bot.reply_to(message, "Minimum withdrawal is 10 Plats.")
+        return
+
+    if balance < amount:
+        bot.reply_to(message, "❌ Insufficient balance.")
+        return
+
+    pending_crypto_withdraw[user]["amount"] = amount
+
+    data = pending_crypto_withdraw[user]
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.row(
+        KeyboardButton("✅ Confirm Withdrawal"),
+        KeyboardButton("❌ Cancel")
+    )
+
+    bot.send_message(
+        message.chat.id,
+        f"""Confirm Withdrawal
+
+Coin: {data['coin']}
+
+Network: {data['network']}
+
+Address:
+{data['address']}
+
+Amount:
+{amount}
+
+Press Confirm to continue.""",
+        reply_markup=markup
+    )
     
 # ==================== HISTORY ================
 
@@ -1474,6 +1553,29 @@ def partners_menu():
     markup.row(KeyboardButton("🔙 Back"))
 
     return markup
+
+def crypto_withdraw_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row(
+        KeyboardButton("₿ Bitcoin"),
+        KeyboardButton("Ξ Ethereum")
+    )
+
+    markup.row(
+        KeyboardButton("₮ USDT TRC20"),
+        KeyboardButton("🟡 USDT BEP20")
+    )
+
+    markup.row(
+        KeyboardButton("🔵 USDT ERC20")
+    )
+
+    markup.row(
+        KeyboardButton("⬅️ Back")
+    )
+
+    return markup
     
 # ================= COMMANDS ================
 
@@ -1739,6 +1841,45 @@ Choose an option below.""",
         parse_mode="Markdown"
     )
 
+@bot.message_handler(func=lambda m: m.text == "📜 History")
+def history(message):
+    user = str(message.from_user.id)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT type, amount, description, created_at
+        FROM transactions
+        WHERE user_id=%s
+        ORDER BY created_at DESC
+        LIMIT 10
+    """, (user,))
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    if not rows:
+        bot.reply_to(message, "📭 No transactions yet.")
+        return
+
+    text = "📜 *Recent Transactions*\n\n"
+
+    for t in rows:
+        text += (
+            f"• {t[0]}\n"
+            f"💰 {t[1]}\n"
+            f"📝 {t[2]}\n"
+            f"📅 {t[3].strftime('%d %b %Y %H:%M')}\n\n"
+        )
+
+    bot.send_message(
+        message.chat.id,
+        text,
+        parse_mode="Markdown"
+    )
 
 @bot.message_handler(func=lambda m: m.text == "➕ Deposit")
 def deposit_menu(message):
@@ -1820,6 +1961,15 @@ Choose the network you want to use.""",
         reply_markup=usdt_network_menu()
     )
 
+@bot.message_handler(func=lambda m: m.text == "💎 Crypto")
+def crypto_withdraw(message):
+
+    bot.send_message(
+        message.chat.id,
+        "Select the cryptocurrency you want to withdraw.",
+        reply_markup=crypto_withdraw_menu()
+    )
+    
 @bot.message_handler(func=lambda m: m.text == "🔴 TRC20")
 def usdt_trc20(message):
     user = str(message.from_user.id)
@@ -1995,7 +2145,89 @@ Our team will verify your payment shortly.""",
         receive_txid
     )
 
+‎@bot.message_handler(func=lambda m: m.text in CRYPTOS)
+‎def crypto_wallet(message):
+‎
+‎    user = str(message.from_user.id)
+‎
+‎    coin, network = CRYPTOS[message.text]
+‎
+‎    pending_crypto_withdraw[user] = {
+‎        "coin": coin,
+‎        "network": network
+‎    }
+‎
+‎    bot.send_message(
+‎        message.chat.id,
+‎        f"Send your {coin} ({network}) wallet address."
+‎    )
+‎
+‎    bot.register_next_step_handler(
+‎        message,
+‎        receive_crypto_address
+‎    )
 
+@bot.message_handler(func=lambda m: m.text == "✅ Confirm Withdrawal")
+def confirm_crypto_withdraw(message):
+
+    user = str(message.from_user.id)
+
+    if user not in pending_crypto_withdraw:
+        return
+
+    data = pending_crypto_withdraw[user]
+
+    add_transaction(
+        user,
+        "Withdrawal",
+        data["amount"],
+        f"{data['coin']} ({data['network']})"
+    )
+
+    add_crypto_withdrawal(
+        user,
+        data["coin"],
+        data["network"],
+        data["address"],
+        data["amount"]
+    )
+
+    bot.send_message(
+        ADMIN_ID,
+        f"""💸 Crypto Withdrawal
+
+User: {user}
+
+Coin: {data['coin']}
+
+Network: {data['network']}
+
+Amount: {data['amount']}
+
+Address:
+{data['address']}"""
+    )
+
+    bot.send_message(
+        message.chat.id,
+        "✅ Your withdrawal request has been submitted and is awaiting approval."
+    )
+
+    del pending_crypto_withdraw[user]
+
+@bot.message_handler(func=lambda m: m.text == "❌ Cancel")
+def cancel_crypto_withdraw(message):
+
+    user = str(message.from_user.id)
+
+    pending_crypto_withdraw.pop(user, None)
+
+    bot.send_message(
+        message.chat.id,
+        "❌ Withdrawal cancelled.",
+        reply_markup=wallet_menu()
+    )
+    
 @bot.message_handler(commands=["deposits"])
 def deposits(message):
 
@@ -2282,6 +2514,13 @@ def do_mine(msg):
         now
     )
 
+    add_transaction(
+    user,
+    "Mining",
+    reward,
+    "Mining reward"
+    )
+    
     if balance >= 1000 and not has_achievement(user, "First 1000"):
         unlock_achievement(user, "First 1000")
         bot.send_message(
