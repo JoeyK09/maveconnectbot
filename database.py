@@ -48,6 +48,11 @@ CREATE TABLE IF NOT EXISTS plats(
 """)
 
 cursor.execute("""
+ALTER TABLE deposits
+ADD COLUMN IF NOT EXISTS approved_at TIMESTAMP
+""")
+
+cursor.execute("""
 CREATE TABLE IF NOT EXISTS favorites(
     user_id TEXT,
     coin TEXT
@@ -589,8 +594,9 @@ def update_deposit_status(txid, status):
 
     cursor.execute("""
         UPDATE deposits
-        SET status = %s
-        WHERE txid = %s
+        SET status=%s,
+            approved_at=CURRENT_TIMESTAMP
+        WHERE txid=%s
     """, (status, txid))
 
     conn.commit()
