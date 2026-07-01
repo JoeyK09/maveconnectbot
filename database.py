@@ -573,6 +573,7 @@ def txid_exists(txid):
         SELECT 1
         FROM deposits
         WHERE txid = %s
+        LIMIT 1
     """, (txid,))
 
     exists = cursor.fetchone() is not None
