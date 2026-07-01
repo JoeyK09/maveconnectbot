@@ -886,6 +886,18 @@ def receive_amount(message):
 
     data = pending_deposit[user]
 
+    ok, reason = verify_trc20_tx(
+       data["txid"],
+       amount
+    )
+
+    if not ok:
+        bot.reply_to(
+        message,
+        f"❌ Deposit rejected.\n\n{reason}"
+    )
+    return
+    
     create_deposit(
         user,
         data["coin"],
