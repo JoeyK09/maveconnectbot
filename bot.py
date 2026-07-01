@@ -895,52 +895,46 @@ def receive_amount(message):
     try:
         amount = float(message.text)
     except:
-        bot.reply_to(
-            message,
-            "❌ Invalid amount."
-        )
+        bot.reply_to(message, "❌ Invalid amount.")
         return
 
     data = pending_deposit[user]
 
-    ok, reason = verify_trc20_tx(
-    data["txid"],
-    amount
-    )
-
-    if not ok:
-        bot.send_message(
-           message.chat.id,
-           f"❌ {reason}"
-        )
+    # Check duplicate TXID
+    if txid_exists(data["txid"]):
+        bot.reply_to(message, "❌ This transaction has already been used.")
         return
 
-create_deposit(
-    user,
-    data["coin"],
-    data["network"],
-    data["txid"],
-    amount
-)
+    # Verify on blockchain
+    ok, reason = verify_trc20_tx(data["txid"], amount)
 
-bot.send_message(
-    ADMIN_ID,
-    f"""💰 New Verified Deposit
+    if not ok:
+        bot.reply_to(message, f"❌ {reason}")
+        return
 
-👤 User: {user}
+    # Save deposit record
+    create_deposit(
+        user,
+        data["coin"],
+        data["network"],
+        data["txid"],
+        amount
+    )
 
-🪙 Coin: {data['coin']}
+    # 👇 PLACE THESE LINES HERE
+    credit_balance(user, amount)
+    update_deposit_status(data["txid"], "Approved")
 
-🌐 Network: {data['network']}
+    del pending_deposit[user]
 
-💵 Amount: {amount}
+    bot.send_message(
+        message.chat.id,
+        f"""🎉 Deposit Successful!
 
-🧾 TXID:
-{data['txid']}
+✅ {amount} USDT has been credited to your wallet.
 
-Status: Waiting Approval
-"""
-)
+Thank you for using MaveConnect!"""
+    )
     
     
 # ==================== HISTORY ================
