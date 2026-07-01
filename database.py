@@ -722,3 +722,94 @@ def is_vip(user_id):
 
     return True
 
+
+def activate_vip(user_id, plan, expiry):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE plats
+        SET
+            vip=TRUE,
+            vip_plan=%s,
+            vip_start=NOW(),
+            vip_expiry=%s
+        WHERE user_id=%s
+    """, (
+        plan,
+        expiry,
+        user_id
+    ))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
+def remove_vip(user_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE plats
+        SET
+            vip=FALSE,
+            vip_plan='Free',
+            vip_start=NULL,
+            vip_expiry=NULL
+        WHERE user_id=%s
+    """, (user_id,))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
+def get_vip_info(user_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT vip,
+               vip_plan,
+               vip_start,
+               vip_expiry
+        FROM plats
+        WHERE user_id=%s
+    """, (user_id,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return row
+
+
+def save_vip_payment(user_id, plan, amount, method, reference):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO vip_payments
+        (user_id, plan, amount, method, reference)
+        VALUES(%s,%s,%s,%s,%s)
+    """, (
+        user_id,
+        plan,
+        amount,
+        method,
+        reference
+    ))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
