@@ -2057,7 +2057,136 @@ After completing the transfer, tap the button below.
         reply_markup=payment_sent_menu()
     )
 
+@bot.message_handler(func=lambda m: m.text == "Ξ Ethereum")
+def withdraw_eth(message):
 
+    user = str(message.from_user.id)
+
+    pending_crypto_withdraw[user] = {
+        "coin": "ETH",
+        "network": "ERC20"
+    }
+
+    bot.send_message(
+        message.chat.id,
+        """Ξ Ethereum Withdrawal
+
+Send your Ethereum wallet address.
+
+Example:
+
+0x1234567890abcdef1234567890abcdef12345678"""
+    )
+
+    bot.register_next_step_handler(
+        message,
+        receive_crypto_address
+    )
+    
+@bot.message_handler(func=lambda m: m.text == "₿ Bitcoin")
+def withdraw_btc(message):
+
+    user = str(message.from_user.id)
+
+    pending_crypto_withdraw[user] = {
+        "coin": "BTC",
+        "network": "Bitcoin"
+    }
+
+    bot.send_message(
+        message.chat.id,
+        """₿ Bitcoin Withdrawal
+
+Send your Bitcoin wallet address.
+
+Example:
+
+bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxx"""
+    )
+
+    bot.register_next_step_handler(
+        message,
+        receive_crypto_address
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🔴 USDT TRC20")
+def withdraw_usdt_trc20(message):
+
+    user = str(message.from_user.id)
+
+    pending_crypto_withdraw[user] = {
+        "coin": "USDT",
+        "network": "TRC20"
+    }
+
+    bot.send_message(
+        message.chat.id,
+        """🔴 USDT (TRC20) Withdrawal
+
+Send your TRC20 wallet address.
+
+Example:
+
+TJzxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"""
+    )
+
+    bot.register_next_step_handler(
+        message,
+        receive_crypto_address
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🟡 USDT BEP20")
+def withdraw_usdt_bep20(message):
+
+    user = str(message.from_user.id)
+
+    pending_crypto_withdraw[user] = {
+        "coin": "USDT",
+        "network": "BEP20"
+    }
+
+    bot.send_message(
+        message.chat.id,
+        """🟡 USDT (BEP20) Withdrawal
+
+Send your BEP20 wallet address.
+
+Example:
+
+0x1234567890abcdef1234567890abcdef12345678"""
+    )
+
+    bot.register_next_step_handler(
+        message,
+        receive_crypto_address
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🔵 USDT ERC20")
+def withdraw_usdt_erc20(message):
+
+    user = str(message.from_user.id)
+
+    pending_crypto_withdraw[user] = {
+        "coin": "USDT",
+        "network": "ERC20"
+    }
+
+    bot.send_message(
+        message.chat.id,
+        """🔵 USDT (ERC20) Withdrawal
+
+Send your ERC20 wallet address.
+
+Example:
+
+0x1234567890abcdef1234567890abcdef12345678"""
+    )
+
+    bot.register_next_step_handler(
+        message,
+        receive_crypto_address
+    )
+    
 @bot.message_handler(func=lambda m: m.text == "₿ Bitcoin")
 def deposit_btc(message):
 
