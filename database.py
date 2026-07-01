@@ -603,3 +603,23 @@ def update_deposit_status(txid, status):
     cursor.close()
     conn.close()
 
+
+def add_transaction(user_id, tx_type, amount, description):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO transactions
+        (user_id, type, amount, description)
+        VALUES (%s, %s, %s, %s)
+    """, (
+        user_id,
+        tx_type,
+        amount,
+        description
+    ))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
