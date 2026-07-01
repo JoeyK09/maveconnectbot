@@ -84,8 +84,13 @@ def verify_trc20_tx(txid, expected_amount):
         to_address = result.get("to")
 
         if to_address != USDT_TRC20_ADDRESS:
-            continue
+           return False, "❌ This transaction was not sent to the MaveConnect wallet."
 
+        confirmations = tx.get("confirmations", 0)
+
+        if confirmations < 20:
+            return False, f"⏳ Waiting for confirmations ({confirmations}/20)."
+    
         try:
             amount = float(result.get("value")) / 1_000_000
         except:
