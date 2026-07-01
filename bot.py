@@ -60,25 +60,42 @@ def verify_trc20_tx(txid, expected_amount):
         "TRON-PRO-API-KEY": TRONGRID_API_KEY
     }
 
-    url = f"https://api.trongrid.io/v1/transactions/{txid}"
+    url = f"https://api.trongrid.io/v1/transactions/{txid}/events"
 
-    r = requests.get(url, headers=headers, timeout=15)
+    r = requests.get(url, headers=headers, timeout=20)
 
     if r.status_code != 200:
+        return False, "Unable to verify transaction."
+
+    data = r.json().get("data", [])
+
+    if not data:
         return False, "Transaction not found."
 
-    data = r.json()
+    for event in data:
 
-    if not data.get("data"):
-        return False, "Invalid TXID."
+        # Must be a Transfer event
+        if event.get("event_name") != "Transfer":
+            continue
 
-    # We'll expand this in the next step to:
-    # ✓ Verify recipient address
-    # ✓ Verify amount
-    # ✓ Verify token (USDT)
-    # ✓ Verify confirmations
+        result = event.get("result", {})
 
-    return True, "Transaction exists."
+        to_address = result.get("to")
+
+        if to_address != USDT_TRC20_ADDRESS:
+            continue
+
+        try:
+            amount = float(result.get("value")) / 1_000_000
+        except:
+            continue
+
+        if abs(amount - expected_amount) > 0.000001:
+            return False, f"Amount mismatch.\nExpected {expected_amount} USDT\nReceived {amount} USDT"
+
+        return True, "Verified"
+
+    return False, "No valid USDT transfer to your wallet."
 
 
 # ================= BOT =================
@@ -887,37 +904,44 @@ def receive_amount(message):
     data = pending_deposit[user]
 
     ok, reason = verify_trc20_tx(
-       data["txid"],
-       amount
-    )
+    data["txid"],
+    amount
+)
 
-    if not ok:
-        bot.reply_to(
-        message,
-        f"❌ Deposit rejected.\n\n{reason}"
-    )
-    return
-    
-    create_deposit(
-        user,
-        data["coin"],
-        data["network"],
-        data["txid"],
-        amount
-    )
-
-    del pending_deposit[user]
-
+if not ok:
     bot.send_message(
         message.chat.id,
-        f"""✅ Deposit submitted!
-
-Coin: {data['coin']}
-Network: {data['network']}
-Amount: {amount}
-
-Your deposit is awaiting admin approval."""
+        f"❌ {reason}"
     )
+    return
+
+create_deposit(
+    user,
+    data["coin"],
+    data["network"],
+    data["txid"],
+    amount
+)
+
+bot.send_message(
+    ADMIN_ID,
+    f"""💰 New Verified Deposit
+
+👤 User: {user}
+
+🪙 Coin: {data['coin']}
+
+🌐 Network: {data['network']}
+
+💵 Amount: {amount}
+
+🧾 TXID:
+{data['txid']}
+
+Status: Waiting Approval
+"""
+)
+    
     
 # ==================== HISTORY ================
 
