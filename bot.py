@@ -2145,27 +2145,27 @@ Our team will verify your payment shortly.""",
         receive_txid
     )
 
-‎@bot.message_handler(func=lambda m: m.text in CRYPTOS)
-‎def crypto_wallet(message):
-‎
-‎    user = str(message.from_user.id)
-‎
-‎    coin, network = CRYPTOS[message.text]
-‎
-‎    pending_crypto_withdraw[user] = {
-‎        "coin": coin,
-‎        "network": network
-‎    }
-‎
-‎    bot.send_message(
-‎        message.chat.id,
-‎        f"Send your {coin} ({network}) wallet address."
-‎    )
-‎
-‎    bot.register_next_step_handler(
-‎        message,
-‎        receive_crypto_address
-‎    )
+@bot.message_handler(func=lambda m: m.text in CRYPTOS)
+def crypto_wallet(message):
+
+    user = str(message.from_user.id)
+
+    coin, network = CRYPTOS[message.text]
+
+    pending_crypto_withdraw[user] = {
+        "coin": coin,
+        "network": network
+    }
+
+    bot.send_message(
+        message.chat.id,
+        f"Send your {coin} ({network}) wallet address."
+    )
+
+    bot.register_next_step_handler(
+        message,
+        receive_crypto_address
+    )
 
 @bot.message_handler(func=lambda m: m.text == "✅ Confirm Withdrawal")
 def confirm_crypto_withdraw(message):
