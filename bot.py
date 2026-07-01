@@ -3,6 +3,8 @@ import os
 import time
 import requests
 import feedparser
+from database import get_vip_info
+from telebot import types
 from datetime import datetime
 from database import update_deposit_status
 from database import update_deposit_status
@@ -1085,7 +1087,7 @@ def main_menu():
 
     markup.row(
         KeyboardButton("💳 Mave Wallet"),
-        KeyboardButton("💎 VIP")
+        KeyboardButton("👑 Vip Membership")
     )
 
     markup.row(
@@ -1577,6 +1579,33 @@ def crypto_withdraw_menu():
     markup.row(
         KeyboardButton("⬅️ Withdraw"),
         KeyboardButton("🏠 Home")
+    )
+
+    return markup
+
+def vip_plans_inline():
+
+    markup = types.InlineKeyboardMarkup()
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "🥉 Basic • KSh299",
+            callback_data="vip_basic"
+        )
+    )
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "🥈 Premium • KSh799",
+            callback_data="vip_premium"
+        )
+    )
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "🥇 Elite • KSh2499",
+            callback_data="vip_elite"
+        )
     )
 
     return markup
@@ -2582,6 +2611,140 @@ Stay updated with:
 🔗 {FREE_GROUP}
         """,
         parse_mode="Markdown"
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "💎 VIP Plans")
+def vip_plans(message):
+
+    text = (
+        "👑 *Choose a VIP Plan*\n\n"
+        "🥉 Basic — 30 Days\n"
+        "💰 KSh 299\n\n"
+
+        "🥈 Premium — 90 Days\n"
+        "💰 KSh 799\n\n"
+
+        "🥇 Elite — 365 Days\n"
+        "💰 KSh 2,499\n\n"
+
+        "Tap a plan below."
+    )
+
+    bot.send_message(
+        message.chat.id,
+        text,
+        parse_mode="Markdown",
+        reply_markup=vip_plans_inline()
+    )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("vip_"))
+def vip_plan_selected(call):
+
+    plans = {
+        "vip_basic": ("🥉 Basic", 299),
+        "vip_premium": ("🥈 Premium", 799),
+        "vip_elite": ("🥇 Elite", 2499)
+    }
+
+    plan, amount = plans[call.data]
+
+    markup = types.InlineKeyboardMarkup()
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "🇰🇪 M-Pesa",
+            callback_data=f"pay_mpesa_{call.data}"
+        )
+    )
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "₿ Crypto",
+            callback_data=f"pay_crypto_{call.data}"
+        )
+    )
+
+    bot.edit_message_text(
+        f"""
+👑 {plan}
+
+Amount: KSh {amount}
+
+Choose your payment method.
+""",
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        reply_markup=markup
+    )
+
+@bot.message_handler(func=lambda m: m.text == "🎁 VIP Benefits")
+def vip_benefits(message):
+
+    text = """
+👑 VIP Benefits
+
+✅ 2× Mining Rewards
+
+✅ 2× Faucet Rewards
+
+✅ Daily VIP Bonus
+
+✅ Faster Withdrawals
+
+✅ VIP Badge
+
+✅ Premium Airdrops
+
+✅ Exclusive Giveaways
+
+✅ Early Features
+
+✅ Priority Support
+"""
+
+    bot.send_message(message.chat.id, text)
+
+@bot.message_handler(func=lambda m: m.text == "🔙 Back")
+def vip_back(message):
+
+    bot.send_message(
+        message.chat.id,
+        "Main Menu",
+        reply_markup=main_menu()
+    )
+
+@bot.message_handler(func=lambda m: m.text == "📅 My VIP")
+def my_vip(message):
+
+    info = get_vip_info(str(message.from_user.id))
+
+    if not info:
+        bot.send_message(
+            message.chat.id,
+            "❌ You don't have a VIP subscription."
+        )
+        return
+
+    vip, plan, start, expiry = info
+
+    if not vip:
+        bot.send_message(
+            message.chat.id,
+            "❌ You are currently on the Free plan."
+        )
+        return
+
+    bot.send_message(
+        message.chat.id,
+        f"""👑 VIP Status
+
+Plan: {plan}
+
+Started: {start}
+
+Expires: {expiry}
+"""
     )
 
 
