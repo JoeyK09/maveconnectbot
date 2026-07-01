@@ -227,12 +227,12 @@ DASHBOARD_BUTTONS = [
 ]
 
 CRYPTOS = {
-‎    "₿ Bitcoin": ("BTC", "Bitcoin"),
-‎    "Ξ Ethereum": ("ETH", "ERC20"),
-‎    "₮ USDT TRC20": ("USDT", "TRC20"),
-‎    "🟡 USDT BEP20": ("USDT", "BEP20"),
-‎    "🔵 USDT ERC20": ("USDT", "ERC20"),
-‎}
+    "₿ Bitcoin": ("BTC", "Bitcoin"),
+    "Ξ Ethereum": ("ETH", "ERC20"),
+    "🔴 USDT TRC20": ("USDT", "TRC20"),
+    "🟡 USDT BEP20": ("USDT", "BEP20"),
+    "🔵 USDT ERC20": ("USDT", "ERC20"),
+}
 
 # ================= CACHE =================
 
