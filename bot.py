@@ -1470,7 +1470,7 @@ def withdraw_menu():
 
     markup.row(
         KeyboardButton("📱 M-Pesa"),
-        KeyboardButton("🪙 Crypto")
+        KeyboardButton("💸 Crypto Withdraw")
     )
 
     markup.row(
@@ -1556,6 +1556,7 @@ def partners_menu():
     return markup
 
 def crypto_withdraw_menu():
+
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
@@ -1573,7 +1574,8 @@ def crypto_withdraw_menu():
     )
 
     markup.row(
-        KeyboardButton("⬅️ Back")
+        KeyboardButton("⬅️ Withdraw"),
+        KeyboardButton("🏠 Home")
     )
 
     return markup
@@ -1962,7 +1964,7 @@ Choose the network you want to use.""",
         reply_markup=usdt_network_menu()
     )
 
-@bot.message_handler(func=lambda m: m.text == "💵 Crypto Withdraw")
+@bot.message_handler(func=lambda m: m.text == "💸 Crypto Withdraw")
 def crypto_withdraw(message):
 
     bot.send_message(
