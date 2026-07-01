@@ -551,3 +551,48 @@ def get_pending_deposits():
     return rows
 
     
+def credit_balance(user_id, amount):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE plats
+        SET balance = balance + %s
+        WHERE user_id = %s
+    """, (amount, user_id))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def txid_exists(txid):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 1
+        FROM deposits
+        WHERE txid = %s
+    """, (txid,))
+
+    exists = cursor.fetchone() is not None
+
+    cursor.close()
+    conn.close()
+
+    return exists
+
+def update_deposit_status(txid, status):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE deposits
+        SET status = %s
+        WHERE txid = %s
+    """, (status, txid))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
