@@ -265,6 +265,7 @@ OKX_REFERRAL = "https://okx.com/join/60241030"
 pending_crypto_withdraw = {}
 mpesa_waiting = {}
 mpesa_code_waiting = {}
+vip_payment_waiting = {}
 
 # ============== PICKAXE PRICES ================
 
@@ -3067,6 +3068,44 @@ SIH8K9L2MN
 """
     )
 
+@bot.message_handler(func=lambda m: vip_payment_waiting.get(m.from_user.id))
+def receive_vip_payment_reference(message):
+
+    user = message.from_user.id
+    reference = message.text.strip().upper()
+
+    vip_payment_waiting.pop(user, None)
+
+    if user not in selected_vip_plan:
+        bot.send_message(
+            message.chat.id,
+            "❌ Please choose a VIP plan first."
+        )
+        return
+
+    plan = selected_vip_plan[user]["plan"]
+    amount = selected_vip_plan[user]["price"]
+
+    save_vip_payment(
+        str(user),
+        plan,
+        amount,
+        "Pending",
+        reference
+    )
+
+    bot.send_message(
+        message.chat.id,
+        "✅ Your payment reference has been submitted for verification. You'll be notified once it's approved."
+    )
+
+    notify_admin_vip_payment(
+        user,
+        plan,
+        amount,
+        reference
+    )
+    
 @bot.message_handler(func=lambda m: mpesa_code_waiting.get(m.from_user.id))
 def receive_mpesa_code(message):
 
