@@ -1204,7 +1204,7 @@ def main_menu():
 
     markup.row(
         KeyboardButton("💳 Mave Wallet"),
-        KeyboardButton("👑 Vip Membership")
+        KeyboardButton("👑 VIP MEMBERSHIP")
     )
 
     markup.row(
@@ -2747,7 +2747,7 @@ Stay updated with:
     )
 
 
-@bot.message_handler(func=lambda m: m.text == "💎 VIP Plans")
+@bot.message_handler(func=lambda m: m.text == "📋 View Plans")
 def vip_plans(message):
 
     text = (
@@ -2808,7 +2808,7 @@ Choose your payment method.
 """,
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
-        reply_markup=vip_plan_inline()
+        reply_markup=vip_plans_inline()
     )
 
 @bot.message_handler(func=lambda m: m.text == "🎁 VIP Benefits")
