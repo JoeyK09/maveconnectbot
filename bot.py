@@ -6,6 +6,7 @@ import feedparser
 from database import get_vip_info
 from telebot import types
 from datetime import datetime
+from datetime import datetime, timedelta
 from database import update_deposit_status
 from database import update_deposit_status
 from database import txid_exists
@@ -127,8 +128,14 @@ FREE_GROUP = "https://t.me/UltimateAvian"
 VIP_GROUP = "https://t.me/UltimateAve"
 VIP_CHANNEL = "@UltimateAve"
 ADMIN_ID = 7988782705
-USDT_TRC20 = "TCHtvSHZgSzKAg85GzJoVgxBTUUauxYGna"
 
+# =============== VIP WALLETS ===============
+VIP_WALLETS = {  
+  "trc20":"TCHtvSHZgSzKAg85GzJoVgxBTUUauxYGna",
+  "bep20":"0x6e4b1b38f345764b430017d7885828f3d91dcaa0",
+  "btc":"bc1q0lr6msjjnmfw73nfdttauwhju03jvhmauu4fwk",
+  "eth":"0x6e4b1b38f345764b430017d7885828f3d91dcaa0"
+}
 # ================= COINS =================
 
 COINS = {
@@ -256,6 +263,8 @@ pending_withdrawal = {}
 BINANCE_REFERRAL = "https://www.binance.com/activity/referral-entry/CPA?ref=CPA_005LWI9SEA"
 OKX_REFERRAL = "https://okx.com/join/60241030"
 pending_crypto_withdraw = {}
+mpesa_waiting = {}
+mpesa_code_waiting = {}
 
 # ============== PICKAXE PRICES ================
 
@@ -636,7 +645,44 @@ def is_vip(user_id):
         print("VIP check error:", e)
         return False
 
-# ================== AI ANALYSIS ==============
+def vip_menu():
+
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row("📋 View Plans")
+
+    markup.row("📅 My Subscription", "🎁 VIP Benefits")
+
+    markup.row("👥 VIP Channel", "📜 Payment History")
+
+    markup.row("🔄 Renew VIP")
+
+    markup.row("🔙 Back")
+
+    return markup
+
+def vip_plans_inline():
+
+    markup = types.InlineKeyboardMarkup(row_width=1)
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "🥉 Basic (30 Days) - KSh 299",
+            callback_data="vip_basic"
+        ),
+        types.InlineKeyboardButton(
+            "🥈 Premium (90 Days) - KSh 799",
+            callback_data="vip_premium"
+        ),
+        types.InlineKeyboardButton(
+            "🥇 Elite (365 Days) - KSh 2499",
+            callback_data="vip_elite"
+        )
+    )
+
+    return markup
+
+# ==================== AI ANALYSIS ==============
 
 def ai_analysis(symbol):
     price = safe_get_price(symbol)
@@ -1024,6 +1070,76 @@ Amount:
 {amount}
 
 Press Confirm to continue.""",
+        reply_markup=markup
+    )
+
+    # ================ VIP ==================
+
+def notify_admin_vip_payment(user, plan, amount, txid):
+
+    markup = types.InlineKeyboardMarkup()
+
+    markup.row(
+        types.InlineKeyboardButton(
+            "✅ Approve",
+            callback_data=f"vipapprove_{user}"
+        ),
+        types.InlineKeyboardButton(
+            "❌ Reject",
+            callback_data=f"vipreject_{user}"
+        )
+    )
+
+    bot.send_message(
+        ADMIN_ID,
+        f"""
+💎 New VIP Payment
+
+User: {user}
+
+Plan: {plan}
+
+Amount: {amount}
+
+TXID:
+
+{txid}
+""",
+        reply_markup=markup
+    )
+
+def notify_admin_mpesa(user, phone, plan, amount, code):
+
+    markup = types.InlineKeyboardMarkup()
+
+    markup.row(
+        types.InlineKeyboardButton(
+            "✅ Approve",
+            callback_data=f"vipapprove_{user}"
+        ),
+        types.InlineKeyboardButton(
+            "❌ Reject",
+            callback_data=f"vipreject_{user}"
+        )
+    )
+
+    bot.send_message(
+        ADMIN_ID,
+        f"""
+🇰🇪 New M-Pesa VIP Payment
+
+👤 User: {user}
+
+📱 Phone: {phone}
+
+💎 Plan: {plan}
+
+💰 Amount: KSh {amount}
+
+🧾 M-Pesa Code:
+
+{code}
+""",
         reply_markup=markup
     )
     
@@ -2704,6 +2820,399 @@ def vip_benefits(message):
 """
 
     bot.send_message(message.chat.id, text)
+
+
+@bot.message_handler(func=lambda m: m.text == "👑 VIP Membership")
+def vip_membership(message):
+
+    info = get_vip_info(str(message.from_user.id))
+
+    if info:
+        vip, plan, start, expiry = info
+    else:
+        vip = False
+        plan = "Free"
+        expiry = None
+
+    if vip:
+
+        text = f"""
+👑 *MaveConnect VIP Dashboard*
+
+━━━━━━━━━━━━━━
+
+🟢 Status: *ACTIVE*
+
+💎 Plan: *{plan}*
+
+📅 Expires:
+`{expiry}`
+
+━━━━━━━━━━━━━━
+
+Thank you for being a VIP member!
+
+Select an option below.
+"""
+
+    else:
+
+        text = """
+👑 *MaveConnect VIP Dashboard*
+
+━━━━━━━━━━━━━━
+
+⚪ Status: *FREE MEMBER*
+
+Upgrade today and unlock:
+
+⛏ 2× Mining Rewards
+
+💰 2× Faucet Rewards
+
+🎁 Daily VIP Bonus
+
+⚡ Priority Withdrawals
+
+🎉 VIP Giveaways
+
+📊 Premium Signals
+
+━━━━━━━━━━━━━━
+
+Tap *📋 View Plans* to become VIP.
+"""
+
+    bot.send_message(
+        message.chat.id,
+        text,
+        parse_mode="Markdown",
+        reply_markup=vip_menu()
+    )
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("vip_"))
+def choose_plan(call):
+
+    plans = {
+        "vip_basic": ("Basic", 299),
+        "vip_premium": ("Premium", 799),
+        "vip_elite": ("Elite", 2499)
+    }
+
+    plan, price = plans[call.data]
+
+    selected_vip_plan[call.from_user.id] = {
+        "plan": plan,
+        "price": price
+    }
+
+    markup = types.InlineKeyboardMarkup(row_width=1)
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "🇰🇪 M-Pesa",
+            callback_data="vippay_mpesa"
+        ),
+        types.InlineKeyboardButton(
+            "💵 USDT TRC20",
+            callback_data="vippay_trc20"
+        ),
+        types.InlineKeyboardButton(
+            "💵 USDT BEP20",
+            callback_data="vippay_bep20"
+        ),
+        types.InlineKeyboardButton(
+            "₿ Bitcoin",
+            callback_data="vippay_btc"
+        ),
+        types.InlineKeyboardButton(
+            "♦ Ethereum",
+            callback_data="vippay_eth"
+        )
+    )
+
+    bot.edit_message_text(
+        f"""
+👑 {plan} VIP
+
+💰 Price: KSh {price}
+
+Choose your preferred payment method.
+""",
+        call.message.chat.id,
+        call.message.message_id,
+        reply_markup=markup
+    )
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("vippay_"))
+def vip_payment(call):
+
+    user = call.from_user.id
+
+    if user not in selected_vip_plan:
+        bot.answer_callback_query(
+            call.id,
+            "Please choose a VIP plan first."
+        )
+        return
+
+    payment = call.data.replace("vippay_", "")
+
+    if payment == "mpesa":
+
+       mpesa_waiting[user] = True
+
+       bot.send_message(
+         call.message.chat.id,
+         """
+    🇰🇪 M-Pesa VIP Payment
+
+    Currently M-Pesa payments are manually verified.
+
+    Please send the following details:
+
+    📱 M-Pesa Phone Number
+
+    Example:
+    254712345678
+    """
+      )
+
+      return
+
+    address = VIP_WALLETS[payment]
+
+    markup = types.InlineKeyboardMarkup()
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "✅ Submit Payment",
+            callback_data="vip_submit_payment"
+        )
+    )
+
+    bot.send_message(
+        call.message.chat.id,
+        f"""
+💳 Payment Method: {payment.upper()}
+
+Send your payment to:
+
+`{address}`
+
+After sending the payment, press the button below.
+""",
+        parse_mode="Markdown",
+        reply_markup=markup
+        )
+
+@bot.message_handler(func=lambda m: mpesa_waiting.get(m.from_user.id))
+def receive_mpesa_phone(message):
+
+    user = message.from_user.id
+
+    phone = message.text.strip()
+
+    mpesa_waiting.pop(user, None)
+
+    selected_vip_plan[user]["phone"] = phone
+
+    markup = types.InlineKeyboardMarkup()
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "✅ I've Paid",
+            callback_data="mpesa_paid"
+        )
+    )
+
+    bot.send_message(
+        message.chat.id,
+        f"""
+📱 Phone Number
+
+{phone}
+
+Please send the payment to:
+
+Name:
+Joseph Gichimu
+
+Phone:
+0142047838
+
+Amount:
+KSh {selected_vip_plan[user]['price']}
+
+After payment press:
+
+✅ I've Paid
+""",
+        reply_markup=markup
+    )
+
+@bot.callback_query_handler(func=lambda c: c.data == "mpesa_paid")
+def mpesa_paid(call):
+
+    mpesa_code_waiting[call.from_user.id] = True
+
+    bot.send_message(
+        call.message.chat.id,
+        """
+Please send your M-Pesa Confirmation Code.
+
+Example:
+
+SIH8K9L2MN
+"""
+    )
+
+@bot.message_handler(func=lambda m: mpesa_code_waiting.get(m.from_user.id))
+def receive_mpesa_code(message):
+
+    user = message.from_user.id
+
+    code = message.text.strip().upper()
+
+    mpesa_code_waiting.pop(user, None)
+
+    plan = selected_vip_plan[user]["plan"]
+    amount = selected_vip_plan[user]["price"]
+    phone = selected_vip_plan[user]["phone"]
+
+    save_vip_payment(
+        str(user),
+        plan,
+        amount,
+        "M-Pesa",
+        code
+    )
+
+    notify_admin_mpesa(
+        user,
+        phone,
+        plan,
+        amount,
+        code
+    )
+
+    bot.send_message(
+        message.chat.id,
+        """
+✅ Thank you!
+
+Your payment has been submitted.
+
+You'll receive your VIP subscription once your payment is verified.
+"""
+    )
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "vip_submit_payment")
+def vip_submit_payment(call):
+
+    vip_payment_waiting[call.from_user.id] = True
+
+    bot.send_message(
+        call.message.chat.id,
+        """
+🧾 Send your Transaction ID (TXID).
+
+Example:
+
+8b1f3d4e9d....
+
+Your payment will be verified automatically.
+"""
+    )
+
+@bot.message_handler(func=lambda m: vip_payment_waiting.get(m.from_user.id))
+def receive_vip_txid(message):
+
+    txid = message.text.strip()
+
+    user = message.from_user.id
+
+    vip_payment_waiting.pop(user, None)
+
+    if txid_exists(txid):
+
+        bot.send_message(
+            message.chat.id,
+            "❌ This transaction has already been used."
+        )
+        return
+
+    plan = selected_vip_plan[user]["plan"]
+
+    amount = selected_vip_plan[user]["price"]
+
+    save_vip_payment(
+        str(user),
+        plan,
+        amount,
+        "Crypto",
+        txid
+    )
+
+    bot.send_message(
+        message.chat.id,
+        """
+✅ Payment submitted successfully.
+
+Your payment is pending verification.
+
+You'll automatically receive VIP once it's approved.
+"""
+    )
+
+    notify_admin_vip_payment(
+        user,
+        plan,
+        amount,
+        txid
+    )
+
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("vipapprove_"))
+def approve_vip(call):
+
+    user = call.data.split("_")[1]
+
+    plan = selected_vip_plan[int(user)]["plan"]
+
+    if plan == "Basic":
+        expiry = datetime.now() + timedelta(days=30)
+
+    elif plan == "Premium":
+        expiry = datetime.now() + timedelta(days=90)
+
+    else:
+        expiry = datetime.now() + timedelta(days=365)
+
+    activate_vip(
+        user,
+        plan,
+        expiry
+    )
+
+    bot.send_message(
+        int(user),
+        f"""
+🎉 Congratulations!
+
+Your {plan} VIP subscription is now active.
+
+Enjoy your premium benefits.
+"""
+    )
+
+    bot.edit_message_text(
+        "✅ VIP activated successfully.",
+        call.message.chat.id,
+        call.message.message_id
+    )
+    
 
 @bot.message_handler(func=lambda m: m.text == "🔙 Back")
 def vip_back(message):
