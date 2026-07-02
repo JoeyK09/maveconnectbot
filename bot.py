@@ -54,6 +54,9 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import telebot
 import os
 import requests
+from vip import register_vip_handlers
+
+register_vip_handlers(bot)
 
 # ========= TRONGRID API KEY ===========
 
