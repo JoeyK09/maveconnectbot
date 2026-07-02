@@ -2977,7 +2977,6 @@ def vip_payment(call):
     254712345678
     """
       )
-
       return
 
     address = VIP_WALLETS[payment]
