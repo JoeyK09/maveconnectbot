@@ -1,7 +1,7 @@
 # ================= VIP CONFIG =================
 
 ADMIN_ID = 7988782705
-VIP_CHANNEL = "https://t.me/YourVIPChannel"
+VIP_CHANNEL = "https://t.me/UltimateAve"
 
 VIP_PLANS = {
     "basic": {
