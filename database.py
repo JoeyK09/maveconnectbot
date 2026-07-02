@@ -173,6 +173,158 @@ CREATE TABLE IF NOT EXISTS vip_payments(
 )
 """)
 
+def create_vip_tables():
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS vip_subscriptions (
+        user_id BIGINT PRIMARY KEY,
+        plan TEXT,
+        start_date TIMESTAMP,
+        expiry_date TIMESTAMP,
+        active BOOLEAN DEFAULT TRUE
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS vip_payments (
+        id SERIAL PRIMARY KEY,
+        user_id BIGINT,
+        plan TEXT,
+        amount INTEGER,
+        payment_method TEXT,
+        reference TEXT UNIQUE,
+        status TEXT DEFAULT 'Pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def save_vip_payment(user_id, plan, amount, payment_method, reference):
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    INSERT INTO vip_payments
+    (user_id, plan, amount, payment_method, reference)
+    VALUES (%s,%s,%s,%s,%s)
+    """, (
+        user_id,
+        plan,
+        amount,
+        payment_method,
+        reference
+    ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def activate_vip(user_id, plan, expiry):
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    INSERT INTO vip_subscriptions
+    (user_id, plan, start_date, expiry_date, active)
+
+    VALUES (%s,%s,NOW(),%s,TRUE)
+
+    ON CONFLICT(user_id)
+
+    DO UPDATE SET
+
+    plan=EXCLUDED.plan,
+    start_date=NOW(),
+    expiry_date=EXCLUDED.expiry_date,
+    active=TRUE
+    """, (
+        user_id,
+        plan,
+        expiry
+    ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def is_vip(user_id):
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT active
+    FROM vip_subscriptions
+    WHERE user_id=%s
+    """, (user_id,))
+
+    row = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return row and row[0]
+
+def get_vip_info(user_id):
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT
+    active,
+    plan,
+    start_date,
+    expiry_date
+
+    FROM vip_subscriptions
+
+    WHERE user_id=%s
+    """, (user_id,))
+
+    row = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return row
+
+def get_vip_payment_history(user_id):
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT
+    plan,
+    amount,
+    payment_method,
+    status,
+    created_at
+
+    FROM vip_payments
+
+    WHERE user_id=%s
+
+    ORDER BY created_at DESC
+    """, (user_id,))
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return rows
+
+
 conn.commit()
 
 # ================= FUNCTIONS =================
