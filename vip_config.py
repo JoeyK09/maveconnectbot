@@ -1,7 +1,6 @@
 # ================= VIP CONFIG =================
 
-ADMIN_ID = 123456789  # Replace with your Telegram ID
-
+ADMIN_ID = 7988782705
 VIP_CHANNEL = "https://t.me/YourVIPChannel"
 
 VIP_PLANS = {
@@ -12,21 +11,21 @@ VIP_PLANS = {
     },
     "premium": {
         "name": "🥈 Premium",
-        "price": 799,
+        "price": 999,
         "days": 90
     },
     "elite": {
         "name": "🥇 Elite",
-        "price": 2499,
+        "price": 8999,
         "days": 365
     }
 }
 
-VIP_WALLETS = {
-    "trc20": "YOUR_TRC20_ADDRESS",
-    "bep20": "YOUR_BEP20_ADDRESS",
-    "btc": "YOUR_BTC_ADDRESS",
-    "eth": "YOUR_ETH_ADDRESS"
+VIP_WALLETS = {  
+  "trc20":"TCHtvSHZgSzKAg85GzJoVgxBTUUauxYGna",
+  "bep20":"0x6e4b1b38f345764b430017d7885828f3d91dcaa0",
+  "btc":"bc1q0lr6msjjnmfw73nfdttauwhju03jvhmauu4fwk",
+  "eth":"0x6e4b1b38f345764b430017d7885828f3d91dcaa0"
 }
 
 VIP_BENEFITS = [
