@@ -129,13 +129,6 @@ VIP_GROUP = "https://t.me/UltimateAve"
 VIP_CHANNEL = "@UltimateAve"
 ADMIN_ID = 7988782705
 
-# =============== VIP WALLETS ===============
-VIP_WALLETS = {  
-  "trc20":"TCHtvSHZgSzKAg85GzJoVgxBTUUauxYGna",
-  "bep20":"0x6e4b1b38f345764b430017d7885828f3d91dcaa0",
-  "btc":"bc1q0lr6msjjnmfw73nfdttauwhju03jvhmauu4fwk",
-  "eth":"0x6e4b1b38f345764b430017d7885828f3d91dcaa0"
-}
 # ================= COINS =================
 
 COINS = {
