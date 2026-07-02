@@ -1726,6 +1726,22 @@ def vip_plans_inline():
     )
 
     return markup
+
+def vip_menu():
+
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.row("📋 View Plans")
+
+    markup.row("📅 My Subscription", "🎁 VIP Benefits")
+
+    markup.row("👥 VIP Channel", "📜 Payment History")
+
+    markup.row("🔄 Renew VIP")
+
+    markup.row("🔙 Back")
+
+    return markup
     
 # ================= COMMANDS ================
 
@@ -3251,7 +3267,50 @@ Enjoy your premium benefits.
         call.message.chat.id,
         call.message.message_id
     )
-    
+
+@bot.message_handler(func=lambda m: m.text == "🔙 Back")
+def vip_back(message):
+
+    bot.send_message(
+        message.chat.id,
+        "Main Menu",
+        reply_markup=main_menu()
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "📅 My VIP")
+def my_vip(message):
+
+    info = get_vip_info(str(message.from_user.id))
+
+    if not info:
+        bot.send_message(
+            message.chat.id,
+            "❌ You don't have a VIP subscription."
+        )
+        return
+
+    vip, plan, start, expiry = info
+
+    if not vip:
+        bot.send_message(
+            message.chat.id,
+            "❌ You are currently on the Free plan."
+        )
+        return
+
+    bot.send_message(
+        message.chat.id,
+        f"""👑 VIP Status
+
+Plan: {plan}
+
+Started: {start}
+
+Expires: {expiry}
+"""
+    )
+
 
 @bot.message_handler(func=lambda m: m.text == "🔙 Back")
 def vip_back(message):
