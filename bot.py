@@ -2960,24 +2960,25 @@ def vip_payment(call):
 
     if payment == "mpesa":
 
-       mpesa_waiting[user] = True
+        mpesa_waiting[user] = True
 
-       bot.send_message(
-         call.message.chat.id,
-         """
-    🇰🇪 M-Pesa VIP Payment
+        bot.send_message(
+            call.message.chat.id,
+            """
+🇰🇪 M-Pesa VIP Payment
 
-    Currently M-Pesa payments are manually verified.
+Currently M-Pesa payments are manually verified.
 
-    Please send the following details:
+Please send the following details:
 
-    📱 M-Pesa Phone Number
+📱 M-Pesa Phone Number
 
-    Example:
-    254712345678
-    """
-      )
-      return
+Example:
+254712345678
+"""
+        )
+
+        return
 
     address = VIP_WALLETS[payment]
 
