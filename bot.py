@@ -57,8 +57,6 @@ import os
 import requests
 from vip import register_vip_handlers
 
-register_vip_handlers(bot)
-
 # ========= TRONGRID API KEY ===========
 
 TRONGRID_API_KEY = os.getenv("TRONGRID_API_KEY")
