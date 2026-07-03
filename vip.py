@@ -1,5 +1,6 @@
 from telebot import types
 from datetime import datetime, timedelta
+from database import get_vip_info
 
 from vip_keyboards import (
     vip_menu,
