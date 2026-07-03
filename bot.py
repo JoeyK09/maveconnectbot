@@ -51,6 +51,7 @@ from database import (
 )
 from database import create_deposit
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+from vip import register_vip_handlers
 import telebot
 import os
 import requests
@@ -122,6 +123,10 @@ if not TOKEN:
 
 bot = telebot.TeleBot(TOKEN, threaded=True)
 print("Telegram bot initialized")
+
+from vip import register_vip_handlers
+
+register_vip_handlers(bot)
 
 app = Flask(__name__)
 
