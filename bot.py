@@ -3,6 +3,11 @@ import os
 import time
 import requests
 import feedparser
+from vip_keyboards import (
+    vip_menu,
+    vip_plans_keyboard,
+    payment_keyboard
+)
 from database import get_vip_info
 from telebot import types
 from datetime import datetime
