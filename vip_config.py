@@ -11,12 +11,12 @@ VIP_PLANS = {
     },
     "premium": {
         "name": "🥈 Premium",
-        "price": 999,
+        "price": 799,
         "days": 90
     },
     "elite": {
         "name": "🥇 Elite",
-        "price": 8999,
+        "price": 2499,
         "days": 365
     }
 }
