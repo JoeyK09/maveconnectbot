@@ -105,7 +105,7 @@ Upgrade today to unlock premium rewards.
             message.chat.id,
             text,
             parse_mode="Markdown",
-            reply_markup=main_menu()
+            reply_markup=vip_menu()
         )
 
 
