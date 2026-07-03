@@ -119,3 +119,43 @@ Upgrade today to unlock premium rewards.
 """,
             reply_markup=vip_plans_keyboard()
         )
+    @bot.message_handler(func=lambda m: m.text == "📅 My Subscription")
+    def my_subscription(message):
+
+      info = get_vip_info(str(message.from_user.id))
+
+      if not info:
+
+         bot.send_message(
+            message.chat.id,
+            "❌ You don't have an active VIP subscription."
+         )
+         return
+
+      active, plan, start, expiry = info
+
+      if not active:
+
+         bot.send_message(
+            message.chat.id,
+            "❌ Your VIP subscription has expired."
+         )
+         return
+
+      bot.send_message(
+         message.chat.id,
+         f"""
+👑 *Your VIP Subscription*
+
+💎 Plan: *{plan}*
+
+📅 Started:
+`{start}`
+
+⏳ Expires:
+`{expiry}`
+
+🟢 Status: Active
+""",
+        parse_mode="Markdown"
+   )
