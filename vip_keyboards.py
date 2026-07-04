@@ -27,43 +27,35 @@ def vip_plans_keyboard():
     return markup
 
 
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+
 def payment_keyboard():
 
-    kb = types.InlineKeyboardMarkup()
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
 
-    kb.add(
-        types.InlineKeyboardButton(
-            "🇰🇪 M-Pesa",
-            callback_data="pay_mpesa"
-        )
+    kb.row(
+        KeyboardButton("🇰🇪 M-Pesa")
     )
 
-    kb.add(
-        types.InlineKeyboardButton(
-            "💵 USDT TRC20",
-            callback_data="pay_trc20"
-        )
+    kb.row(
+        KeyboardButton("💵 USDT (TRC20)")
     )
 
-    kb.add(
-        types.InlineKeyboardButton(
-            "💵 USDT BEP20",
-            callback_data="pay_bep20"
-        )
+    kb.row(
+        KeyboardButton("💵 USDT (BEP20)")
     )
 
-    kb.add(
-        types.InlineKeyboardButton(
-            "₿ Bitcoin",
-            callback_data="pay_btc"
-        )
+    kb.row(
+        KeyboardButton("₿ Bitcoin")
     )
 
-    kb.add(
-        types.InlineKeyboardButton(
-            "♦ Ethereum",
-            callback_data="pay_eth"
-        )
+    kb.row(
+        KeyboardButton("♦ Ethereum")
+    )
+
+    kb.row(
+        KeyboardButton("🔙 Back")
     )
 
     return kb
+    
