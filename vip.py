@@ -66,7 +66,7 @@ def register_vip_handlers(bot):
 
     # ================= VIP DASHBOARD =================
 
-    @bot.message_handler(func=lambda m: m.text == "👑 Vip Membership")
+    @bot.message_handler(func=lambda m: m.text == "👑 VIP MEMBERSHIP")
     def vip_dashboard(message):
 
         info = get_vip_info(str(message.from_user.id))
