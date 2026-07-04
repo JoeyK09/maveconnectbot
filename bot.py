@@ -2909,60 +2909,6 @@ Tap *📋 View Plans* to become VIP.
         reply_markup=vip_menu()
     )
 
-@bot.callback_query_handler(func=lambda c: c.data.startswith("vip_"))
-def choose_plan(call):
-
-    plans = {
-        "vip_basic": ("Basic", 299),
-        "vip_premium": ("Premium", 799),
-        "vip_elite": ("Elite", 2499)
-    }
-
-    plan, price = plans[call.data]
-
-    selected_vip_plan[call.from_user.id] = {
-        "plan": plan,
-        "price": price
-    }
-
-    markup = types.InlineKeyboardMarkup(row_width=1)
-
-    markup.add(
-        types.InlineKeyboardButton(
-            "🇰🇪 M-Pesa",
-            callback_data="vippay_mpesa"
-        ),
-        types.InlineKeyboardButton(
-            "💵 USDT TRC20",
-            callback_data="vippay_trc20"
-        ),
-        types.InlineKeyboardButton(
-            "💵 USDT BEP20",
-            callback_data="vippay_bep20"
-        ),
-        types.InlineKeyboardButton(
-            "₿ Bitcoin",
-            callback_data="vippay_btc"
-        ),
-        types.InlineKeyboardButton(
-            "♦ Ethereum",
-            callback_data="vippay_eth"
-        )
-    )
-
-    bot.edit_message_text(
-        f"""
-👑 {plan} VIP
-
-💰 Price: KSh {price}
-
-Choose your preferred payment method.
-""",
-        call.message.chat.id,
-        call.message.message_id,
-        reply_markup=markup
-    )
-
 @bot.callback_query_handler(func=lambda c: c.data.startswith("vippay_"))
 def vip_payment(call):
 
