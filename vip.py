@@ -160,3 +160,76 @@ Upgrade today to unlock premium rewards.
 """,
         parse_mode="Markdown"
    )
+
+    @bot.callback_query_handler(func=lambda c: c.data.startswith("vip_"))
+    def choose_plan(call):
+
+       plans = {
+         "vip_basic": ("Basic", 299),
+         "vip_premium": ("Premium", 799),
+         "vip_elite": ("Elite", 2499)
+       }
+
+       if call.data not in plans:
+          bot.answer_callback_query(call.id, "Invalid plan.")
+          return
+
+       plan, price = plans[call.data]
+
+       selected_plan[call.from_user.id] = {
+          "plan": plan,
+          "price": price
+       }
+
+       markup = types.InlineKeyboardMarkup()
+
+       markup.add(
+        types.InlineKeyboardButton(
+            "🇰🇪 M-Pesa",
+            callback_data="vippay_mpesa"
+        )
+       )
+
+       markup.add(
+        types.InlineKeyboardButton(
+            "💵 USDT (TRC20)",
+            callback_data="vippay_trc20"
+        )
+       )
+
+        markup.add(
+         types.InlineKeyboardButton(
+            "💵 USDT (BEP20)",
+            callback_data="vippay_bep20"
+         )
+        )
+
+         markup.add(
+          types.InlineKeyboardButton(
+            "₿ Bitcoin",
+            callback_data="vippay_btc"
+          )
+         )
+
+         markup.add(
+          types.InlineKeyboardButton(
+            "♦ Ethereum",
+            callback_data="vippay_eth"
+          )
+         )
+
+         bot.edit_message_text(
+            f"""
+    👑 *{plan} VIP*
+
+    💰 Price: *KSh {price}*
+
+    Choose your preferred payment method.
+    """,
+        chat_id=call.message.chat.id,
+             
+    message_id=call.message.message_id,
+        parse_mode="Markdown",
+        reply_markup=markup
+       )
+    
