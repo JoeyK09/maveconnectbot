@@ -16,30 +16,15 @@ def vip_menu():
 
 def vip_plans_keyboard():
 
-    kb = types.InlineKeyboardMarkup()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
-    kb.add(
-        types.InlineKeyboardButton(
-            "🥉 Basic • KSh299",
-            callback_data="vip_basic"
-        )
-    )
+    markup.row("🥉 Basic • KSh299")
+    markup.row("🥈 Premium • KSh799")
+    markup.row("🥇 Elite • KSh2499")
 
-    kb.add(
-        types.InlineKeyboardButton(
-            "🥈 Premium • KSh799",
-            callback_data="vip_premium"
-        )
-    )
+    markup.row("🔙 Back")
 
-    kb.add(
-        types.InlineKeyboardButton(
-            "🥇 Elite • KSh2499",
-            callback_data="vip_elite"
-        )
-    )
-
-    return kb
+    return markup
 
 
 def payment_keyboard():
