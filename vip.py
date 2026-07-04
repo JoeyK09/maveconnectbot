@@ -119,15 +119,20 @@ Tap *📋 View Plans* below.
     # ================= VIEW PLANS =================
 
     @bot.message_handler(func=lambda m: m.text == "📋 View Plans")
-    def view_plans(message):
+def view_plans(message):
 
-        bot.send_message(
-            message.chat.id,
-            "👑 *Choose a VIP Plan*",
-            parse_mode="Markdown",
-            reply_markup=vip_plans_keyboard()
-        )
+    bot.send_message(
+        message.chat.id,
+        """
+👑 Choose your VIP Plan
 
+🥉 Basic - KSh299
+🥈 Premium - KSh799
+🥇 Elite - KSh2499
+""",
+        reply_markup=vip_plans_keyboard()
+    )
+    
     # ================= MY SUBSCRIPTION =================
 
     @bot.message_handler(func=lambda m: m.text == "📅 My Subscription")
@@ -173,76 +178,34 @@ Tap *📋 View Plans* below.
 
     # ================= CHOOSE PLAN =================
 
-    @bot.callback_query_handler(func=lambda c: c.data.startswith("vip_"))
-    def choose_plan(call):
+    @bot.message_handler(func=lambda m: m.text in [
+    "🥉 Basic • KSh299",
+    "🥈 Premium • KSh799",
+    "🥇 Elite • KSh2499"
+])
+def choose_plan(message):
 
-        print("VIP plan callback:", call.data)
+    plans = {
+        "🥉 Basic • KSh299": ("Basic", 299),
+        "🥈 Premium • KSh799": ("Premium", 799),
+        "🥇 Elite • KSh2499": ("Elite", 2499)
+    }
 
-        plans = {
-            "vip_basic": ("🥉 Basic", 299),
-            "vip_premium": ("🥈 Premium", 799),
-            "vip_elite": ("🥇 Elite", 2499)
-        }
+    plan, price = plans[message.text]
 
-        if call.data not in plans:
-            bot.answer_callback_query(call.id, "Invalid VIP plan.")
-            return
+    selected_plan[message.from_user.id] = {
+        "plan": plan,
+        "price": price
+    }
 
-        plan, price = plans[call.data]
+    bot.send_message(
+        message.chat.id,
+        f"""
+👑 {plan} VIP
 
-        selected_plan[call.from_user.id] = {
-            "plan": plan,
-            "price": price
-        }
+💰 Price: KSh {price}
 
-        markup = types.InlineKeyboardMarkup()
-
-        markup.add(
-            types.InlineKeyboardButton(
-                "🇰🇪 M-Pesa",
-                callback_data="vippay_mpesa"
-            )
-        )
-
-        markup.add(
-            types.InlineKeyboardButton(
-                "💵 USDT (TRC20)",
-                callback_data="vippay_trc20"
-            )
-        )
-
-        markup.add(
-            types.InlineKeyboardButton(
-                "💵 USDT (BEP20)",
-                callback_data="vippay_bep20"
-            )
-        )
-
-        markup.add(
-            types.InlineKeyboardButton(
-                "₿ Bitcoin",
-                callback_data="vippay_btc"
-            )
-        )
-
-        markup.add(
-            types.InlineKeyboardButton(
-                "♦ Ethereum",
-                callback_data="vippay_eth"
-            )
-        )
-
-        bot.edit_message_text(
-            f"""
-👑 *{plan} VIP*
-
-💰 Price: *KSh {price}*
-
-Choose your preferred payment method.
+Choose your payment method.
 """,
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-            parse_mode="Markdown",
-            reply_markup=markup
-        )
-      
+        reply_markup=payment_keyboard()
+    )
