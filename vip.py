@@ -60,14 +60,13 @@ def notify_admin(bot, user, plan, payment, reference):
 def register_vip_handlers(bot):
 
     selected_plan = {}
-
     mpesa_waiting = {}
-
     mpesa_code_waiting = {}
-
     crypto_waiting = {}
 
-    @bot.message_handler(func=lambda m: m.text == "👑 VIP MEMBERSHIP")
+    # ================= VIP DASHBOARD =================
+
+    @bot.message_handler(func=lambda m: m.text == "👑 Vip Membership")
     def vip_dashboard(message):
 
         info = get_vip_info(str(message.from_user.id))
@@ -84,12 +83,12 @@ def register_vip_handlers(bot):
             text = f"""
 👑 *MaveConnect VIP Dashboard*
 
-🟢 Status: ACTIVE
+🟢 Status: *ACTIVE*
 
-💎 Plan: {plan}
+💎 Plan: *{plan}*
 
 📅 Expires:
-{expiry}
+`{expiry}`
 """
 
         else:
@@ -97,9 +96,17 @@ def register_vip_handlers(bot):
             text = """
 👑 *MaveConnect VIP Dashboard*
 
-⚪ Status: FREE MEMBER
+⚪ Status: *FREE MEMBER*
 
-Upgrade today to unlock premium rewards.
+Upgrade today to unlock:
+
+⛏ 2× Mining Rewards
+💰 2× Faucet Rewards
+🎁 Daily VIP Bonus
+⚡ Faster Withdrawals
+🎉 Exclusive Giveaways
+
+Tap *📋 View Plans* below.
 """
 
         bot.send_message(
@@ -109,43 +116,46 @@ Upgrade today to unlock premium rewards.
             reply_markup=vip_menu()
         )
 
+    # ================= VIEW PLANS =================
 
     @bot.message_handler(func=lambda m: m.text == "📋 View Plans")
     def view_plans(message):
 
         bot.send_message(
             message.chat.id,
-            """
-👑 Choose your VIP Plan
-""",
+            "👑 *Choose a VIP Plan*",
+            parse_mode="Markdown",
             reply_markup=vip_plans_keyboard()
         )
+
+    # ================= MY SUBSCRIPTION =================
+
     @bot.message_handler(func=lambda m: m.text == "📅 My Subscription")
     def my_subscription(message):
 
-      info = get_vip_info(str(message.from_user.id))
+        info = get_vip_info(str(message.from_user.id))
 
-      if not info:
+        if not info:
 
-         bot.send_message(
+            bot.send_message(
+                message.chat.id,
+                "❌ You don't have an active VIP subscription."
+            )
+            return
+
+        active, plan, start, expiry = info
+
+        if not active:
+
+            bot.send_message(
+                message.chat.id,
+                "❌ Your VIP subscription has expired."
+            )
+            return
+
+        bot.send_message(
             message.chat.id,
-            "❌ You don't have an active VIP subscription."
-         )
-         return
-
-      active, plan, start, expiry = info
-
-      if not active:
-
-         bot.send_message(
-            message.chat.id,
-            "❌ Your VIP subscription has expired."
-         )
-         return
-
-      bot.send_message(
-         message.chat.id,
-         f"""
+            f"""
 👑 *Your VIP Subscription*
 
 💎 Plan: *{plan}*
@@ -156,80 +166,81 @@ Upgrade today to unlock premium rewards.
 ⏳ Expires:
 `{expiry}`
 
-🟢 Status: Active
+🟢 Status: *Active*
 """,
-        parse_mode="Markdown"
-   )
+            parse_mode="Markdown"
+        )
+
+    # ================= CHOOSE PLAN =================
 
     @bot.callback_query_handler(func=lambda c: c.data.startswith("vip_"))
     def choose_plan(call):
 
-       plans = {
-         "vip_basic": ("Basic", 299),
-         "vip_premium": ("Premium", 799),
-         "vip_elite": ("Elite", 2499)
-       }
+        plans = {
+            "vip_basic": ("🥉 Basic", 299),
+            "vip_premium": ("🥈 Premium", 799),
+            "vip_elite": ("🥇 Elite", 2499)
+        }
 
-       if call.data not in plans:
-          bot.answer_callback_query(call.id, "Invalid plan.")
-          return
+        if call.data not in plans:
+            bot.answer_callback_query(call.id, "Invalid VIP plan.")
+            return
 
-       plan, price = plans[call.data]
+        plan, price = plans[call.data]
 
-       selected_plan[call.from_user.id] = {
-          "plan": plan,
-          "price": price
-       }
+        selected_plan[call.from_user.id] = {
+            "plan": plan,
+            "price": price
+        }
 
-       markup = types.InlineKeyboardMarkup()
-
-       markup.add(
-        types.InlineKeyboardButton(
-            "🇰🇪 M-Pesa",
-            callback_data="vippay_mpesa"
-        )
-       )
-
-       markup.add(
-        types.InlineKeyboardButton(
-            "💵 USDT (TRC20)",
-            callback_data="vippay_trc20"
-        )
-       )
+        markup = types.InlineKeyboardMarkup()
 
         markup.add(
-         types.InlineKeyboardButton(
-            "💵 USDT (BEP20)",
-            callback_data="vippay_bep20"
-         )
+            types.InlineKeyboardButton(
+                "🇰🇪 M-Pesa",
+                callback_data="vippay_mpesa"
+            )
         )
 
-         markup.add(
-          types.InlineKeyboardButton(
-            "₿ Bitcoin",
-            callback_data="vippay_btc"
-          )
-         )
+        markup.add(
+            types.InlineKeyboardButton(
+                "💵 USDT (TRC20)",
+                callback_data="vippay_trc20"
+            )
+        )
 
-         markup.add(
-          types.InlineKeyboardButton(
-            "♦ Ethereum",
-            callback_data="vippay_eth"
-          )
-         )
+        markup.add(
+            types.InlineKeyboardButton(
+                "💵 USDT (BEP20)",
+                callback_data="vippay_bep20"
+            )
+        )
 
-         bot.edit_message_text(
+        markup.add(
+            types.InlineKeyboardButton(
+                "₿ Bitcoin",
+                callback_data="vippay_btc"
+            )
+        )
+
+        markup.add(
+            types.InlineKeyboardButton(
+                "♦ Ethereum",
+                callback_data="vippay_eth"
+            )
+        )
+
+        bot.edit_message_text(
             f"""
-    👑 *{plan} VIP*
+👑 *{plan} VIP*
 
-    💰 Price: *KSh {price}*
+💰 Price: *KSh {price}*
 
-    Choose your preferred payment method.
-    """,
-        chat_id=call.message.chat.id,
-             
-    message_id=call.message.message_id,
-        parse_mode="Markdown",
-        reply_markup=markup
-       )
-    
+Choose your preferred payment method.
+""",
+            chat_id=call.message.chat.id,
+            message_id=call.message.message_id,
+            parse_mode="Markdown",
+            reply_markup=markup
+        )
+      
