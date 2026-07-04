@@ -176,6 +176,8 @@ Tap *📋 View Plans* below.
     @bot.callback_query_handler(func=lambda c: c.data.startswith("vip_"))
     def choose_plan(call):
 
+        print("VIP plan callback:", call.data)
+
         plans = {
             "vip_basic": ("🥉 Basic", 299),
             "vip_premium": ("🥈 Premium", 799),
