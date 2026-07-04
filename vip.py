@@ -208,3 +208,237 @@ Choose your preferred payment method.
             reply_markup=payment_keyboard()
         )
         
+        # ================= PAYMENT METHOD =================
+
+    @bot.message_handler(func=lambda m: m.text in [
+        "🇰🇪 M-Pesa",
+        "💵 USDT (TRC20)",
+        "💵 USDT (BEP20)",
+        "₿ Bitcoin",
+        "♦ Ethereum"
+    ])
+    def payment_method(message):
+
+        user = message.from_user.id
+
+        if user not in selected_plan:
+
+            bot.send_message(
+                message.chat.id,
+                "❌ Please choose a VIP plan first."
+            )
+            return
+
+        plan = selected_plan[user]["plan"]
+        price = selected_plan[user]["price"]
+
+        # ---------- MPESA ----------
+
+        if message.text == "🇰🇪 M-Pesa":
+
+            mpesa_waiting[user] = True
+
+            bot.send_message(
+                message.chat.id,
+                f"""
+🇰🇪 *M-Pesa Payment*
+
+👑 Plan: *{plan.title()}*
+💰 Amount: *KSh {price}*
+
+Send the payment.
+
+Then send your M-Pesa phone number.
+
+Example:
+
+254712345678
+""",
+                parse_mode="Markdown"
+            )
+
+            return
+
+        # ---------- CRYPTO ----------
+
+        wallets = {
+            "💵 USDT (TRC20)": VIP_WALLETS["trc20"],
+            "💵 USDT (BEP20)": VIP_WALLETS["bep20"],
+            "₿ Bitcoin": VIP_WALLETS["btc"],
+            "♦ Ethereum": VIP_WALLETS["eth"]
+        }
+
+        crypto_waiting[user] = {
+            "payment": message.text
+        }
+
+        bot.send_message(
+            message.chat.id,
+            f"""
+💳 *{message.text}*
+
+👑 Plan: *{plan.title()}*
+💰 Amount: *KSh {price}*
+
+Send payment to:
+
+`{wallets[message.text]}`
+
+After paying, send the TXID (Transaction Hash).
+""",
+            parse_mode="Markdown"
+        )
+
+    # ================= MPESA PHONE =================
+
+    @bot.message_handler(func=lambda m: m.from_user.id in mpesa_waiting)
+    def receive_mpesa_phone(message):
+
+        user = message.from_user.id
+
+        mpesa_waiting.pop(user)
+
+        mpesa_code_waiting[user] = message.text
+
+        bot.send_message(
+            message.chat.id,
+            """
+✅ Phone number received.
+
+Now send your M-Pesa Confirmation Code.
+
+Example:
+
+SGL8K2M9PQ
+"""
+        )
+
+    # ================= MPESA CODE =================
+
+    @bot.message_handler(func=lambda m: m.from_user.id in mpesa_code_waiting)
+    def receive_mpesa_code(message):
+
+        user = message.from_user.id
+
+        phone = mpesa_code_waiting.pop(user)
+
+        plan = selected_plan[user]["plan"]
+
+        save_vip_payment(
+            str(user),
+            plan,
+            "M-Pesa",
+            message.text
+        )
+
+        notify_admin(
+            bot,
+            user,
+            plan,
+            "M-Pesa",
+            f"{phone}\n{message.text}"
+        )
+
+        bot.send_message(
+            message.chat.id,
+            """
+✅ Payment submitted.
+
+Please wait for admin approval.
+"""
+        )
+
+    # ================= CRYPTO TXID =================
+
+    @bot.message_handler(func=lambda m: m.from_user.id in crypto_waiting)
+    def receive_crypto_txid(message):
+
+        user = message.from_user.id
+
+        payment = crypto_waiting[user]["payment"]
+
+        crypto_waiting.pop(user)
+
+        plan = selected_plan[user]["plan"]
+
+        save_vip_payment(
+            str(user),
+            plan,
+            payment,
+            message.text
+        )
+
+        notify_admin(
+            bot,
+            user,
+            plan,
+            payment,
+            message.text
+        )
+
+        bot.send_message(
+            message.chat.id,
+            """
+✅ Transaction submitted.
+
+Your payment will be verified shortly.
+"""
+        )
+
+    # ================= ADMIN APPROVE =================
+
+    @bot.callback_query_handler(func=lambda c: c.data.startswith("approvevip_"))
+    def approve(call):
+
+        user = call.data.split("_")[1]
+
+        activate_vip(user)
+
+        bot.edit_message_reply_markup(
+            call.message.chat.id,
+            call.message.message_id,
+            reply_markup=None
+        )
+
+        bot.answer_callback_query(
+            call.id,
+            "VIP Activated."
+        )
+
+        bot.send_message(
+            int(user),
+            """
+🎉 Congratulations!
+
+Your VIP membership has been approved.
+
+Welcome to MaveConnect VIP 👑
+"""
+        )
+
+    # ================= ADMIN REJECT =================
+
+    @bot.callback_query_handler(func=lambda c: c.data.startswith("rejectvip_"))
+    def reject(call):
+
+        user = call.data.split("_")[1]
+
+        bot.edit_message_reply_markup(
+            call.message.chat.id,
+            call.message.message_id,
+            reply_markup=None
+        )
+
+        bot.answer_callback_query(
+            call.id,
+            "Payment rejected."
+        )
+
+        bot.send_message(
+            int(user),
+            """
+❌ Your VIP payment was rejected.
+
+Please contact support if you believe this is an error.
+"""
+        )
