@@ -119,20 +119,18 @@ Tap *📋 View Plans* below.
     # ================= VIEW PLANS =================
 
     @bot.message_handler(func=lambda m: m.text == "📋 View Plans")
-def view_plans(message):
+    def view_plans(message):
 
-    bot.send_message(
-        message.chat.id,
-        """
+        bot.send_message(
+            message.chat.id,
+            """
 👑 Choose your VIP Plan
 
-🥉 Basic - KSh299
-🥈 Premium - KSh799
-🥇 Elite - KSh2499
+Select one of the plans below.
 """,
-        reply_markup=vip_plans_keyboard()
-    )
-    
+            reply_markup=vip_plans_keyboard()
+        )
+
     # ================= MY SUBSCRIPTION =================
 
     @bot.message_handler(func=lambda m: m.text == "📅 My Subscription")
@@ -179,33 +177,34 @@ def view_plans(message):
     # ================= CHOOSE PLAN =================
 
     @bot.message_handler(func=lambda m: m.text in [
-    "🥉 Basic • KSh299",
-    "🥈 Premium • KSh799",
-    "🥇 Elite • KSh2499"
-])
-def choose_plan(message):
+        "🥉 Basic • KSh299",
+        "🥈 Premium • KSh799",
+        "🥇 Elite • KSh2499"
+    ])
+    def choose_plan(message):
 
-    plans = {
-        "🥉 Basic • KSh299": ("Basic", 299),
-        "🥈 Premium • KSh799": ("Premium", 799),
-        "🥇 Elite • KSh2499": ("Elite", 2499)
-    }
+        plans = {
+            "🥉 Basic • KSh299": ("basic", 299),
+            "🥈 Premium • KSh799": ("premium", 799),
+            "🥇 Elite • KSh2499": ("elite", 2499)
+        }
 
-    plan, price = plans[message.text]
+        plan, price = plans[message.text]
 
-    selected_plan[message.from_user.id] = {
-        "plan": plan,
-        "price": price
-    }
+        selected_plan[message.from_user.id] = {
+            "plan": plan,
+            "price": price
+        }
 
-    bot.send_message(
-        message.chat.id,
-        f"""
-👑 {plan} VIP
+        bot.send_message(
+            message.chat.id,
+            f"""
+👑 {plan.title()} VIP
 
 💰 Price: KSh {price}
 
-Choose your payment method.
+Choose your preferred payment method.
 """,
-        reply_markup=payment_keyboard()
-    )
+            reply_markup=payment_keyboard()
+        )
+        
