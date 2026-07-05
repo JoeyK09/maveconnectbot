@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from admin import register_admin_handlers
 from vip_keyboards import (
     vip_menu,
     vip_plans_keyboard,
