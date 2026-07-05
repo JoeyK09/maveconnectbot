@@ -106,7 +106,7 @@ Select an option below.
 
 Upgrade today and enjoy:
 
-⛏ 2× Mining Rewards
+⛏️ 2× Mining Rewards
 
 💰 2× Faucet Rewards
 
