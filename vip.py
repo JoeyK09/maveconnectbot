@@ -59,14 +59,37 @@ def notify_admin(bot, user, plan, payment, reference):
 
 def register_vip_handlers(bot):
 
-    # Temporary user states
     selected_plan = {}
-
     mpesa_waiting = {}
-
     mpesa_code_waiting = {}
-
     crypto_waiting = {}
+
+    @bot.message_handler(func=lambda m: m.text == "✅ I've Paid")
+    def mpesa_paid(message):
+
+        user = message.from_user.id
+
+        if user not in selected_plan:
+            bot.send_message(
+                message.chat.id,
+                "❌ Please select a VIP plan first."
+            )
+            return
+
+        mpesa_code_waiting[user] = True
+
+        bot.send_message(
+            message.chat.id,
+            """
+🧾 *Enter your M-PESA Transaction Code.*
+
+Example:
+
+`TIQ8ABC123`
+""",
+            parse_mode="Markdown"
+        )
+
 
     # ================= VIP DASHBOARD =================
 
