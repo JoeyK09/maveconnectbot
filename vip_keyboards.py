@@ -59,3 +59,18 @@ def payment_keyboard():
 
     return kb
     
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+
+def mpesa_paid_keyboard():
+
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    kb.row(
+        KeyboardButton("✅ I've Paid")
+    )
+
+    kb.row(
+        KeyboardButton("🔙 Back")
+    )
+
+    return kb
