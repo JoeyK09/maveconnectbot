@@ -246,7 +246,15 @@ Choose your preferred payment method.
 👑 Plan: *{plan.title()}*
 💰 Amount: *KSh {price}*
 
-Send the payment.
+Send the payment to:
+
+📱0142047838
+
+👤Joseph Gichimu
+
+After paying tap *I've Paid* below and send your Mpesa transaction code
+
+Your VIP membership qill be updated after verification.
 
 Then send your M-Pesa phone number.
 
@@ -259,6 +267,58 @@ Example:
 
             return
 
+        @bot.callback_query_handler(func=lambda c: c.data == "vippay_mpesa")
+def vip_mpesa_payment(call):
+
+    user = call.from_user.id
+
+    if user not in selected_plan:
+        bot.answer_callback_query(
+            call.id,
+            "Please select a VIP plan first."
+        )
+        return
+
+    plan = selected_plan[user]["plan"]
+    price = selected_plan[user]["price"]
+
+    markup = types.InlineKeyboardMarkup()
+
+    markup.add(
+        types.InlineKeyboardButton(
+            "✅ I've Paid",
+            callback_data="vip_paid_mpesa"
+        )
+    )
+
+    bot.edit_message_text(
+        f"""
+🇰🇪 *M-PESA Payment*
+
+👑 Plan: *{plan}*
+
+💰 Amount: *KSh {price}*
+
+━━━━━━━━━━━━━━
+
+Send the payment to:
+
+📱 *07XXXXXXXX*
+
+👤 *Your Name*
+
+━━━━━━━━━━━━━━
+
+After paying, tap *I've Paid* below and enter your M-PESA transaction code.
+
+Your VIP membership will be activated after verification.
+""",
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        parse_mode="Markdown",
+        reply_markup=markup
+    )
+    
         # ---------- CRYPTO ----------
 
         wallets = {
