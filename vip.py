@@ -311,32 +311,36 @@ After sending the payment, reply with your TXID (Transaction Hash).
 
     # ================= I'VE PAID =================
 
-    @bot.callback_query_handler(func=lambda c: c.data == "vip_paid_mpesa")
-    def vip_paid_mpesa(call):
+@bot.message_handler(func=lambda m: m.text == "✅ I've Paid")
+def mpesa_paid(message):
 
-        user = call.from_user.id
+    user = message.from_user.id
 
-        mpesa_code_waiting[user] = True
-
-        bot.answer_callback_query(
-            call.id,
-            "Payment received. Please send your M-PESA transaction code."
-        )
-
+    # Ensure the user selected a plan first
+    if user not in selected_plan:
         bot.send_message(
-            call.message.chat.id,
-            """
-🧾 *Send your M-PESA transaction code.*
+            message.chat.id,
+            "❌ Please select a VIP plan first."
+        )
+        return
+
+    # Wait for the transaction code
+    mpesa_code_waiting[user] = True
+
+    bot.send_message(
+        message.chat.id,
+        """
+🧾 *Enter your M-PESA Transaction Code.*
 
 Example:
 
 `TIQ8ABC123`
 
-Your payment will be verified by the admin.
+After sending the code, your payment will be submitted for verification.
 """,
-            parse_mode="Markdown"
-            )
-
+        parse_mode="Markdown"
+    )
+    
     # ================= RECEIVE MPESA CODE =================
 
     @bot.message_handler(func=lambda m: m.from_user.id in mpesa_code_waiting)
