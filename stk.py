@@ -3,42 +3,42 @@ import base64
 import requests
 from datetime import datetime
 
-CONSUMER_KEY = os.getenv("zhwFg9gbNCyAfTRiG86jeU1GRCohH4wCVEBTdJl2vEjMOpMU")
-CONSUMER_SECRET = os.getenv("fAzDwJjXBFBbaVtS0GDR1kAZceGPPNxH0rkKxouHgPVGimdOkCo2Eu22RoUmay3m")
-
-SHORTCODE = "174379"
-
-PASSKEY = "YOUR_SANDBOX_PASSKEY"
-
+CONSUMER_KEY = os.getenv("CONSUMER_KEY")
+CONSUMER_SECRET = os.getenv("CONSUMER_SECRET")
 CALLBACK_URL = os.getenv("CALLBACK_URL")
 
+# Sandbox credentials
+SHORTCODE = "174379"
+PASSKEY = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
+
 TOKEN_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+STK_PUSH_URL = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
 
-STK_URL = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
 
-
-def get_access_token():
-
+def access_token():
     response = requests.get(
         TOKEN_URL,
         auth=(CONSUMER_KEY, CONSUMER_SECRET)
     )
+
+    response.raise_for_status()
 
     return response.json()["access_token"]
 
 
 def stk_push(phone, amount, account_reference, description):
 
-    token = get_access_token()
+    token = access_token()
 
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 
     password = base64.b64encode(
-        (SHORTCODE + PASSKEY + timestamp).encode()
+        f"{SHORTCODE}{PASSKEY}{timestamp}".encode()
     ).decode()
 
     headers = {
-        "Authorization": f"Bearer {token}"
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
     }
 
     payload = {
@@ -46,7 +46,7 @@ def stk_push(phone, amount, account_reference, description):
         "Password": password,
         "Timestamp": timestamp,
         "TransactionType": "CustomerPayBillOnline",
-        "Amount": amount,
+        "Amount": int(amount),
         "PartyA": phone,
         "PartyB": SHORTCODE,
         "PhoneNumber": phone,
@@ -56,7 +56,7 @@ def stk_push(phone, amount, account_reference, description):
     }
 
     response = requests.post(
-        STK_URL,
+        STK_PUSH_URL,
         json=payload,
         headers=headers
     )
