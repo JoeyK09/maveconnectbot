@@ -53,18 +53,42 @@ Choose an option below.
             "👥 VIP members list coming soon."
         )
 
-
+    
     @bot.message_handler(func=lambda m: m.text == "📊 Statistics")
     def statistics(message):
 
-        if str(message.from_user.id) != str(ADMIN_ID):
-            return
+      if str(message.from_user.id) != str(ADMIN_ID):
+          return
 
-        bot.send_message(
-            message.chat.id,
-            "📊 Statistics coming soon."
-        )
+      try:
+          users = get_total_users()
+          vip = get_total_vip()
+          pending = get_pending_vip_payments()
+          withdrawals = get_pending_withdrawals()
 
+          bot.send_message(
+             message.chat.id,
+             f"""
+    📊 *MaveConnect Statistics*
+
+    👥 Total Users: *{users}*
+
+    👑 Active VIP Members: *{vip}*
+
+    💳 Pending VIP Payments: *{pending}*
+
+    💰 Pending Withdrawals: *{withdrawals}*
+    """,
+               parse_mode="Markdown"
+           )
+
+         except Exception as e:
+           bot.send_message(
+              message.chat.id,
+              f"❌ Error loading statistics:\n`{e}`",
+              parse_mode="Markdown"
+           )
+        
     @bot.message_handler(func=lambda m: m.text == "📢 Broadcast")
     def broadcast(message):
 
