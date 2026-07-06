@@ -130,6 +130,8 @@ print("Telegram bot initialized")
 
 register_vip_handlers(bot)
 
+register_admin_handlers(bot)
+
 app = Flask(__name__)
 
 # ================= GROUPS =================
