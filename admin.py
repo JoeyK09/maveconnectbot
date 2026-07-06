@@ -1,6 +1,12 @@
 from telebot import types
 from vip_config import ADMIN_ID
 from admin_keyboards import admin_menu
+from database import (
+    get_total_users,
+    get_total_vip,
+    get_pending_vip_payments,
+    get_pending_withdrawals
+)
 
 
 def register_admin_handlers(bot):
@@ -58,7 +64,6 @@ Choose an option below.
             message.chat.id,
             "📊 Statistics coming soon."
         )
-
 
     @bot.message_handler(func=lambda m: m.text == "📢 Broadcast")
     def broadcast(message):
