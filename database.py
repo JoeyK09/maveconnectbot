@@ -965,3 +965,55 @@ def save_vip_payment(user_id, plan, amount, method, reference):
     cursor.close()
     conn.close()
 
+def get_total_users():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM users")
+    total = cur.fetchone()[0]
+
+    conn.close()
+    return total
+
+
+def get_total_vip():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM vip_members WHERE active=TRUE")
+    total = cur.fetchone()[0]
+
+    conn.close()
+    return total
+
+
+def get_pending_vip_payments():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM vip_payments
+        WHERE status='pending'
+    """)
+
+    total = cur.fetchone()[0]
+
+    conn.close()
+    return total
+
+
+def get_pending_withdrawals():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM withdrawals
+        WHERE status='pending'
+    """)
+
+    total = cur.fetchone()[0]
+
+    conn.close()
+    return total
