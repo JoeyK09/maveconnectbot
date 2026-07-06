@@ -2,16 +2,13 @@ from telebot import types
 
 def admin_menu():
 
-    kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup = types.ReplyKeyboardMarkup(
+        resize_keyboard=True
+    )
 
-    kb.row("👥 Users", "👑 VIP")
+    markup.row("💳 Pending Payments", "👥 VIP Members")
+    markup.row("📊 Statistics", "💰 Withdrawals")
+    markup.row("📢 Broadcast", "⚙ VIP Settings")
+    markup.row("🔙 Back")
 
-    kb.row("💸 Withdrawals", "💰 Finance")
-
-    kb.row("📢 Broadcast", "📊 Statistics")
-
-    kb.row("⚙ Settings")
-
-    kb.row("🔙 Back")
-
-    return kb
+    return markup
