@@ -211,9 +211,9 @@ def save_vip_payment(user_id, plan, amount, payment_method, reference):
     cur = conn.cursor()
 
     cur.execute("""
-    INSERT INTO vip_payments
-    (user_id, plan, amount, payment_method, reference)
-    VALUES (%s,%s,%s,%s,%s)
+        INSERT INTO vip_payments
+        (user_id, plan, amount, payment_method, reference)
+        VALUES (%s,%s,%s,%s,%s)
     """, (
         user_id,
         plan,
@@ -969,7 +969,7 @@ def get_total_users():
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM users")
+    cur.execute("SELECT COUNT(*) FROM plats")
     total = cur.fetchone()[0]
 
     conn.close()
@@ -980,7 +980,7 @@ def get_total_vip():
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM vip_members WHERE active=TRUE")
+    cur.execute("SELECT COUNT(*)FROM plats WHERE vip=TRUE")
     total = cur.fetchone()[0]
 
     conn.close()
@@ -1025,7 +1025,7 @@ def get_all_pending_vip_payments():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT id, user_id, plan, payment_method, reference
+        SELECT id, user_id, plan, amount, payment_method, reference
         FROM vip_payments
         WHERE status = 'pending'
         ORDER BY id ASC
