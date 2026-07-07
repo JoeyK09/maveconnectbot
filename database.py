@@ -1048,3 +1048,35 @@ def get_all_pending_vip_payments():
     conn.close()
 
     return payments
+
+
+def approve_vip_payment(user_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE vip_payments
+        SET status = 'approved'
+        WHERE user_id = %s
+        AND status = 'pending'
+    """, (user_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def reject_vip_payment(user_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE vip_payments
+        SET status = 'rejected'
+        WHERE user_id = %s
+        AND status = 'pending'
+    """, (user_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
