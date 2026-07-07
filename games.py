@@ -128,5 +128,6 @@ def register_game_handlers(bot):
         # Replace this with your main menu keyboard.
         bot.send_message(
             message.chat.id,
-            "🏠 Returned to the main menu."
+            "🏠 Main Menu.",
+            reply_markup=main_menu()
 )
