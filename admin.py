@@ -2,6 +2,8 @@ from telebot import types
 
 from vip_config import ADMIN_ID
 
+from database import get_all_pending_vip_payments
+
 from admin_keyboards import admin_menu
 
 from database import (
