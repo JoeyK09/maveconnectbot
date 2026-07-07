@@ -1017,3 +1017,34 @@ def get_pending_withdrawals():
 
     conn.close()
     return total
+
+
+def get_all_pending_vip_payments():
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, user_id, plan, payment_method, reference
+        FROM vip_payments
+        WHERE status = 'pending'
+        ORDER BY id ASC
+    """)
+
+    rows = cur.fetchall()
+
+    payments = []
+
+    for row in rows:
+        payments.append({
+            "id": row[0],
+            "user_id": row[1],
+            "plan": row[2],
+            "payment_method": row[3],
+            "reference": row[4]
+        })
+
+    cur.close()
+    conn.close()
+
+    return payments
