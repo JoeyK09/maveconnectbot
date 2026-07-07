@@ -360,9 +360,6 @@ def get_vip_payment_history(user_id):
 
     return rows
 
-
-conn.commit()
-
 # ================= FUNCTIONS =================
 
 def get_profile(user_id):
