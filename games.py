@@ -10,7 +10,7 @@ save_game_history()
 get_game_history()
 games_menu()
 
-Coin Flip
+#Coin Flip
 
 register_game_handlers(bot)
 
