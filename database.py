@@ -47,6 +47,46 @@ CREATE TABLE IF NOT EXISTS plats(
 )
 """)
 
+cur.execute("""
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS mave_coins BIGINT DEFAULT 0;
+
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS games_played INTEGER DEFAULT 0;
+
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS games_won INTEGER DEFAULT 0;
+
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS win_streak INTEGER DEFAULT 0;
+
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS highest_win BIGINT DEFAULT 0;
+
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS last_daily_bonus TIMESTAMP;
+""")
+
+conn.commit()
+cur.close()
+conn.close()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS game_history (
+    id SERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    game_name VARCHAR(50) NOT NULL,
+    bet BIGINT DEFAULT 0,
+    reward BIGINT DEFAULT 0,
+    result VARCHAR(20) NOT NULL,
+    played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+""")
+
+conn.commit()
+cur.close()
+conn.close()
+
 cursor.execute("""
 ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS vip BOOLEAN DEFAULT FALSE
@@ -172,6 +212,10 @@ CREATE TABLE IF NOT EXISTS vip_payments(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
+
+conn.commit()
+cur.close()
+conn.close()
 
 def create_vip_tables():
 
