@@ -1,25 +1,6 @@
 import random
 import time
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-
-# Database Adapter
-get_balance()
-add_balance()
-remove_balance()
-save_game_history()
-get_game_history()
-games_menu()
-
-#Coin Flip
-
-register_game_handlers(bot)
-
-# ============================================
-# MaveConnect Games Module (Part 1)
-# ============================================
-
-import random
-import time
+from database import get_balance, add_plats, remove_plats
 
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
