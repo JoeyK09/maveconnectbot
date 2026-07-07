@@ -47,29 +47,25 @@ CREATE TABLE IF NOT EXISTS plats(
 )
 """)
 
-cur.execute("""
-ALTER TABLE users
+cursor.execute("""
+ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS mave_coins BIGINT DEFAULT 0;
 
-ALTER TABLE users
+ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS games_played INTEGER DEFAULT 0;
 
-ALTER TABLE users
+ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS games_won INTEGER DEFAULT 0;
 
-ALTER TABLE users
+ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS win_streak INTEGER DEFAULT 0;
 
-ALTER TABLE users
+ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS highest_win BIGINT DEFAULT 0;
 
-ALTER TABLE users
+ALTER TABLE plats
 ADD COLUMN IF NOT EXISTS last_daily_bonus TIMESTAMP;
 """)
-
-conn.commit()
-cur.close()
-conn.close()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS game_history (
@@ -82,10 +78,6 @@ CREATE TABLE IF NOT EXISTS game_history (
     played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """)
-
-conn.commit()
-cur.close()
-conn.close()
 
 cursor.execute("""
 ALTER TABLE plats
@@ -214,7 +206,7 @@ CREATE TABLE IF NOT EXISTS vip_payments(
 """)
 
 conn.commit()
-cur.close()
+cursor.close()
 conn.close()
 
 def create_vip_tables():
@@ -434,6 +426,7 @@ def add_plats(user_id, amount):
         balance + amount
     ))
 
+    conn.commit()
     cursor.close()
     conn.close()
 
@@ -512,7 +505,7 @@ def update_daily(user_id, balance, last_daily):
     cursor.execute("""
         UPDATE plats
         SET balance=%s,
-            last_daily=%s
+            last_daily=%s,
             streak=%s
         WHERE user_id=%s
     """, (
