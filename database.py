@@ -1080,3 +1080,21 @@ def reject_vip_payment(user_id):
     conn.commit()
     cur.close()
     conn.close()
+
+def get_all_pending_vip_payments():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT user_id, plan, payment_method, reference
+        FROM vip_payments
+        WHERE status = 'pending'
+        ORDER BY id ASC
+    """)
+
+    payments = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return payments
