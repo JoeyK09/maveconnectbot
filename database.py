@@ -205,6 +205,14 @@ CREATE TABLE IF NOT EXISTS vip_payments(
 )
 """)
 
+conn = get_connection()
+cur = conn.cursor()
+
+cur.execute("""
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS vip BOOLEAN DEFAULT FALSE;
+""")
+
 conn.commit()
 cursor.close()
 conn.close()
@@ -1113,17 +1121,33 @@ def approve_vip_payment(user_id):
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("""
-        UPDATE vip_payments
-        SET status = 'approved'
-        WHERE user_id = %s
-        AND status = 'pending'
-    """, (user_id,))
+    try:
+        # Approve the payment
+        cur.execute("""
+            UPDATE vip_payments
+            SET status = 'approved'
+            WHERE user_id = %s
+            AND LOWER(status) = 'pending'
+        """, (user_id,))
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        # Activate VIP
+        cur.execute("""
+            UPDATE plats
+            SET vip = TRUE
+            WHERE user_id = %s
+        """, (str(user_id),))
 
+        conn.commit()
+        return True
+
+    except Exception as e:
+        conn.rollback()
+        print(e)
+        return False
+
+    finally:
+        cur.close()
+        conn.close()
 
 def reject_vip_payment(user_id):
     conn = get_connection()
@@ -1157,3 +1181,99 @@ def get_all_pending_vip_payments():
     conn.close()
 
     return payments
+
+
+from datetime import datetime, timedelta
+
+def approve_vip_payment(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT plan
+            FROM vip_payments
+            WHERE user_id=%s
+            AND LOWER(status)='pending'
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (user_id,))
+
+        row = cursor.fetchone()
+
+        if not row:
+            cursor.close()
+            conn.close()
+            return False
+
+        plan = row[0]
+
+        # VIP duration
+        if plan.lower() == "basic":
+            expiry = datetime.now() + timedelta(days=30)
+
+        elif plan.lower() == "premium":
+            expiry = datetime.now() + timedelta(days=90)
+
+        elif plan.lower() == "elite":
+            expiry = datetime.now() + timedelta(days=365)
+
+        else:
+            expiry = datetime.now() + timedelta(days=30)
+
+        # Use your existing function
+        activate_vip(user_id, plan, expiry)
+
+        cursor.execute("""
+            UPDATE vip_payments
+            SET status='approved'
+            WHERE user_id=%s
+            AND LOWER(status)='pending'
+        """, (user_id,))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return True
+
+    except Exception as e:
+        conn.rollback()
+        print(e)
+
+        cursor.close()
+        conn.close()
+
+        return False
+
+
+def reject_vip_payment(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            UPDATE vip_payments
+            SET status='rejected'
+            WHERE user_id=%s
+            AND LOWER(status)='pending'
+        """, (user_id,))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return True
+
+    except Exception as e:
+        conn.rollback()
+        print(e)
+
+        cursor.close()
+        conn.close()
+
+        return False
+        
