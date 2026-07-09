@@ -54,7 +54,10 @@ def get_game_history(user_id):
 # GAMES MENU
 # ============================================
 
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+
 def games_menu():
+
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.row(
@@ -68,12 +71,17 @@ def games_menu():
     )
 
     markup.row(
-        KeyboardButton("🏆 Leaderboard"),
-        KeyboardButton("📜 Game History")
+        KeyboardButton("🎁 Daily Bonus"),
+        KeyboardButton("🎉 Jackpot")
     )
 
     markup.row(
-        KeyboardButton("🎁 Daily Bonus")
+        KeyboardButton("🏆 Leaderboard"),
+        KeyboardButton("📜 History")
+    )
+
+    markup.row(
+        KeyboardButton("🛒 Mining Shop")
     )
 
     markup.row(
@@ -103,32 +111,61 @@ def coinflip_menu():
 
 def register_game_handlers(bot):
 
-    # ----------------------------
-    # Games Menu
-    # ----------------------------
+    # ==========================================
+    # GAMES MENU
+    # ==========================================
+
     @bot.message_handler(func=lambda m: m.text == "🎮 Games")
     def open_games(message):
 
+        user_id = str(message.from_user.id)
+
+        # Create profile if it doesn't exist
+        get_profile(user_id)
+
+        balance = get_balance(user_id)
+
         bot.send_message(
             message.chat.id,
-            "🎮 *Welcome to MaveConnect Games!*\n\n"
-            "Play games, earn Mave Coins and climb the leaderboard.\n\n"
-            "Choose a game below.",
-            parse_mode="Markdown",
+            f"""
+🎮 <b>Welcome to MaveConnect Games!</b>
+
+💰 <b>Your Balance:</b> <code>{balance:,}</code> Plats
+
+━━━━━━━━━━━━━━━━━━━
+
+🎲 <b>Available Games</b>
+
+🪙 Coin Flip
+🎲 Dice Roll
+🎰 Slot Machine
+🎯 Lucky Number
+
+━━━━━━━━━━━━━━━━━━━
+
+🏆 Win Plats
+🔥 Build Win Streaks
+🎁 Claim Daily Bonuses
+📜 View Game History
+🥇 Climb the Leaderboard
+
+👇 <b>Select a game below.</b>
+""",
+            parse_mode="HTML",
             reply_markup=games_menu()
         )
 
-    # ----------------------------
-    # Back Button
-    # ----------------------------
+    # ==========================================
+    # BACK BUTTON
+    # ==========================================
+
     @bot.message_handler(func=lambda m: m.text == "🔙 Back")
     def back_button(message):
 
         game_states.pop(message.from_user.id, None)
 
-        # Replace this with your main menu keyboard.
         bot.send_message(
             message.chat.id,
-            "🏠 Main Menu.",
+            "🏠 Main Menu",
             reply_markup=main_menu()
-        )    
+        )
