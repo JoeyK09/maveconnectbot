@@ -408,6 +408,8 @@ def get_balance(user_id):
 
     row = cursor.fetchone()
 
+    print("Database returned now:",row)
+
     cursor.close()
     conn.close()
 
