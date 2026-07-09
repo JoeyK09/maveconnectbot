@@ -271,3 +271,5 @@ Choose your side.
         parse_mode="HTML",
         reply_markup=markup
     )
+
+    bot.register_next_step_handler(message,process_coinflip_bet)
