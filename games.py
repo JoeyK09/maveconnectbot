@@ -1,8 +1,15 @@
 import random
 import time
-from database import get_balance, add_plats, remove_plats
 
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+
+from database import (
+    get_balance,
+    add_plats,
+    remove_plats,
+    add_win,
+    leaderboard
+)
 
 # ===============USER STATE ==============================
 
@@ -124,99 +131,4 @@ def register_game_handlers(bot):
             message.chat.id,
             "🏠 Main Menu.",
             reply_markup=main_menu()
-            # ==========================
-# COIN FLIP
-# ==========================
-
-@bot.message_handler(func=lambda m: m.text == "🪙 Coin Flip")
-def start_coinflip(message):
-
-    bot.send_message(
-        message.chat.id,
-        "🪙 Coin Flip\n\n"
-        "Enter the amount of Plats you want to bet."
-    )
-
-    bot.register_next_step_handler(message, process_coinflip_bet)
-
-
-# ==========================
-# DICE ROLL
-# ==========================
-
-@bot.message_handler(func=lambda m: m.text == "🎲 Dice Roll")
-def dice_roll(message):
-    bot.send_message(
-        message.chat.id,
-        "🎲 Dice Roll\n\n"
-        "This game is under construction.\n"
-        "Coming soon!"
-    )
-
-
-# ==========================
-# SLOT MACHINE
-# ==========================
-
-@bot.message_handler(func=lambda m: m.text == "🎰 Slot Machine")
-def slot_machine(message):
-    bot.send_message(
-        message.chat.id,
-        "🎰 Slot Machine\n\n"
-        "This game is under construction.\n"
-        "Coming soon!"
-    )
-
-
-# ==========================
-# LUCKY NUMBER
-# ==========================
-
-@bot.message_handler(func=lambda m: m.text == "🎯 Lucky Number")
-def lucky_number(message):
-    bot.send_message(
-        message.chat.id,
-        "🎯 Lucky Number\n\n"
-        "This game is under construction.\n"
-        "Coming soon!"
-    )
-
-
-# ==========================
-# LEADERBOARD
-# ==========================
-
-@bot.message_handler(func=lambda m: m.text == "🏆 Leaderboard")
-def leaderboard(message):
-    bot.send_message(
-        message.chat.id,
-        "🏆 Leaderboard\n\n"
-        "No games have been played yet."
-    )
-
-
-# ==========================
-# GAME HISTORY
-# ==========================
-
-@bot.message_handler(func=lambda m: m.text == "📜 Game History")
-def history(message):
-    bot.send_message(
-        message.chat.id,
-        "📜 Game History\n\n"
-        "No history available."
-    )
-
-
-# ==========================
-# DAILY BONUS
-# ==========================
-
-@bot.message_handler(func=lambda m: m.text == "🎁 Daily Bonus")
-def daily_bonus(message):
-    bot.send_message(
-        message.chat.id,
-        "🎁 Daily Bonus\n\n"
-        "Coming soon!"
-    )
-)
+            
