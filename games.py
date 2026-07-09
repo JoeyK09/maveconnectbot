@@ -207,3 +207,67 @@ Enter the amount you want to bet.
         )
 
         bot.register_next_step_handler(message, process_coinflip_bet)
+
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+
+# Stores temporary game data
+coinflip_data = {}
+
+def process_coinflip_bet(message):
+
+    user_id = str(message.from_user.id)
+
+    try:
+        bet = int(message.text.replace(",", ""))
+
+    except ValueError:
+        bot.send_message(
+            message.chat.id,
+            "❌ Please enter a valid number."
+        )
+        bot.register_next_step_handler(message, process_coinflip_bet)
+        return
+
+    if bet < 10:
+        bot.send_message(
+            message.chat.id,
+            "❌ Minimum bet is 10 Plats."
+        )
+        bot.register_next_step_handler(message, process_coinflip_bet)
+        return
+
+    balance = get_balance(user_id)
+
+    if bet > balance:
+        bot.send_message(
+            message.chat.id,
+            f"❌ You only have {balance:,} Plats."
+        )
+        bot.register_next_step_handler(message, process_coinflip_bet)
+        return
+
+    coinflip_data[user_id] = {
+        "bet": bet
+    }
+
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.row(
+        KeyboardButton("🟡 Heads"),
+        KeyboardButton("⚪ Tails")
+    )
+    markup.row(
+        KeyboardButton("🔙 Back")
+    )
+
+    bot.send_message(
+        message.chat.id,
+        f"""
+🪙 <b>Coin Flip</b>
+
+Bet: <code>{bet:,}</code> Plats
+
+Choose your side.
+""",
+        parse_mode="HTML",
+        reply_markup=markup
+    )
