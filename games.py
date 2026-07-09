@@ -131,4 +131,4 @@ def register_game_handlers(bot):
             message.chat.id,
             "🏠 Main Menu.",
             reply_markup=main_menu()
-            
+        )    
