@@ -208,10 +208,10 @@ CREATE TABLE IF NOT EXISTS vip_payments(
 conn = get_connection()
 cur = conn.cursor()
 
-cur.execute("""
-ALTER TABLE users
-ADD COLUMN IF NOT EXISTS vip BOOLEAN DEFAULT FALSE;
-""")
+#cur.execute("""
+#ALTER TABLE users
+#ADD COLUMN IF NOT EXISTS vip BOOLEAN DEFAULT FALSE;
+#""")
 
 conn.commit()
 cursor.close()
