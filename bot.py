@@ -273,6 +273,7 @@ pending_crypto_withdraw = {}
 mpesa_waiting = {}
 mpesa_code_waiting = {}
 vip_payment_waiting = {}
+coinflip_bets = {}
 
 # ============== PICKAXE PRICES ================
 
