@@ -179,7 +179,7 @@ def register_game_handlers(bot):
     @bot.message_handler(func=lambda m: m.text == "🪙 Coin Flip")
     def start_coinflip(message):
 
-        user_id = str(message.from_user.id)
+        user_id = message.from_user.id
 
         get_profile(user_id)
 
@@ -216,7 +216,7 @@ coinflip_data = {}
 
 def process_coinflip_bet(message):
 
-    user_id = str(message.from_user.id)
+    user_id = message.from_user.id
 
     try:
         bet = int(message.text.replace(",", ""))
