@@ -1,6 +1,8 @@
 import random
 import time
 
+from games_keyboard import games_menu
+
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
 from database import (
