@@ -7,6 +7,7 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
 from database import (
     get_balance,
+    get_profile,
     add_plats,
     remove_plats,
     add_win,
