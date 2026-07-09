@@ -134,6 +134,8 @@ register_vip_handlers(bot)
 
 register_admin_handlers(bot)
 
+register_game_handlers(bot)
+
 app = Flask(__name__)
 
 # ================= GROUPS =================
