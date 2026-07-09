@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from games_keyboard import games_menu
 from games import register_game_handlers
 from admin import register_admin_handlers
 from vip_keyboards import (
