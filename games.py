@@ -171,3 +171,39 @@ def register_game_handlers(bot):
             "🏠 Main Menu",
             reply_markup=main_menu()
         )
+       # ==========================================
+    # COIN FLIP
+    # ==========================================
+
+    @bot.message_handler(func=lambda m: m.text == "🪙 Coin Flip")
+    def start_coinflip(message):
+
+        user_id = str(message.from_user.id)
+
+        get_profile(user_id)
+
+        balance = get_balance(user_id)
+
+        if balance <= 0:
+            bot.send_message(
+                message.chat.id,
+                "❌ You don't have enough Plats to play.\n\nMine or earn more Plats first."
+            )
+            return
+
+        bot.send_message(
+            message.chat.id,
+            f"""
+🪙 <b>Coin Flip</b>
+
+💰 Balance: <code>{balance:,}</code> Plats
+
+Enter the amount you want to bet.
+
+<b>Minimum Bet:</b> 10 Plats
+<b>Maximum Bet:</b> 100,000 Plats
+""",
+            parse_mode="HTML"
+        )
+
+        bot.register_next_step_handler(message, process_coinflip_bet)
