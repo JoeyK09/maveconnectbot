@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS crypto_withdrawals(
     network TEXT NOT NULL,
     address TEXT NOT NULL,
     amount DOUBLE PRECISION NOT NULL,
-    status TEXT DEFAULT 'Pending',
+    status TEXT DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS vip_payments(
     amount DOUBLE PRECISION NOT NULL,
     method TEXT NOT NULL,
     reference TEXT,
-    status TEXT DEFAULT 'Pending',
+    status TEXT DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
@@ -232,7 +232,7 @@ def create_vip_tables():
         amount INTEGER,
         payment_method TEXT,
         reference TEXT UNIQUE,
-        status TEXT DEFAULT 'Pending',
+        status TEXT DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
@@ -1032,9 +1032,34 @@ def get_pending_vip_payments():
     """)
 
     total = cur.fetchone()[0]
-
+    
+    cur.close()
     conn.close()
+    
     return total
+
+
+def get_all_pending_vip_payments():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            user_id,
+            plan,
+            payment_method,
+            reference
+        FROM vip_payments
+        WHERE status='pending'
+        ORDER BY id ASC
+    """)
+
+    payments = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return payments
 
 
 def get_pending_withdrawals():
