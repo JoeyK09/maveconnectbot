@@ -3729,15 +3729,44 @@ def refer_btn(msg):
     )
 
 
-@bot.message_handler(func=lambda m: m.text=="🎮 Games")
-def games_btn(msg):
-    bot.reply_to(
-        msg,
-        "🎮 Games\n\n"
-        "🎲 Dice\n"
-        "🪙 Coin Flip\n"
-        "🎰 Slots\n\n"
-        "Coming in the next update!"
+@bot.message_handler(func=lambda m: m.text == "🎮 Games")
+def open_games(message):
+
+    user_id = str(message.from_user.id)
+
+    # Ensure the player exists in the database
+    get_profile(user_id)
+
+    balance = get_balance(user_id)
+
+    bot.send_message(
+        message.chat.id,
+        f"""
+🎮 <b>Welcome to MaveConnect Games!</b>
+
+💰 <b>Your Balance:</b> <code>{balance:,}</code> Plats
+
+━━━━━━━━━━━━━━━━━━━
+
+🎲 <b>Available Games</b>
+
+🪙 Coin Flip
+🎲 Dice Roll
+🎰 Slot Machine
+🎯 Lucky Number
+
+━━━━━━━━━━━━━━━━━━━
+
+🏆 Win Plats
+🔥 Build Win Streaks
+🎁 Claim Daily Bonuses
+📜 View Game History
+🥇 Climb the Leaderboard
+
+👇 <b>Select a game below.</b>
+""",
+        parse_mode="HTML",
+        reply_markup=games_menu()
     )
 
 
