@@ -403,7 +403,7 @@ def get_balance(user_id):
 
     cursor.execute(
         "SELECT balance FROM plats WHERE user_id=%s",
-       (str(user_id),))
+       (str(user_id),)
     )
 
     row = cursor.fetchone()
