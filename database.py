@@ -308,7 +308,7 @@ def is_vip(user_id):
     SELECT active
     FROM vip_subscriptions
     WHERE user_id=%s
-    """, (user_id,))
+    """, (str(user_id),))
 
     row = cur.fetchone()
 
@@ -332,7 +332,7 @@ def get_vip_info(user_id):
     FROM vip_subscriptions
 
     WHERE user_id=%s
-    """, (user_id,))
+    """, (str(user_id),))
 
     row = cur.fetchone()
 
@@ -359,7 +359,7 @@ def get_vip_payment_history(user_id):
     WHERE user_id=%s
 
     ORDER BY created_at DESC
-    """, (user_id,))
+    """, (str(user_id),))
 
     rows = cur.fetchall()
 
@@ -379,7 +379,7 @@ def get_profile(user_id):
                last_daily, last_mine, wins,streak
         FROM plats
         WHERE user_id=%s
-    """, (user_id,))
+    """, (str(user_id),))
 
     row = cursor.fetchone()
 
@@ -403,7 +403,7 @@ def get_balance(user_id):
 
     cursor.execute(
         "SELECT balance FROM plats WHERE user_id=%s",
-        (user_id,)
+       (str(user_id),))
     )
 
     row = cursor.fetchone()
@@ -417,6 +417,8 @@ def get_balance(user_id):
     
 
 def add_plats(user_id, amount):
+    user_id= str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -439,6 +441,8 @@ def add_plats(user_id, amount):
 
 
 def remove_plats(user_id, amount):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -460,6 +464,8 @@ def remove_plats(user_id, amount):
 
 
 def update_mine(user_id, balance, xp, level, pickaxe, last_mine):
+    user_id= str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -486,6 +492,8 @@ def update_mine(user_id, balance, xp, level, pickaxe, last_mine):
 
 
 def update_pickaxe(user_id, balance, pickaxe):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -506,6 +514,8 @@ def update_pickaxe(user_id, balance, pickaxe):
 
 
 def update_daily(user_id, balance, last_daily):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -535,7 +545,7 @@ def add_win(user_id):
         UPDATE plats
         SET wins = wins + 1
         WHERE user_id=%s
-    """, (user_id,))
+    """, (str(user_id),))
 
     conn.commit()
     cursor.close()
@@ -543,6 +553,7 @@ def add_win(user_id):
     
 
 def leaderboard(limit=10):
+    user_id=str(user_id)
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -563,6 +574,8 @@ def leaderboard(limit=10):
     
 
 def add_favorite(user, coin):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
     
@@ -593,6 +606,8 @@ def add_favorite(user, coin):
     
 
 def get_favorites(user):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
     
@@ -604,6 +619,8 @@ def get_favorites(user):
 
 
 def add_alert(user, coin, target):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
     
@@ -617,6 +634,8 @@ def add_alert(user, coin, target):
 
 
 def get_alerts():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
     
@@ -627,6 +646,8 @@ def get_alerts():
 
 
 def delete_alert(user, coin, target):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -640,6 +661,8 @@ def delete_alert(user, coin, target):
     
     
 def has_achievement(user_id, achievement):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -656,6 +679,8 @@ def has_achievement(user_id, achievement):
     return found
 
 def unlock_achievement(user_id, achievement):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -670,6 +695,8 @@ def unlock_achievement(user_id, achievement):
 
 
 def get_pickaxe(user_id):
+    user_id=str(user_id)
+    
     get_profile(user_id)
 
     cursor.execute(
@@ -684,6 +711,8 @@ def get_pickaxe(user_id):
 
 
 def get_mining_bonus(user_id):
+    user_id=str(user_id)
+    
     get_profile(user_id)
 
     cursor.execute(
@@ -703,6 +732,8 @@ def get_mining_bonus(user):
 
 
 def create_deposit(user_id, coin, network, txid, amount):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -724,6 +755,8 @@ def create_deposit(user_id, coin, network, txid, amount):
 
 
 def add_withdrawal(user_id, amount, phone):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -742,6 +775,8 @@ def add_withdrawal(user_id, amount, phone):
 
 
 def get_pending_withdrawals():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -761,6 +796,8 @@ def get_pending_withdrawals():
 
 
 def add_deposit(user_id, coin, txid):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -779,6 +816,8 @@ def add_deposit(user_id, coin, txid):
 
 
 def get_pending_deposits():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -799,6 +838,8 @@ def get_pending_deposits():
 
     
 def credit_balance(user_id, amount):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -813,6 +854,8 @@ def credit_balance(user_id, amount):
     conn.close()
 
 def txid_exists(txid):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -831,6 +874,8 @@ def txid_exists(txid):
     return exists
 
 def update_deposit_status(txid, status):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -847,6 +892,8 @@ def update_deposit_status(txid, status):
 
 
 def add_transaction(user_id, tx_type, amount, description):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -867,6 +914,7 @@ def add_transaction(user_id, tx_type, amount, description):
 
 
 def add_crypto_withdrawal(user_id, coin, network, address, amount):
+    user_id=str(user_id)
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -897,7 +945,7 @@ def is_vip(user_id):
         SELECT vip, vip_expiry
         FROM plats
         WHERE user_id=%s
-    """, (user_id,))
+    """, (str(user_id),))
 
     row = cursor.fetchone()
 
@@ -920,6 +968,7 @@ def is_vip(user_id):
 
 
 def activate_vip(user_id, plan, expiry):
+    user_id=str(user_id)
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -957,7 +1006,7 @@ def remove_vip(user_id):
             vip_start=NULL,
             vip_expiry=NULL
         WHERE user_id=%s
-    """, (user_id,))
+    """, (str(user_id),))
 
     conn.commit()
 
@@ -977,7 +1026,7 @@ def get_vip_info(user_id):
                vip_expiry
         FROM plats
         WHERE user_id=%s
-    """, (user_id,))
+    """, (str(user_id),))
 
     row = cursor.fetchone()
 
@@ -988,6 +1037,7 @@ def get_vip_info(user_id):
 
 
 def save_vip_payment(user_id, plan, amount, method, reference):
+    user_id=str(user_id)
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -1010,6 +1060,8 @@ def save_vip_payment(user_id, plan, amount, method, reference):
     conn.close()
 
 def get_total_users():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cur = conn.cursor()
 
@@ -1021,6 +1073,8 @@ def get_total_users():
 
 
 def get_total_vip():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cur = conn.cursor()
 
@@ -1032,6 +1086,8 @@ def get_total_vip():
 
 
 def get_pending_vip_payments():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cur = conn.cursor()
 
@@ -1050,6 +1106,8 @@ def get_pending_vip_payments():
 
 
 def get_all_pending_vip_payments():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cur = conn.cursor()
 
@@ -1073,6 +1131,8 @@ def get_all_pending_vip_payments():
 
 
 def get_pending_withdrawals():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cur = conn.cursor()
 
@@ -1089,6 +1149,7 @@ def get_pending_withdrawals():
 
 
 def get_all_pending_vip_payments():
+    user_id=str(user_id)
 
     conn = get_connection()
     cur = conn.cursor()
@@ -1120,6 +1181,8 @@ def get_all_pending_vip_payments():
 
 
 def approve_vip_payment(user_id):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cur = conn.cursor()
 
@@ -1167,6 +1230,8 @@ def reject_vip_payment(user_id):
     conn.close()
 
 def get_all_pending_vip_payments():
+    user_id=str(user_id)
+    
     conn = get_connection()
     cur = conn.cursor()
 
@@ -1188,6 +1253,8 @@ def get_all_pending_vip_payments():
 from datetime import datetime, timedelta
 
 def approve_vip_payment(user_id):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -1251,6 +1318,8 @@ def approve_vip_payment(user_id):
 
 
 def reject_vip_payment(user_id):
+    user_id=str(user_id)
+    
     conn = get_connection()
     cursor = conn.cursor()
 
