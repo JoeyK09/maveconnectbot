@@ -1180,75 +1180,132 @@ def get_all_pending_vip_payments():
     return payments
 
 
-def approve_vip_payment(user_id):
-    user_id=str(user_id)
-    
+def approve_vip_payment(payment_id):
+
     conn = get_connection()
     cur = conn.cursor()
 
     try:
-        # Approve the payment
+        # Get payment details
+        cur.execute("""
+            SELECT user_id, plan
+            FROM vip_payments
+            WHERE id=%s
+            AND LOWER(status)='pending'
+        """, (payment_id,))
+
+        row = cur.fetchone()
+
+        if not row:
+            return None
+
+        user_id, plan = row
+
+        # Mark payment approved
         cur.execute("""
             UPDATE vip_payments
-            SET status = 'approved'
-            WHERE user_id = %s
-            AND LOWER(status) = 'pending'
-        """, (user_id,))
+            SET status='approved'
+            WHERE id=%s
+        """, (payment_id,))
 
         # Activate VIP
         cur.execute("""
             UPDATE plats
-            SET vip = TRUE
-            WHERE user_id = %s
+            SET vip=TRUE
+            WHERE user_id=%s
         """, (str(user_id),))
 
         conn.commit()
-        return True
+
+        return {
+            "user_id": str(user_id),
+            "plan": plan
+        }
 
     except Exception as e:
         conn.rollback()
         print(e)
-        return False
+        return None
 
     finally:
         cur.close()
         conn.close()
 
-def reject_vip_payment(user_id):
+def reject_vip_payment(payment_id):
+
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("""
-        UPDATE vip_payments
-        SET status = 'rejected'
-        WHERE user_id = %s
-        AND status = 'pending'
-    """, (user_id,))
+    try:
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        cur.execute("""
+            SELECT user_id
+            FROM vip_payments
+            WHERE id=%s
+            AND LOWER(status)='pending'
+        """, (payment_id,))
+
+        row = cur.fetchone()
+
+        if not row:
+            return None
+
+        user_id = row[0]
+
+        cur.execute("""
+            UPDATE vip_payments
+            SET status='rejected'
+            WHERE id=%s
+        """, (payment_id,))
+
+        conn.commit()
+
+        return str(user_id)
+
+    except Exception as e:
+        conn.rollback()
+        print(e)
+        return None
+
+    finally:
+        cur.close()
+        conn.close()
 
 def get_all_pending_vip_payments():
-    user_id=str(user_id)
-    
+
     conn = get_connection()
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT user_id, plan, payment_method, reference
+        SELECT
+            id,
+            user_id,
+            plan,
+            payment_method,
+            reference
         FROM vip_payments
-        WHERE status = 'pending'
+        WHERE LOWER(status)='pending'
         ORDER BY id ASC
     """)
 
-    payments = cur.fetchall()
+    rows = cur.fetchall()
+
+    payments = []
+
+    for row in rows:
+
+        payments.append({
+            "id": row[0],
+            "user_id": str(row[1]),
+            "plan": row[2],
+            "payment_method": row[3],
+            "reference": row[4]
+        })
 
     cur.close()
     conn.close()
 
     return payments
-
 
 from datetime import datetime, timedelta
 
