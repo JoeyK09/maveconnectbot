@@ -1845,66 +1845,6 @@ def scan(msg):
         print("Scan error:", repr(e))
         bot.reply_to(msg, "⚠️ Scan failed")
 
-@bot.message_handler(commands=["addvip"])
-def addvip(msg):
-
-    if msg.from_user.id != ADMIN_ID:
-        return
-
-    parts = msg.text.split()
-
-    if len(parts) != 2:
-        bot.reply_to(msg, "Usage: /addvip USER_ID")
-        return
-
-    try:
-        user_id = int(parts[1])
-
-        vip_users.add(user_id)
-
-        bot.reply_to(
-            msg,
-            f"✅ Added {user_id} to VIP"
-        )
-
-    except Exception as e:
-        bot.reply_to(msg, f"Error: {e}")
-
-@bot.message_handler(commands=["removevip"])
-def removevip(msg):
-
-    if msg.from_user.id != ADMIN_ID:
-        return
-
-    parts = msg.text.split()
-
-    if len(parts) != 2:
-        bot.reply_to(msg, "Usage: /removevip USER_ID")
-        return
-
-    try:
-        user_id = int(parts[1])
-
-        vip_users.discard(user_id)
-
-        bot.reply_to(
-            msg,
-            f"❌ Removed {user_id}"
-        )
-
-    except Exception as e:
-        bot.reply_to(msg, f"Error: {e}")
-
-@bot.message_handler(commands=["vipcount"])
-def vipcount(msg):
-
-    if msg.from_user.id != ADMIN_ID:
-        return
-
-    bot.reply_to(
-        msg,
-        f"💎 VIP Users: {len(vip_users)}"
-    )
 
 
 @bot.message_handler(commands=["nettest"])
@@ -1982,6 +1922,47 @@ Choose an option below.""",
         parse_mode="Markdown"
     )
 
+@bot.message_handler(commands=["pendingvip"])
+def pending_vip(message):
+
+    if message.from_user.id != ADMIN_ID:
+        return
+
+    payments = get_pending_payments()
+
+    if not payments:
+        bot.send_message(message.chat.id, "✅ No pending VIP payments.")
+        return
+
+    for payment in payments:
+        payment_id, user_id, plan, amount, method, reference = payment
+
+        markup = types.InlineKeyboardMarkup()
+
+        markup.row(
+            types.InlineKeyboardButton(
+                "✅ Approve",
+                callback_data=f"approvevip_{user_id}"
+            ),
+            types.InlineKeyboardButton(
+                "❌ Reject",
+                callback_data=f"rejectvip_{user_id}"
+            )
+        )
+
+        bot.send_message(
+            message.chat.id,
+            f"""💳 VIP PAYMENT
+
+👤 User ID: {user_id}
+👑 Plan: {plan}
+💰 Amount: KSh {amount}
+💳 Method: {method}
+🧾 Reference: {reference}
+""",
+            reply_markup=markup
+        )
+        
 @bot.message_handler(func=lambda m: m.text == "📜 History")
 def history(message):
     user = str(message.from_user.id)
