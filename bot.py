@@ -3,6 +3,7 @@ import os
 import time
 import requests
 import feedparser
+from keyboards import main_menu
 from games_keyboard import games_menu
 from games import register_game_handlers
 from admin import register_admin_handlers
@@ -1201,42 +1202,6 @@ def get_history(symbol, days=60):
 def home():
     return "LEVEL 4 AI TRADING BOT 🚀"
 
-# ==================MAIN MENU ================
-
-def main_menu():
-
-    markup = ReplyKeyboardMarkup(resize_keyboard=True)
-
-    markup.row(
-        KeyboardButton("📈 Trading"),
-        KeyboardButton("⛏️ Mine")
-    )
-
-    markup.row(
-        KeyboardButton("💳 Mave Wallet"),
-        KeyboardButton("👑 VIP MEMBERSHIP")
-    )
-
-    markup.row(
-        KeyboardButton("👥 Refer & Earn"),
-        KeyboardButton("🎁 Daily")
-    )
-
-    markup.row(
-        KeyboardButton("👤 Account"),
-        KeyboardButton("🏆 Leaderboard")
-    )
-
-    markup.row(
-        KeyboardButton("🎮 Games"),
-        KeyboardButton("⚙️ Settings")
-    )
-
-    markup.row(
-        KeyboardButton("🤝 Partners")
-    )
-    
-    return markup
 
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
