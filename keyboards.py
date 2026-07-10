@@ -35,3 +35,16 @@ def main_menu():
     )
 
     return markup
+
+markup = types.InlineKeyboardMarkup()
+
+markup.row(
+    types.InlineKeyboardButton(
+        "✅ Approve",
+        callback_data=f"approvevip_{user_id}"
+    ),
+    types.InlineKeyboardButton(
+        "❌ Reject",
+        callback_data=f"rejectvip_{user_id}"
+    )
+)
