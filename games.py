@@ -1,7 +1,7 @@
 import random
 import time
 
-from keyboards import main_menu
+from telebot.types import main_menu
 
 from games_keyboard import games_menu
 
