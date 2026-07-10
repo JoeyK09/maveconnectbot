@@ -1922,46 +1922,6 @@ Choose an option below.""",
         parse_mode="Markdown"
     )
 
-@bot.message_handler(commands=["pendingvip"])
-def pending_vip(message):
-
-    if message.from_user.id != ADMIN_ID:
-        return
-
-    payments = get_pending_payments()
-
-    if not payments:
-        bot.send_message(message.chat.id, "✅ No pending VIP payments.")
-        return
-
-    for payment in payments:
-        payment_id, user_id, plan, amount, method, reference = payment
-
-        markup = types.InlineKeyboardMarkup()
-
-        markup.row(
-            types.InlineKeyboardButton(
-                "✅ Approve",
-                callback_data=f"approvevip_{user_id}"
-            ),
-            types.InlineKeyboardButton(
-                "❌ Reject",
-                callback_data=f"rejectvip_{user_id}"
-            )
-        )
-
-        bot.send_message(
-            message.chat.id,
-            f"""💳 VIP PAYMENT
-
-👤 User ID: {user_id}
-👑 Plan: {plan}
-💰 Amount: KSh {amount}
-💳 Method: {method}
-🧾 Reference: {reference}
-""",
-            reply_markup=markup
-        )
         
 @bot.message_handler(func=lambda m: m.text == "📜 History")
 def history(message):
