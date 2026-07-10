@@ -143,56 +143,25 @@ Choose an option below.
                 message.chat.id,
                 f"❌ {e}"
                 )
-            
-    # ================= APPROVE VIP =================
+            # ================= APPROVE VIP =================
 
-    @bot.callback_query_handler(func=lambda c: c.data.startswith("approvevip_"))
-    def approve_vip_callback(call):
+@bot.callback_query_handler(func=lambda call: call.data.startswith("approvevip_"))
+def approve_vip_callback(call):
 
-        if str(call.from_user.id) != str(ADMIN_ID):
-            bot.answer_callback_query(call.id, "Unauthorized")
-            return
+    if str(call.from_user.id) != str(ADMIN_ID):
+        bot.answer_callback_query(call.id, "Unauthorized.")
+        return
 
-        payment_id = call.data.split("_")[1]
+    user_id = call.data.split("_")[1]
 
-        if approve_vip_payment(payment_id):
+    success = approve_vip_payment(user_id)
 
-            bot.edit_message_reply_markup(
-                chat_id=call.message.chat.id,
-                message_id=call.message.message_id,
-                reply_markup=None
-            )
+    if success:
 
-            bot.answer_callback_query(
-                call.id,
-                "VIP Approved!"
-            )
-
-            bot.send_message(
-                call.message.chat.id,
-                "✅ VIP payment approved successfully."
-            )
-
-        else:
-
-            bot.answer_callback_query(
-                call.id,
-                "Payment not found."
-            )
-
-
-    # ================= REJECT VIP =================
-
-    @bot.callback_query_handler(func=lambda c: c.data.startswith("rejectvip_"))
-    def reject_vip_callback(call):
-
-        if str(call.from_user.id) != str(ADMIN_ID):
-            bot.answer_callback_query(call.id, "Unauthorized")
-            return
-
-        payment_id = call.data.split("_")[1]
-
-        reject_vip_payment(payment_id)
+        bot.answer_callback_query(
+            call.id,
+            "✅ VIP Approved!"
+        )
 
         bot.edit_message_reply_markup(
             chat_id=call.message.chat.id,
@@ -200,12 +169,51 @@ Choose an option below.
             reply_markup=None
         )
 
+        bot.send_message(
+            user_id,
+            "🎉 Congratulations! Your VIP Membership has been approved.\n\nEnjoy your premium benefits!"
+        )
+
+    else:
         bot.answer_callback_query(
             call.id,
-            "Payment rejected."
+            "❌ Approval failed."
+        )
+
+
+# ================= REJECT VIP =================
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("rejectvip_"))
+def reject_vip_callback(call):
+
+    if str(call.from_user.id) != str(ADMIN_ID):
+        bot.answer_callback_query(call.id, "Unauthorized.")
+        return
+
+    user_id = call.data.split("_")[1]
+
+    success = reject_vip_payment(user_id)
+
+    if success:
+
+        bot.answer_callback_query(
+            call.id,
+            "❌ Payment Rejected."
+        )
+
+        bot.edit_message_reply_markup(
+            chat_id=call.message.chat.id,
+            message_id=call.message.message_id,
+            reply_markup=None
         )
 
         bot.send_message(
-            call.message.chat.id,
-            "❌ VIP payment rejected."
-    )
+            user_id,
+            "❌ Your VIP payment has been rejected.\n\nIf you believe this is a mistake, please contact support."
+        )
+
+    else:
+        bot.answer_callback_query(
+            call.id,
+            "Failed to reject payment."
+        )
