@@ -151,36 +151,42 @@ Choose an option below.
 def approve_vip_callback(call):
 
     if str(call.from_user.id) != str(ADMIN_ID):
-        bot.answer_callback_query(call.id, "Unauthorized.")
+        bot.answer_callback_query(call.id, "Unauthorized")
         return
 
-    user_id = call.data.split("_")[1]
+    payment_id = call.data.split("_")[1]
 
-    success = approve_vip_payment(user_id)
+    result = approve_vip_payment(payment_id)
 
-    if success:
+    if not result:
 
         bot.answer_callback_query(
             call.id,
-            "✅ VIP Approved!"
+            "Approval failed."
         )
 
-        bot.edit_message_reply_markup(
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-            reply_markup=None
-        )
+        return
 
-        bot.send_message(
-            user_id,
-            "🎉 Congratulations! Your VIP Membership has been approved.\n\nEnjoy your premium benefits!"
-        )
+    bot.answer_callback_query(
+        call.id,
+        "VIP Approved!"
+    )
 
-    else:
-        bot.answer_callback_query(
-            call.id,
-            "❌ Approval failed."
-        )
+    bot.edit_message_reply_markup(
+        call.message.chat.id,
+        call.message.message_id,
+        reply_markup=None
+    )
+
+    bot.send_message(
+        result["user_id"],
+        f"""🎉 Congratulations!
+
+Your *{result["plan"].title()} VIP Membership* has been approved.
+
+Welcome to MaveConnect VIP! 👑""",
+        parse_mode="Markdown"
+    )
 
 
 # ================= REJECT VIP =================
@@ -189,33 +195,36 @@ def approve_vip_callback(call):
 def reject_vip_callback(call):
 
     if str(call.from_user.id) != str(ADMIN_ID):
-        bot.answer_callback_query(call.id, "Unauthorized.")
+        bot.answer_callback_query(call.id, "Unauthorized")
         return
 
-    user_id = call.data.split("_")[1]
+    payment_id = call.data.split("_")[1]
 
-    success = reject_vip_payment(user_id)
+    user_id = reject_vip_payment(payment_id)
 
-    if success:
+    if not user_id:
 
         bot.answer_callback_query(
             call.id,
-            "❌ Payment Rejected."
+            "Rejection failed."
         )
 
-        bot.edit_message_reply_markup(
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-            reply_markup=None
-        )
+        return
 
-        bot.send_message(
-            user_id,
-            "❌ Your VIP payment has been rejected.\n\nIf you believe this is a mistake, please contact support."
-        )
+    bot.answer_callback_query(
+        call.id,
+        "Payment Rejected."
+    )
 
-    else:
-        bot.answer_callback_query(
-            call.id,
-            "Failed to reject payment."
-        )
+    bot.edit_message_reply_markup(
+        call.message.chat.id,
+        call.message.message_id,
+        reply_markup=None
+    )
+
+    bot.send_message(
+        user_id,
+        """❌ Your VIP payment has been rejected.
+
+If you believe this is an error, please contact MaveConnect Support."""
+    )
